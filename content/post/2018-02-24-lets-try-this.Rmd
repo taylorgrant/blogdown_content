@@ -1,0 +1,26 @@
+---
+title: Lets Try This
+author: ''
+date: '2018-02-24'
+slug: lets-try-this
+
+---
+
+This is a test to see how blogdown works. We'll eventually delte this. 
+
+We'll run some inline calculations here `{r} 2+2`
+
+And we'll include a table here 
+
+```{r, echo = FALSE}
+library(knitr)
+knitr::kable(mtcars)
+```
+
+And then, let's have a plot 
+
+```{r, echo = FALSE}
+library(ggplot2)
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, col = Species)) + 
+  geom_point()
+```
