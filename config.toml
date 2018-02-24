@@ -202,9 +202,9 @@ canonifyurls = true
     url = "https://plus.google.com/share?url=%s"
 
   [params.header.rightLink]
-  class = "open-algolia-search"
-  icon = "search"
-  url = "/#search"
+    class = ""
+    icon = ""
+    url = "/#about"
 
   # Customize link of author avatar in sidebar
   # [params.sidebar.profile]
