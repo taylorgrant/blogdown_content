@@ -1,0 +1,72 @@
+---
+title: Reading data into R
+author: ''
+date: '2018-02-24'
+slug: reading-data-into-r
+categories: 
+  - R
+tags:
+  - data
+  - ingest
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+```
+
+This is intended to document the many ways of getting data into R. Here, I want to showcase how data can be read the data into a session from various sources, without having to download a csv file first. We'll do it all in one step. 
+
+## Built in data sets 
+
+There are so many packages that come with datasets, it can be hard to keep track of all of them. While there isn't any one site that keeps track of all of them, Vincent Arel-Bundock has built out a pretty detailed composite of a lot of them [here](https://vincentarelbundock.github.io/Rdatasets/datasets.html). 
+
+As an example, let's load the airquality dataset and investigate the effects of ozone on air temperature. 
+
+```{r, airquality, warning = FALSE}
+data(airquality) 
+
+ggplot(airquality, aes(x = Ozone, y = Temp)) + 
+  geom_point(col = "dodgerblue") + 
+  facet_grid(~Month) + 
+  geom_smooth(method = 'lm') + 
+  theme_minimal()
+```
+
+## Reading in data from a URL
+
+As it has become the convention that data should be shared publicly, there are lots of wonderful places to find data online. For instance, here is one [great collection](https://github.com/caesar0301/awesome-public-datasets) of data sources. An easy source for good data is the [FiveThirtyEight](https://github.com/fivethirtyeight/data) data page on github, which provides data for all of their articles. 
+
+Any csv that has a direct link to it can be downloaded using the ```readr``` package. In this case, we'll read in the raw csv used for their [Fandango piece](https://fivethirtyeight.com/features/fandango-movies-ratings/) and recreate a version of their data viz. 
+
+```{r , fandango, message = FALSE, warning = FALSE}
+fan <- read_csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv")
+
+starseq <- data.frame(Site = c(rep("Fandango_Stars",10), rep("IMDB_norm_round",10),
+                               rep("Metacritic_norm_round",10), rep("RT_norm_round", 10)),
+                               Stars = rep(seq(0.5,5,.5), 4))
+
+fan %>% gather("Site", "Stars", c(7,14,16,18)) %>%
+  select(Site, Stars) %>% group_by(Site, Stars) %>% tally %>% 
+  mutate(frac = n / nrow(fan)) %>% right_join(starseq) %>%
+  mutate(frac = ifelse(is.na(frac), 0, frac)) %>%
+  ggplot(aes(x = Stars, y = frac, group = Site)) + 
+  # geom_area(stat = "identity", position = "stack") + 
+  geom_ribbon(aes(ymin = 0, ymax = frac, group = Site), fill = "gray",
+              alpha = .6) + 
+    geom_line(aes(col = Site)) + 
+  scale_y_continuous(labels = scales::percent) +
+  scale_color_manual(values = c("red", "blue", "purple", "#3F3F3F"),
+                     labels = c("Fandango", "IMDB", 
+                                "Metacritic", "Rotten Tomatoes")) + 
+  theme_minimal() + 
+    theme(legend.position = "bottom") + 
+  labs(x = "Stars", y = "", 
+       title = "Fandango LOVES Movies")
+```
+
+
+
+
+
