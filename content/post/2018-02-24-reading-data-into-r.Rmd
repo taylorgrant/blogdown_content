@@ -96,7 +96,7 @@ unzip(path_unzip, exdir = "data/unzipped/.")
 
 With the data unzipped, we can read specific files in from the directory. In this case, we'll map out how many players were born in each US state since 1950. 
 
-```{r, map, warning = FALSE, message = FALSE}
+```{r, cache = TRUE, map, warning = FALSE, message = FALSE}
 # read in the csv, filter and tally
 players <- read_csv(here("data/unzipped/baseballdatabank-2017.1/core/Master.csv")) %>%
   filter(birthYear > 1950 & birthCountry == "USA") %>%
