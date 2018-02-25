@@ -33,7 +33,7 @@ canonifyurls = true
 [author]
   name = "Taylor Grant"
   bio = "Rather than search Stack Overflow one more time, I decided to create this."
-  job = "Director, Data and Analytics"
+  job = "Director of Data and Analytics, RED Interactive"
   location = "Manhattan Beach"
   # Your Gravatar email. Overwrite `author.picture` everywhere in the blog
   gravatarEmail = ""
@@ -88,7 +88,7 @@ canonifyurls = true
   identifier = "stackoverflow"
   name = "Stack Overflow"
   pre = "<i class=\"sidebar-button-icon fa fa-lg fa-stack-overflow\"></i>"
-  url = "https://stackoverflow.com/users/636472/kakawait"
+  url = "https://stackoverflow.com/users/8940397/taylor"
 
 [[menu.misc]]
   weight = 1
