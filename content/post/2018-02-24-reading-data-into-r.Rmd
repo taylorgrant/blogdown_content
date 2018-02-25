@@ -272,3 +272,4 @@ df %>% select(WAR, G, `K%`, SB, BsR, PA, Def) %>%
     strip.background = element_rect(fill="gray", colour = "transparent"))
 ```
 
+~fin~
