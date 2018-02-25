@@ -81,16 +81,15 @@ So, what's going on here? First, is the label, this is how the computer will ref
 
 Now that you have the plist, it needs to be saved as `com.LABEL_NAME.plist`, and where you save it depends on your permissions. If you are User Agent - meaning that you must be logged in - you save the file in `~Library/LaunchAgents`. See [here](http:www.launchd.info) for the full breakdown of permissions and the requisite locations for the plist to go. 
 
-**3. Load the plist into launchctl**
+**3. Load the plist into launchd**
 
 Once it's saved, open Terminal and it's time to load the plist job into launchd. 
 
-To load the job, you use `launchctl load /Users/path/to/LaunchAgents/com.LABEL_NAME.plist`. 
-To unload, it's the same, but unload rather than load. 
+To load the job, you use `launchctl load /Users/path/to/LaunchAgents/com.LABEL_NAME.plist`. To unload, it's the same command, but unload rather than load. I'm not positive about such things, but out of an abundance of caution if I make any changes to my plist file I unload and then reload it into launchd.
 
-All current jobs can be seen using the command `launchctl list`, or you can call your job specifically using `launchctl list | grep com.LABEL_NAME`. Next to each plist job is a Status code. 0 means fine, anything else probably means something is wrong. If the job returns a non-zero status, you can look up the code in terminal using `launch ctl #` where # is the Status code. 
+All current jobs on the computer can be seen using the command `launchctl list`, or you can call your job specifically using `launchctl list | grep com.LABEL_NAME`. To the left of each plist job is a Status code. 0 status means everything is working, anything else probably means something is wrong. If the job returns a non-zero status, you can look up the code in terminal using `launch ctl #` where # is the Status code. 
 
-And that, is basically that. The automation works as long as the computer is on and not in sleep mode.  
+And that, is basically that. The automation works as long as the computer is on and not in sleep mode. It's certainly not as simple as simply setting a cronjob in Linux, but given the benefits of automation the process is worth it.   
 
 
 
