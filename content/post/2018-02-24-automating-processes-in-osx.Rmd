@@ -35,11 +35,13 @@ The command `#!/bin/bash` tells the computer that this is a bash file. The full 
 
 Now save the bash file. 
 
+Note that it's a good idea to see if the bash file will run on its own in terminal. Give yourself permission to do so with the command `chmod +x /path/to/bashScript.sh.
+
 **2. Write a plist file.** 
 
 plist files are awful. They are written in xml and they're not at all intuitive to write. The site [http:www.launchd.info](http:www.launchd.info) provides a full breakdown of how to write a plist and all of the different configurations that can be had. 
 
-If you don't want to struggle through writing these things from scratch, there are applications that can do this for you. The easiest that I've found is Launch Control, which is a drag and drop application that helps to set all options that are necessary for your job. Launch Control can be found online, or if you have Homebrew, you can use `brew install launchcontrol` and it will download for you. Note that Launch Control now requires a $10 payment to create jobs. 
+If you don't want to struggle through writing these things from scratch, there are applications that can do this for you. The easiest that I've found is Launch Control, which is a drag and drop application that helps to set all options that are necessary for your job. Launch Control can be found online, or if you have Homebrew, you can use `brew install launchcontrol` and it will download for you. Note that Launch Control used to be free, but now has a $10 license to create new jobs or modify current jobs. 
 
 This is what my plist file looked like when I was through. 
 
