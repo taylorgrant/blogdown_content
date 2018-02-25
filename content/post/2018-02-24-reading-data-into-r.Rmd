@@ -10,6 +10,7 @@ tags: ["data ingest"]
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(readxl)
+library(here)
 ```
 
 This is intended to document the many ways of getting data into R. Here, I want to showcase how data can be read the data into a session from various sources, without having to download a csv file first. We'll do it all in one step. 
@@ -62,7 +63,83 @@ fan %>% gather("Site", "Stars", c(7,14,16,18)) %>%
        title = "Fandango LOVES Movies")
 ```
 
+## Reading in a zip file
 
+When datasets are kept in a compressed form like a zip file, R has the capability of downloading and unzipping those files. The first thing we do is create a temporary directory for the data, then download the archive, then unzip the files and read the data. 
+
+As an example, we'll download, read, and plot some of the data from the [Lahman Baseball Database](http://www.seanlahman.com/baseball-archive/statistics/)
+
+```{r eval = FALSE} 
+library(tidyverse)
+
+# create temporary directory for data
+ifelse(!dir.exists("data/unzipped"), dir.create("data/unzipped"), "Directory already exists...")
+
+# specify zip URL 
+url <- "http://seanlahman.com/files/database/baseballdatabank-2017.1.zip"
+
+# put zip contents into temp file
+tmp <- tempfile()
+download.file(url, destfile = tmp)
+unzip(tmp, exdir = "unzipped/.")
+```
+
+We can keep the unzipped contents in a separate folder if the data is large and time consuming to download. 
+
+```{r eval = FALSE} 
+path_unzip <- "unzipped/data_archive.zip"
+ifelse(!file.exists(path_unzip), 
+       download.file(url, path_unzip, mode = "wb"),
+       "file already exists")
+unzip(path_unzip, exdir = "unzipped/.")
+```
+
+With the data unzipped, we can read specific files in from the directory. In this case, we'll map out how many players were born in each US state since 1950. 
+
+```{r, warning = FALSE, message = FALSE}
+# read in the csv, filter and tally
+players <- read_csv(here("data/unzipped/baseballdatabank-2017.1/core/Master.csv")) %>%
+  filter(birthYear > 1950 & birthCountry == "USA") %>%
+  distinct(playerID, .keep_all = TRUE) %>%
+  group_by(birthState) %>% 
+  rename(iso_3166_2 = birthState) %>%
+  tally %>%
+  mutate(logN = log(n))
+    
+# get map data 
+library(pacman)
+p_load(albersusa, sf, sp, rgeos, maptools, ggplot2, 
+       ggalt, ggthemes, viridis, scales)
+
+us <- usa_composite()
+us_map <- fortify(us, region="name")
+# merge player dataframe into us data
+us@data <- us@data %>% left_join(players)
+
+# set the max for the brightest color
+max <- max(us@data$n)
+min <- min(us@data$n)
+
+
+# map it out 
+gg <- ggplot()
+gg <- gg + geom_map(data=us_map, map=us_map,
+                    aes(x=long, y=lat, map_id=id),
+                    color="#2b2b2b", size=0.1, fill=NA)
+gg <- gg + theme_map()
+
+gg + 
+  geom_map(data=us@data, map=us_map,
+           aes(fill=n, map_id=name),
+           color="white", size=0.1) +
+  coord_map("polyconic") +
+  labs(title = "Number of major leaguers from each state since 1950") + 
+  scale_fill_viridis(trans = "log", breaks = c(min(players$n), median(players$n), max(players$n)),
+                     option = "A") +
+  theme(legend.position="right", 
+        legend.title = element_blank(),
+        legend.key.width=unit(1, "lines"))
+```
 
 
 
