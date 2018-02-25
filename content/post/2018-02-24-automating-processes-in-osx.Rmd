@@ -1,0 +1,94 @@
+---
+title: Automating processes in OSX
+author: ''
+date: '2018-02-24'
+slug: automating-processes-in-osx
+categories:
+  - OSX
+tags:
+  - cron
+---
+
+I recently had to set up an automated process on a Mac, and I'm writing this down so that I don't have to struggle through this process again. 
+
+The first thing to note is that Apple has moved away from cron, and instead moves users into the world of launchd. This means that if you're using a Mac, the R package, ```cronr``` and its RStudio addins will unfortunately not work, nor will setting a cronjob through terminal (in my experience, cronjobs aren't saved). 
+
+In this case, let's assume that we wanted to automate an R script that was going to run on a specific day of the week at a specific time. What follows is how to do accomplish this goal. <br>
+
+**1. Create a bash script that can be run through launchd.**
+
+If we were to physically run an R script in terminal, we would simply use a command like this: 
+
+`Rscript ./path/to/script.R`
+
+But as we'll see, when a plist gets loaded, the Program Argument has to call the program to run, and it needs to be a single string; we can't preface our command with `Rscript`. To get around this, we'll create and call a bash script that will then call the Rscript that will eventually run. 
+
+So, we open a new text file in RStudio, and we write the following: 
+
+``` 
+#!/bin/bash
+
+/usr/local/bin/Rscript "path/to/our/script.R"
+```
+
+The command `#!/bin/bash` tells the computer that this is a bash file. The full path to R is needed because when the process is run in launchd, my computer was having trouble locating R. This is the standard location of R when it's installed, but it's possible that R is elsewhere -- to find its location, in terminal type `which R`. Finally, include the full path to the R script that should be run, don't shorten with the `~/` prefix, on a Mac, start with `/Users/...`
+
+Now save the bash file. 
+
+**2. Write a plist file.** 
+
+plist files are awful. They are written in xml and they're not at all intuitive to write. The site [http:www.launchd.info](http:www.launchd.info) provides a full breakdown of how to write a plist and all of the different configurations that can be had. 
+
+If you don't want to struggle through writing these things from scratch, there are applications that can do this for you. The easiest that I've found is Launch Control, which is a drag and drop application that helps to set all options that are necessary for your job. Launch Control can be found online, or if you have Homebrew, you can use `brew install launchcontrol` and it will download for you. Note that Launch Control now requires a $10 payment to create jobs. 
+
+This is what my plist file looked like when I was through. 
+
+```
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.LABEL_NAME</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/path/to/bashShellScript.sh</string>
+    </array>
+    <key>RunAtLoad</key>
+    <false/>
+    <key>StandardErrorPath</key>
+    <string>/Users/path/to/file.err</string>
+    <key>StandardOutPath</key>
+    <<string>/Users/path/to/file.out</string>
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict>
+            <key>Hour</key>
+            <integer>6</integer>
+            <key>Minute</key>
+            <integer>00</integer>
+            <key>Weekday</key>
+            <integer>1</integer>
+        </dict>
+    </array>
+</dict>
+</plist>
+```
+
+So, what's going on here? First, is the label, this is how the computer will reference the job. The ProgramArguments has the actual location that the bash script is located. RunAtLoad determines whether the script runs when it is first loaded into the launchctl. Setting this to True, and having the bash script call a simple R script is a good way of debugging the pathing and ensuring that the computer can find all programs and files. The Error and Out paths specify where error and output logs are stored. These aren't necessary, but the error log is helpful. Finally, my plist references the calendar interval because I only want to run my script once per week. Weekday ranges from 0 to 7, Sundays are 0 and 7 (that makes no sense), Monday through Friday are 1 through 5 respectively, and Saturday is 6. 
+
+Now that you have the plist, it needs to be saved as `com.LABEL_NAME.plist`, and where you save it depends on your permissions. If you are User Agent - meaning that you must be logged in - you save the file in `~Library/LaunchAgents`. 
+
+**3. Load the plist into launchctl**
+
+Once it's saved, open Terminal and it's time to load the plist job into launchd. 
+
+To load the job, you use `launchctl load /Users/path/to/LaunchAgents/com.LABEL_NAME.plist`. 
+To unload, it's the same, but unload rather than load. 
+
+All current jobs can be seen using the command `launchctl list`, or you can call your job specifically using `launchctl list | grep com.LABEL_NAME`. Next to each plist job is a Status code. 0 means fine, anything else probably means something is wrong. If the job returns a non-zero status, you can look up the code in terminal using `launch ctl #` where # is the Status code. 
+
+And that is basically that. 
+
+
+
