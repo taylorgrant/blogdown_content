@@ -15,7 +15,7 @@
 baseURL = "https://taylorgrant.netlify.com/"
 languageCode = "en-us"
 defaultContentLanguage = "en-us"
-title = ""
+title = "A superbly produced duck"
 theme = "hugo-tranquilpeak-theme"
 disqusShortname = ""
 # googleAnalytics = "UA-123-45"
