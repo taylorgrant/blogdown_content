@@ -35,7 +35,7 @@ The command `#!/bin/bash` tells the computer that this is a bash file. The full 
 
 Now save the bash file. 
 
-Note that it's a good idea to see if the bash file will run on its own in terminal. Give yourself permission to do so with the command `chmod +x /path/to/bashScript.sh`.
+Note that it's a good idea to see if the bash file will run on its own in terminal. Run it with the command `bash /path/to/rShellScript.sh`, or if your script lives in the current directory, with `bash ./rShellScript.sh`. It may be the case that you have to give yourself permission to run the script; do so with the command `chmod +x /path/to/rShellScript.sh`.
 
 **2. Write a plist file.** 
 
@@ -54,7 +54,7 @@ This is what my plist file looked like when I was through.
     <string>com.LABEL_NAME</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/Users/path/to/bashShellScript.sh</string>
+        <string>/Users/path/to/rShellScript.sh</string>
     </array>
     <key>RunAtLoad</key>
     <false/>

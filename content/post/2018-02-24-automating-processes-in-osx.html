@@ -24,7 +24,7 @@ tags:
 /usr/local/bin/Rscript &quot;path/to/our/script.R&quot;</code></pre>
 <p>The command <code>#!/bin/bash</code> tells the computer that this is a bash file. The full path to R is needed because when the process is run in launchd, my computer was having trouble locating R. This is the standard location of R when it’s installed, but it’s possible that R is elsewhere – to find its location, in terminal type <code>which R</code>. Finally, include the full path to the R script that should be run, don’t shorten with the <code>~/</code> prefix, on a Mac, start with <code>/Users/...</code></p>
 <p>Now save the bash file.</p>
-<p>Note that it’s a good idea to see if the bash file will run on its own in terminal. Give yourself permission to do so with the command <code>chmod +x /path/to/bashScript.sh</code>.</p>
+<p>Note that it’s a good idea to see if the bash file will run on its own in terminal. Run it with the command <code>bash /path/to/rShellScript.sh</code>, or if your script lives in the current directory, with <code>bash ./rShellScript.sh</code>. It may be the case that you have to give yourself permission to run the script; do so with the command <code>chmod +x /path/to/rShellScript.sh</code>.</p>
 <p><strong>2. Write a plist file.</strong></p>
 <p>plist files are awful. They are written in xml and they’re not at all intuitive to write. The site <a href="http:www.launchd.info" class="uri">http:www.launchd.info</a> provides a full breakdown of how to write a plist and all of the different configurations that can be had.</p>
 <p>If you don’t want to struggle through writing these things from scratch, there are applications that can do this for you. The easiest that I’ve found is Launch Control, which is a drag and drop application that helps to set all options that are necessary for your job. Launch Control can be found online, or if you have Homebrew, you can use <code>brew install launchcontrol</code> and it will download for you. Note that Launch Control used to be free, but now has a $10 license to create new jobs or modify current jobs.</p>
@@ -37,7 +37,7 @@ tags:
     &lt;string&gt;com.LABEL_NAME&lt;/string&gt;
     &lt;key&gt;ProgramArguments&lt;/key&gt;
     &lt;array&gt;
-        &lt;string&gt;/Users/path/to/bashShellScript.sh&lt;/string&gt;
+        &lt;string&gt;/Users/path/to/rShellScript.sh&lt;/string&gt;
     &lt;/array&gt;
     &lt;key&gt;RunAtLoad&lt;/key&gt;
     &lt;false/&gt;
