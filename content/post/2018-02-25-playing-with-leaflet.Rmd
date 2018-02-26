@@ -64,7 +64,7 @@ Since I'm just doing this for the map, I'm not pulling any of it. I only want th
 
 First, I need to load the packages that will be used for this. Then we can go ahead with our revisions.
 
-```{r, eval = FALSE, echo = FALSE}
+```{r, eval = FALSE}
 library(tidyverse)
 library(leaflet)
 library(mapsapi)
@@ -172,7 +172,7 @@ rev_get_segments <- function()  {
 
 And now we'll run our list of destinations through the function and map it using the ```leaflet``` package. Clicking on any of the segments will tell you the ultimate destination. 
 
-```{r}
+```{r, echo = FALSE}
 df <- rev_get_segments()
 
 pal = colorFactor(
