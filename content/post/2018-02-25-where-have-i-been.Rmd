@@ -63,7 +63,7 @@ trips <- trips %>% left_join(cities, by = c("To" = "city")) %>%
   left_join(cities, by = c("From" = "city"))
 ```
 
-Now that I have the latitiudes and longitudes of each city that I travelled from and to, I can think about mapping the last seven years of trips. But when looking at my trips - 5 of these 8 years I was in grad school - it's apparent that while I travelled a bit, I didn't travel that far afield. This means that using a full world map doesn't make the most sense. 
+Now that I have the latitiudes and longitudes of each city that I travelled from and to, I can think about mapping the last eight years of trips. But when looking at my trips - 5 of these 8 years I was in grad school - it's apparent that while I travelled a bit, I didn't travel that far afield. This means that using a full world map doesn't make the most sense. 
 
 Instead, I'm going to cut down my map by specific lat and long limits, and to ensure that I have a good looking map, I'm going to use a Mercator projection of a world map using the ggplot2 ```map_data``` command. 
 
