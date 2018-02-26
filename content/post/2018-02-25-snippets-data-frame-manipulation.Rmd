@@ -1,0 +1,86 @@
+---
+title: 'Snippets: data frame manipulation'
+author: ''
+date: '2018-02-25'
+slug: snippets-data-frame-manipulation
+categories:
+  - R
+tags:
+  - dataframe
+---
+
+```{r , setup, include = FALSE}
+library(here)
+library(tidyverse)
+mlb <- read_csv(here('data', 'mlb.csv'))
+```
+
+Snippet files are periodically updated with how-to's for data wrangling. These commands are relevant for data frames and their manipulation. 
+
+### Multiple character columns to numeric
+```{r eval = FALSE}
+# can either reference columns by position or names
+df[c(1,3,5,9)] <- sapply(df[c(1,3,5,9)], as.numeric)
+```
+
+### Data frame factor to character 
+```{r eval = FALSE}
+df <- df %>% mutate_if(is.factor, as.character)
+
+# this can also be done using the purrr package 
+library(purrr)
+library(dplyr)
+df <- df %>% map_if(is.factor, as.character) %>% as_data_frame
+```
+
+### Renaming columns with special characters
+This is primarily useful if special characters are necessary for graphing.  
+```{r eval = TRUE}
+# can also reference with specific columns using names(df)[i:j]
+names(mlb)
+# choose which cols to name change
+names(mlb)[1:17] <- gsub(x = names(mlb)[1:17], pattern = "\\.", replacement = "%")
+# now can add in the + to the final column
+names(mlb) <- gsub(x = names(mlb), pattern = "\\.", replacement = "+")
+names(mlb)
+```
+
+### Setting NAs to Zero 
+Assume a data frame that has NAs and you want to set any NA to zero, it is straightforward to do so. 
+```{r eval = TRUE}
+df <- tibble(x = c(1,NA,3,NA,5), 
+                 y = c(1:5),
+                 z = x ^ 2 + y) %>%
+  data.frame()
+df[is.na(df)] <- 0
+head(df)
+```
+
+We can also selectively choose the column to change by referencing it specifically 
+```{r eval = TRUE}
+df <- tibble(x = c(1,NA,3,NA,5), 
+                 y = c(1,NA,3,NA,5),
+                 z = 1:5) %>%
+  data.frame()
+df$x[is.na(df$x)] <- 0
+head(df)
+```
+
+Or, within a dplyr pipe, we can use this, and this will work across the entire data frame 
+```{r eval = FALSE}
+mutate_all(funs(replace(., is.na(.), 0)))
+```
+
+### Replacing NAs with Previous Value by Group
+Occasionally you can end up with a data frame that has a series of NA, such as below. The goal is to replace those NA simply. The ```tidyr``` package can handle this with the ```fill``` command. Note that this is a slow process though, so if you have a large dataframe, this is probably not the best option. 
+``` {r eval = TRUE}
+df <- data.frame(userID = c(rep(21, 10), rep(22, 10)), 
+                 date = c("2017-12-10", rep(NA, 9), 
+                          rep("2017-12-11", 10)))
+df
+
+df %>% group_by(userID) %>% 
+  fill(date)
+```
+
+
