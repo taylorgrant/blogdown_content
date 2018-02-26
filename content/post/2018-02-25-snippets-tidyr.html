@@ -113,44 +113,45 @@ event &lt;- sample(letters, 15)
 data &lt;- data.frame(date, hour, min, second, event)
 data</code></pre>
 <pre><code>##          date hour min second event
-## 1  2018-01-01    3  25     16     a
-## 2  2018-01-02    1  23     48     c
-## 3  2018-01-03   24  21     26     u
-## 4  2018-01-04   22  37     45     t
-## 5  2018-01-05    6  39     58     s
-## 6  2018-01-06    7  10     43     e
-## 7  2018-01-07   14  42     21     o
-## 8  2018-01-08   20  14      2     y
-## 9  2018-01-09   11  59     39     k
-## 10 2018-01-10   19  51     41     b
-## 11 2018-01-11   23  33     19     h
-## 12 2018-01-12   16  49     11     d
-## 13 2018-01-13   18  55     10     r
-## 14 2018-01-14   12  18     18     w
-## 15 2018-01-15   21  47     53     n</code></pre>
+## 1  2018-01-01   15  39     15     d
+## 2  2018-01-02   21  52     33     v
+## 3  2018-01-03   18  41     55     o
+## 4  2018-01-04    5  11     18     b
+## 5  2018-01-05   16  24     16     m
+## 6  2018-01-06   20  15     14     p
+## 7  2018-01-07   24  40     59     x
+## 8  2018-01-08    3  43     42     t
+## 9  2018-01-09   17   2     53     q
+## 10 2018-01-10    4  49     56     u
+## 11 2018-01-11   22  54     38     e
+## 12 2018-01-12    6  23     52     s
+## 13 2018-01-13   23  53      3     c
+## 14 2018-01-14    1  26     32     l
+## 15 2018-01-15   11   5     37     i</code></pre>
 <pre class="r"><code>data %&gt;% unite(datetime, hour, min, second, sep = &quot;:&quot;)</code></pre>
 <pre><code>##          date datetime event
-## 1  2018-01-01  3:25:16     a
-## 2  2018-01-02  1:23:48     c
-## 3  2018-01-03 24:21:26     u
-## 4  2018-01-04 22:37:45     t
-## 5  2018-01-05  6:39:58     s
-## 6  2018-01-06  7:10:43     e
-## 7  2018-01-07 14:42:21     o
-## 8  2018-01-08  20:14:2     y
-## 9  2018-01-09 11:59:39     k
-## 10 2018-01-10 19:51:41     b
-## 11 2018-01-11 23:33:19     h
-## 12 2018-01-12 16:49:11     d
-## 13 2018-01-13 18:55:10     r
-## 14 2018-01-14 12:18:18     w
-## 15 2018-01-15 21:47:53     n</code></pre>
+## 1  2018-01-01 15:39:15     d
+## 2  2018-01-02 21:52:33     v
+## 3  2018-01-03 18:41:55     o
+## 4  2018-01-04  5:11:18     b
+## 5  2018-01-05 16:24:16     m
+## 6  2018-01-06 20:15:14     p
+## 7  2018-01-07 24:40:59     x
+## 8  2018-01-08  3:43:42     t
+## 9  2018-01-09  17:2:53     q
+## 10 2018-01-10  4:49:56     u
+## 11 2018-01-11 22:54:38     e
+## 12 2018-01-12  6:23:52     s
+## 13 2018-01-13  23:53:3     c
+## 14 2018-01-14  1:26:32     l
+## 15 2018-01-15  11:5:37     i</code></pre>
 <pre class="r"><code># the default separator is &quot;_&quot;, so if that doesn&#39;t work, change it as necessary</code></pre>
 <p>The <code>unite</code> function is also helpful when you need to spread multiple columns in a dataframe.</p>
 <pre class="r"><code>df &lt;- data.frame(quarter=rep(1:4,2),
                  section=rep(c(&quot;Sec1&quot;, &quot;Sec2&quot;), each=4),
                  QA=c(.9, .7, .6, .8, .6, .9, 1.0, .6),
                  QB=c(.6, .7, .8, .5, .6, .7, .5, .9))
+
 df</code></pre>
 <pre><code>##   quarter section  QA  QB
 ## 1       1    Sec1 0.9 0.6
@@ -167,9 +168,13 @@ df</code></pre>
                  QA=c(.9, .7, .6, .8, .6, .9, 1.0, .6),
                  QB=c(.6, .7, .8, .5, .6, .7, .5, .9))
 
-df %&gt;% gather(variable, value, -(quarter:section)) %&gt;%
-  unite(tmp, section, variable) %&gt;% 
-  spread(tmp, value)</code></pre>
+
+df &lt;- df %&gt;% 
+  gather(variable, value, -(quarter:section)) %&gt;%
+  unite(tmp, section, variable) %&gt;%
+  spread(tmp, value)
+
+df</code></pre>
 <pre><code>##   quarter Sec1_QA Sec1_QB Sec2_QA Sec2_QB
 ## 1       1     0.9     0.6     0.6     0.6
 ## 2       2     0.7     0.7     0.9     0.7

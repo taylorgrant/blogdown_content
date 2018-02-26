@@ -85,6 +85,7 @@ df <- data.frame(quarter=rep(1:4,2),
                  section=rep(c("Sec1", "Sec2"), each=4),
                  QA=c(.9, .7, .6, .8, .6, .9, 1.0, .6),
                  QB=c(.6, .7, .8, .5, .6, .7, .5, .9))
+
 df
 ```
 
@@ -96,9 +97,12 @@ df <- data.frame(quarter=rep(1:4,2),
                  QA=c(.9, .7, .6, .8, .6, .9, 1.0, .6),
                  QB=c(.6, .7, .8, .5, .6, .7, .5, .9))
 
-df %>% gather(variable, value, -(quarter:section)) %>%
-  unite(tmp, section, variable) %>% 
+
+df <- df %>% 
+  gather(variable, value, -(quarter:section)) %>%
+  unite(tmp, section, variable) %>%
   spread(tmp, value)
 
+df
 ```
 
