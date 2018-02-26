@@ -34,7 +34,7 @@ df <- df %>% map_if(is.factor, as.character) %>% as_data_frame
 ```
 
 ### Renaming columns with special characters
-This is primarily useful if special characters are necessary for graphing.  
+This is primarily useful if special characters are necessary for graphing. For instance, when reading in a csv that has special characters such as a `%` or `+` sign, R converts these to dots `(.)`. But if we were to try to use these variables in graphs, we need to put these characters back into the variable names.  
 ```{r eval = TRUE}
 # can also reference with specific columns using names(df)[i:j]
 names(mlb)
