@@ -1,0 +1,63 @@
+---
+title: 'Snippets: regular expressions regex'
+author: ''
+date: '2018-02-25'
+slug: snippets-regular-expressions-regex
+categories:
+  - R
+tags:
+  - regex
+  - stringr
+---
+
+Snippet files are periodically updated with how-to’s for data wrangling. These commands are relevant for regular expressions and string queries. 
+
+### Pulling out text before or after symbol/space/other
+```{r}
+# timestamp as example 
+stamp <- "2017-10-16T12:45:04PM"
+# time: pull out everything after the T
+gsub(".*\\T", "", stamp) 
+# date: pull out everything before the T
+gsub("\\T.*", "", stamp) 
+```
+
+### Splitting and pulling data after symbols. 
+
+There are also pure regex ways of achieving the same ends, but stringr is so easy. The `str_split` function returns a list, and we then pull out the specific list element that we want. This command works nicely when working with dataframes and `dplyr` - simply mutate with this command to create a new variable. 
+```{r}
+library(stringr)
+# assume a url with the following path, and we want to pull out the 
+# info after the 2nd slash
+urlPath <- "/t5/Announcements-and-Info/Bixby-Button-Short-Press-The-choice-is-yours/m-p/168685/highlight/true#M210"
+
+sapply(str_split(urlPath, "/"), "[[", 3)
+```
+
+### Remove commas and convert string to numeric
+This is actually taken directly from [hrbrmstr](https://rud.is/b/2017/11/02/yet-another-power-outages-post-full-tidyverse-edition/), who is fantastic. 
+```{r}
+to_num <- function(x) { as.numeric(stringi::stri_replace_all_fixed(x, ",", "")) }
+stringnum <- "100,954"
+to_num(stringnum)
+```
+
+### Add commas and convert numeric to string
+In the alternative, sometimes you want comma separators for pretty tables or something. 
+
+```{r}
+library(scales)    
+comma_format()(10000000)
+```
+
+### Pull out the last N and first N characters in string
+The ```str_sub``` function from the ```stringr``` package is useful for this. There are three arguments (string, from = start, to = end) - if you don't include "from" and "to" is positive, then it starts from character 1. If "from" is left out and "to" is negative, it starts from the last character in the string. 
+```{r}
+st <- "Thisstringhasnospaces"
+# Last word
+str_sub(st, -6)
+# First word  
+str_sub(st, 1, 4)
+# In between
+str_sub(st, 5, 10)
+```

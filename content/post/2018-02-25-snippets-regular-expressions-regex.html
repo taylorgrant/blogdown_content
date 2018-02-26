@@ -1,0 +1,66 @@
+---
+title: 'Snippets: regular expressions regex'
+author: ''
+date: '2018-02-25'
+slug: snippets-regular-expressions-regex
+categories:
+  - R
+tags:
+  - regex
+  - stringr
+---
+
+
+
+<p>Snippet files are periodically updated with how-to’s for data wrangling. These commands are relevant for regular expressions and string queries.</p>
+<div id="pulling-out-text-before-or-after-symbolspaceother" class="section level3">
+<h3>Pulling out text before or after symbol/space/other</h3>
+<pre class="r"><code># timestamp as example 
+stamp &lt;- &quot;2017-10-16T12:45:04PM&quot;
+# time: pull out everything after the T
+gsub(&quot;.*\\T&quot;, &quot;&quot;, stamp) </code></pre>
+<pre><code>## [1] &quot;12:45:04PM&quot;</code></pre>
+<pre class="r"><code># date: pull out everything before the T
+gsub(&quot;\\T.*&quot;, &quot;&quot;, stamp) </code></pre>
+<pre><code>## [1] &quot;2017-10-16&quot;</code></pre>
+</div>
+<div id="splitting-and-pulling-data-after-symbols." class="section level3">
+<h3>Splitting and pulling data after symbols.</h3>
+<p>There are also pure regex ways of achieving the same ends, but stringr is so easy. The <code>str_split</code> function returns a list, and we then pull out the specific list element that we want. This command works nicely when working with dataframes and <code>dplyr</code> - simply mutate with this command to create a new variable.</p>
+<pre class="r"><code>library(stringr)
+# assume a url with the following path, and we want to pull out the 
+# info after the 2nd slash
+urlPath &lt;- &quot;/t5/Announcements-and-Info/Bixby-Button-Short-Press-The-choice-is-yours/m-p/168685/highlight/true#M210&quot;
+
+sapply(str_split(urlPath, &quot;/&quot;), &quot;[[&quot;, 3)</code></pre>
+<pre><code>## [1] &quot;Announcements-and-Info&quot;</code></pre>
+</div>
+<div id="remove-commas-and-convert-string-to-numeric" class="section level3">
+<h3>Remove commas and convert string to numeric</h3>
+<p>This is actually taken directly from <a href="https://rud.is/b/2017/11/02/yet-another-power-outages-post-full-tidyverse-edition/">hrbrmstr</a>, who is fantastic.</p>
+<pre class="r"><code>to_num &lt;- function(x) { as.numeric(stringi::stri_replace_all_fixed(x, &quot;,&quot;, &quot;&quot;)) }
+stringnum &lt;- &quot;100,954&quot;
+to_num(stringnum)</code></pre>
+<pre><code>## [1] 100954</code></pre>
+</div>
+<div id="add-commas-and-convert-numeric-to-string" class="section level3">
+<h3>Add commas and convert numeric to string</h3>
+<p>In the alternative, sometimes you want comma separators for pretty tables or something.</p>
+<pre class="r"><code>library(scales)    
+comma_format()(10000000)</code></pre>
+<pre><code>## [1] &quot;10,000,000&quot;</code></pre>
+</div>
+<div id="pull-out-the-last-n-and-first-n-characters-in-string" class="section level3">
+<h3>Pull out the last N and first N characters in string</h3>
+<p>The <code>str_sub</code> function from the <code>stringr</code> package is useful for this. There are three arguments (string, from = start, to = end) - if you don’t include “from” and “to” is positive, then it starts from character 1. If “from” is left out and “to” is negative, it starts from the last character in the string.</p>
+<pre class="r"><code>st &lt;- &quot;Thisstringhasnospaces&quot;
+# Last word
+str_sub(st, -6)</code></pre>
+<pre><code>## [1] &quot;spaces&quot;</code></pre>
+<pre class="r"><code># First word  
+str_sub(st, 1, 4)</code></pre>
+<pre><code>## [1] &quot;This&quot;</code></pre>
+<pre class="r"><code># In between
+str_sub(st, 5, 10)</code></pre>
+<pre><code>## [1] &quot;string&quot;</code></pre>
+</div>
