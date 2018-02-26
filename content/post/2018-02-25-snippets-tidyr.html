@@ -113,52 +113,54 @@ event &lt;- sample(letters, 15)
 data &lt;- data.frame(date, hour, min, second, event)
 data</code></pre>
 <pre><code>##          date hour min second event
-## 1  2018-01-01   14   5     12     p
-## 2  2018-01-02    4  54     50     u
-## 3  2018-01-03   24  36      3     s
-## 4  2018-01-04    1  31      4     b
-## 5  2018-01-05   11  11     47     d
-## 6  2018-01-06   18  39     45     h
-## 7  2018-01-07   12  58      8     j
-## 8  2018-01-08   22  37     60     v
-## 9  2018-01-09   17   3     13     z
-## 10 2018-01-10   10  56     11     k
-## 11 2018-01-11    8   8     39     t
-## 12 2018-01-12    2   2     23     f
-## 13 2018-01-13    5  24     17     r
-## 14 2018-01-14   16  51     36     e
-## 15 2018-01-15   15  23     38     w</code></pre>
+## 1  2018-01-01    3  25     16     a
+## 2  2018-01-02    1  23     48     c
+## 3  2018-01-03   24  21     26     u
+## 4  2018-01-04   22  37     45     t
+## 5  2018-01-05    6  39     58     s
+## 6  2018-01-06    7  10     43     e
+## 7  2018-01-07   14  42     21     o
+## 8  2018-01-08   20  14      2     y
+## 9  2018-01-09   11  59     39     k
+## 10 2018-01-10   19  51     41     b
+## 11 2018-01-11   23  33     19     h
+## 12 2018-01-12   16  49     11     d
+## 13 2018-01-13   18  55     10     r
+## 14 2018-01-14   12  18     18     w
+## 15 2018-01-15   21  47     53     n</code></pre>
 <pre class="r"><code>data %&gt;% unite(datetime, hour, min, second, sep = &quot;:&quot;)</code></pre>
 <pre><code>##          date datetime event
-## 1  2018-01-01  14:5:12     p
-## 2  2018-01-02  4:54:50     u
-## 3  2018-01-03  24:36:3     s
-## 4  2018-01-04   1:31:4     b
-## 5  2018-01-05 11:11:47     d
-## 6  2018-01-06 18:39:45     h
-## 7  2018-01-07  12:58:8     j
-## 8  2018-01-08 22:37:60     v
-## 9  2018-01-09  17:3:13     z
-## 10 2018-01-10 10:56:11     k
-## 11 2018-01-11   8:8:39     t
-## 12 2018-01-12   2:2:23     f
-## 13 2018-01-13  5:24:17     r
-## 14 2018-01-14 16:51:36     e
-## 15 2018-01-15 15:23:38     w</code></pre>
+## 1  2018-01-01  3:25:16     a
+## 2  2018-01-02  1:23:48     c
+## 3  2018-01-03 24:21:26     u
+## 4  2018-01-04 22:37:45     t
+## 5  2018-01-05  6:39:58     s
+## 6  2018-01-06  7:10:43     e
+## 7  2018-01-07 14:42:21     o
+## 8  2018-01-08  20:14:2     y
+## 9  2018-01-09 11:59:39     k
+## 10 2018-01-10 19:51:41     b
+## 11 2018-01-11 23:33:19     h
+## 12 2018-01-12 16:49:11     d
+## 13 2018-01-13 18:55:10     r
+## 14 2018-01-14 12:18:18     w
+## 15 2018-01-15 21:47:53     n</code></pre>
 <pre class="r"><code># the default separator is &quot;_&quot;, so if that doesn&#39;t work, change it as necessary</code></pre>
 <p>The <code>unite</code> function is also helpful when you need to spread multiple columns in a dataframe.</p>
-<pre class="r"><code>df &lt;- data.frame(month=rep(1:3,2),
-                 student=rep(c(&quot;Amy&quot;, &quot;Bob&quot;), each=3),
-                 A=c(9, 7, 6, 8, 6, 9),
-                 B=c(6, 7, 8, 5, 6, 7))
+<pre class="r"><code>df &lt;- data.frame(quarter=rep(1:4,2),
+                 section=rep(c(&quot;Sec1&quot;, &quot;Sec2&quot;), each=4),
+                 QA=c(.9, .7, .6, .8, .6, .9, 1.0, .6),
+                 QB=c(.6, .7, .8, .5, .6, .7, .5, .9))
 df</code></pre>
-<pre><code>##   month student A B
-## 1     1     Amy 9 6
-## 2     2     Amy 7 7
-## 3     3     Amy 6 8
-## 4     1     Bob 8 5
-## 5     2     Bob 6 6
-## 6     3     Bob 9 7</code></pre>
+<pre><code>##   quarter section  QA  QB
+## 1       1    Sec1 0.9 0.6
+## 2       2    Sec1 0.7 0.7
+## 3       3    Sec1 0.6 0.8
+## 4       4    Sec1 0.8 0.5
+## 5       1    Sec2 0.6 0.6
+## 6       2    Sec2 0.9 0.7
+## 7       3    Sec2 1.0 0.5
+## 8       4    Sec2 0.6 0.9</code></pre>
 <p>What if we want to spread this so that each column relates to a section and a class average on two quizzes each quarter? We would use a lot of what the <code>tidyr</code> package has to offer - gather, unite, and then spread.</p>
 <pre class="r"><code>df &lt;- data.frame(quarter=rep(1:4,2),
                  section=rep(c(&quot;Sec1&quot;, &quot;Sec2&quot;), each=4),
