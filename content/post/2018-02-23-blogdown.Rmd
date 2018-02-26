@@ -5,7 +5,8 @@ date: '2018-02-23'
 slug: blogdown
 categories:
   - R
-tags: []
+tags: 
+  - blogdown
 ---
 
 I decided the other day that I didn't really like the blog capabilities that RStudio and Github pages offered. It was super easy to create the Rmarkdown documents, but in the end, the design was limited and I was struggling with some internal navigation issues. 
