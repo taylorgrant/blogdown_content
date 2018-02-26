@@ -1,0 +1,186 @@
+---
+title: Playing with the Google Maps API and leaflet
+author: ''
+date: '2018-02-25'
+slug: playing-with-leaflet
+categories:
+  - R
+tags:
+  - leaflet
+  - mapping
+---
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(leaflet)
+library(mapsapi)
+library(xml2)
+library(bitops)
+key <- "AIzaSyC-oYVm8_cDmBCS1bYWGZeKuftsUKXGoAc"
+```
+
+I just ran across a new package called ```mapsapi``` which has some nice functionality for pulling Google Maps information. In poking around, I didn't see any ability to get directions either to or from multiple locations. So I took a portion of the code from that package and rewrote it to do so. Is there much reason to do this? No, probably not, but it's fun.  
+
+First, I went [here](https://console.developers.google.com/apis) to get an API key - the one I created is for the Directions API, but there are several others available. 
+
+Then I specify our start and end points. In my case, I'm going to pick an origin in Manhattan Beach. We'll always start at the same place, but we're going to map out a number of popular tourist attractions around Los Angeles.  
+ 
+```{r}
+origin <- "3300 Vista Drive,Manhattan Beach, CA"
+destination <- c("2800 E Observatory Rd, Los Angeles, CA 90027",
+                 "200 Santa Monica Pier A, Santa Monica, CA 90401",
+                 "1200 Getty Center Dr, Los Angeles, CA 90049",
+                 "6925 Hollywood Blvd, Hollywood, CA 90028",
+                 "1151 Oxford Rd, San Marino, CA 91108",
+                 "1000 Vin Scully Ave, Los Angeles, CA 90012",
+                 "1313 Disneyland Dr, Anaheim, CA 92802",
+                 "100 Universal City Plaza, Universal City, CA 91608",
+                 "2301 N Highland Ave, Los Angeles, CA 90068",
+                 "5801 Wilshire Blvd, Los Angeles, CA 90036",
+                 "6333 W 3rd St, Los Angeles, CA 90036",
+                 "221 S Grand Ave, Los Angeles, CA 90012",
+                 "1126 Queens Hwy, Long Beach, CA 90802"
+                 )
+spot <- c("Griffith Park", "Santa Monica Pier", "Getty Center",
+          "Grauman's Chinese Theater", "Huntington Library", "Dodger Stadium",
+          "Disneyland", "Universal City Walk", "Hollywood Bowl", 
+          "La Brea Tar Pits", "Farmer's Market", "The Broad", "The Queen Mary")
+mode = c("driving", "transit", "walking", "bicycling")
+alternatives = FALSE
+```
+
+Next, we'll specify the urls for the Maps API. The API returns the information in JSON and XML formats, and the writer of the mapsapi package chose XML, which I'm not going to change here.
+
+```{r}
+url = paste0("https://maps.googleapis.com/maps/api/directions/xml?", 
+        "origin=", origin, "&destination=", destination, "&mode=", 
+        mode[1], "&alternatives=", tolower(alternatives))
+url = paste0(url, "&key=",key)
+```
+
+Now I just run those through a modified version of the mapsapi ```get_segments``` function, which is going to identify each segment of the trip. There is a bunch of information that comes with each segment including time for each segment, distance, the directions themselves, etc. 
+
+Since I'm just doing this for the map, I'm not pulling any of it. I only want the geometry for each segment. The revised function is below. 
+
+First, I need to load the packages that will be used for this. Then we can go ahead with our revisions.
+
+```{r, eval = FALSE, echo = FALSE}
+library(tidyverse)
+library(leaflet)
+library(mapsapi)
+library(xml2)
+library(bitops)
+```
+
+
+```{r, echo = FALSE}
+decode_line = function(encoded){
+  
+  vlen = nchar(encoded)
+  vindex = 0
+  varray = NULL
+  vlat = 0
+  vlng = 0
+  
+  while(vindex < vlen) {
+    vb = NULL
+    vshift = 0
+    vresult = 0
+    repeat{
+      if(vindex + 1 <= vlen) {
+        vindex = vindex + 1
+        vb = as.integer(charToRaw(substr(encoded, vindex, vindex))) - 63
+      }
+      
+      vresult = bitops::bitOr(vresult, bitShiftL(bitAnd(vb, 31), vshift))
+      vshift = vshift + 5
+      if(vb < 32) break
+    }
+    
+    dlat = ifelse(
+      bitops::bitAnd(vresult, 1),
+      -(bitops::bitShiftR(vresult, 1) + 1),
+      bitops::bitShiftR(vresult, 1)
+    )
+    vlat = vlat + dlat
+    
+    vshift = 0
+    vresult = 0
+    repeat{
+      if(vindex + 1 <= vlen) {
+        vindex = vindex + 1
+        vb = as.integer(charToRaw(substr(encoded, vindex, vindex))) - 63
+      }
+      
+      vresult = bitOr(vresult, bitops::bitShiftL(bitops::bitAnd(vb, 31), vshift))
+      vshift = vshift + 5
+      if(vb < 32) break
+    }
+    
+    dlng = ifelse(
+      bitops::bitAnd(vresult, 1),
+      -(bitops::bitShiftR(vresult, 1) + 1),
+      bitops::bitShiftR(vresult, 1)
+    )
+    vlng = vlng + dlng
+    
+    varray = rbind(varray, c(vlng * 1e-5, vlat * 1e-5))
+  }
+  colnames(varray) = c("lon", "lat")
+  varray
+}
+
+```
+
+```{r}
+# revised segments function
+rev_get_segments <- function()  {
+  
+  routes = list()
+  for(i in 1:length(url)) {
+    
+    x <- URLencode(url[i])
+    y <- xml2::read_xml(x)
+    
+    summary <- xml_find_all(y, sprintf("/DirectionsResponse/route[%s]/summary", 1)) %>% xml_text
+    steps <- xml_find_all(y, sprintf("/DirectionsResponse/route[%s]/leg/step/polyline/points", 1)) %>% xml_text %>% length
+    
+    for(j in 1:steps) {
+      
+      step =
+        xml_find_all(y, sprintf("/DirectionsResponse/route[%s]/leg/step[%s]/polyline/points", 1, j)) %>% xml_text 
+  
+      rt = decode_line(step)
+      rt = sf::st_linestring(rt)
+      rt = sf::st_sfc(rt, crs = 4326)
+      
+      routes[[paste(i, j, sep = "-")]] = sf::st_sf(
+        alternative_id = i,
+        segment_id = j,
+        location = spot[i],
+        summary = summary,
+        geometry = rt,
+        stringsAsFactors = FALSE
+      )
+    }
+  }
+  routes = do.call(rbind, routes)
+  
+  return(routes)
+}
+```
+
+And now we'll run our list of destinations through the function and map it using the ```leaflet``` package. Clicking on any of the segments will tell you the ultimate destination. 
+
+```{r}
+df <- rev_get_segments()
+
+pal = colorFactor(
+  palette = sample(colors(), length(unique(df$alternative_id))), 
+  domain = df$alternative_id
+)
+
+leaflet(df) %>% 
+  addProviderTiles("CartoDB.DarkMatter") %>%
+  addPolylines(opacity = 1, weight = 2, color = ~pal(alternative_id), popup = ~location)
+```
