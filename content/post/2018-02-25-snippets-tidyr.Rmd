@@ -1,0 +1,104 @@
+---
+title: 'Snippets: tidyr'
+author: ''
+date: '2018-02-25'
+slug: snippets-tidyr
+categories:
+  - R
+tags:
+  - tidyr
+---
+
+Snippet files are periodically updated with how-to’s for data wrangling. These commands are relevant for tidying dataframes - to rearrange data and normally to change the structure of the data for easier use. 
+
+### spread()
+
+Spread is based on the key, value pairing -- the key becomes the names of the new columns and the values are row values within each new column. 
+```{r, warning = FALSE, message = FALSE}
+library(tidyverse)
+dat <- read_csv("https://raw.githubusercontent.com/garrettgman/DSR/master/data-raw/table2.csv")
+
+dat
+
+dat %>% spread(key, value)
+```
+
+### gather()
+
+Gather is going to work in the opposite direction. It gathers the column names, puts them in a single column, and then matches the value to each row. Note that you need to specify the columns you want to bring into the gathering. 
+
+```{r, warning = FALSE, message = FALSE}
+library(tidyverse)
+dat <- read_csv("https://raw.githubusercontent.com/garrettgman/DSR/master/data-raw/table4.csv")
+
+dat
+
+dat %>% gather("year", "cases", 2:3)
+```
+
+Gather works similar to the dplyr function `select` in that you can also use the -varname to specify which variable isn't included. 
+
+```{r, warning = FALSE, message = FALSE}
+library(tidyverse)
+dat <- read_csv("https://raw.githubusercontent.com/garrettgman/DSR/master/data-raw/table4.csv")
+
+dat %>% gather(year, cases, -country)
+```
+
+### separate()
+
+Separate works when a dataframe includes compound variables - for instance, age and gender demographics. Separate works in one of two ways - first, you can pass it a regular expression to split on, but if you choose not to give it, it will default to non-alphanumeric character to split on, as below. 
+
+```{r}
+df <- data.frame(x = c(NA, "m.14", "f.20", "f.45"))
+df %>% separate(x, c("Gender", "Age"))
+```
+
+Second, you can tell it how many characters in to split on. If we change our example somewhat, we can see where this might be useful. 
+
+```{r}
+df <- data.frame(x = c(NA, "m14", "f20", "f45"))
+df %>% separate(x, c("Gender", "Age") , 1)
+```
+
+### unite()
+
+The `unite` function is helpful in that it pulls disparate columns together into one. To see how it works, we'll make some fake data, and then use `unite` to pull the hour, min, and second into a single variable. 
+
+```{r}
+date <- as.Date('2018-01-01') + 0:14
+hour <- sample(1:24, 15)
+min <- sample(1:60, 15)
+second <- sample(1:60, 15)
+event <- sample(letters, 15)
+data <- data.frame(date, hour, min, second, event)
+data
+
+data %>% unite(datetime, hour, min, second, sep = ":")
+# the default separator is "_", so if that doesn't work, change it as necessary
+```
+
+The `unite` function is also helpful when you need to spread multiple columns in a dataframe.
+
+```{r}
+df <- data.frame(month=rep(1:3,2),
+                 student=rep(c("Amy", "Bob"), each=3),
+                 A=c(9, 7, 6, 8, 6, 9),
+                 B=c(6, 7, 8, 5, 6, 7))
+df
+```
+
+What if we want to spread this so that each column relates to a section and a class average on two quizzes each quarter? We would use a lot of what the `tidyr` package has to offer - gather, unite, and then spread. 
+
+```{r}
+df <- data.frame(quarter=rep(1:4,2),
+                 section=rep(c("Sec1", "Sec2"), each=4),
+                 QA=c(.9, .7, .6, .8, .6, .9, 1.0, .6),
+                 QB=c(.6, .7, .8, .5, .6, .7, .5, .9))
+
+df %>% gather(variable, value, -(quarter:section)) %>%
+  unite(tmp, section, variable) %>% 
+  spread(tmp, value)
+
+```
+
