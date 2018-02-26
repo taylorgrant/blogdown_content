@@ -19,7 +19,7 @@ library(bitops)
 key <- "AIzaSyC-oYVm8_cDmBCS1bYWGZeKuftsUKXGoAc"
 ```
 
-I just ran across a new package called ```mapsapi``` which has some nice functionality for pulling Google Maps information. In poking around, I didn't see any ability to get directions either to or from multiple locations. So I took a portion of the code from that package and rewrote it to do so. Is there much reason to do this? No, probably not, but it's fun.  
+I ran across a package called ```mapsapi``` a while back, and it has some nice functionality for pulling Google Maps information. In poking around, I didn't see any ability to get directions either to or from multiple locations. So I took a portion of the code from that package and rewrote it to do so. Is there much reason to do this? No, probably not, but it's fun.  
 
 First, I went [here](https://console.developers.google.com/apis) to get an API key - the one I created is for the Directions API, but there are several others available. 
 
