@@ -9,7 +9,7 @@ tags:
   - tidyr
 ---
 
-Snippet files are periodically updated with how-to’s for data wrangling. These commands are relevant for tidying dataframes - to rearrange data and normally to change the structure of the data for easier use. 
+Snippet files are periodically updated with how-to’s for data wrangling. These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use. 
 
 ### spread()
 
@@ -25,7 +25,7 @@ dat %>% spread(key, value)
 
 ### gather()
 
-Gather is going to work in the opposite direction. It gathers the column names, puts them in a single column, and then matches the value to each row. Note that you need to specify the columns you want to bring into the gathering. 
+`gather` is going to work in the opposite direction. It gathers the column names, puts them in a single column, and then matches the value to each row. Note that you need to specify the columns you want to bring into the gathering. 
 
 ```{r, warning = FALSE, message = FALSE}
 library(tidyverse)
@@ -36,7 +36,7 @@ dat
 dat %>% gather("year", "cases", 2:3)
 ```
 
-Gather works similar to the dplyr function `select` in that you can also use the -varname to specify which variable isn't included. 
+`gather` works similar to the dplyr function `select` in that you can also use the -varname to specify which variable isn't included. 
 
 ```{r, warning = FALSE, message = FALSE}
 library(tidyverse)
@@ -47,7 +47,7 @@ dat %>% gather(year, cases, -country)
 
 ### separate()
 
-Separate works when a dataframe includes compound variables - for instance, age and gender demographics. Separate works in one of two ways - first, you can pass it a regular expression to split on, but if you choose not to give it, it will default to non-alphanumeric character to split on, as below. 
+`separate` works when a dataframe includes compound variables - for instance, age and gender demographics. `separate` works in one of two ways - first, you can pass it a regular expression to split on, but if you choose not to give it, it will default to non-alphanumeric character to split on, as below. 
 
 ```{r}
 df <- data.frame(x = c(NA, "m.14", "f.20", "f.45"))
