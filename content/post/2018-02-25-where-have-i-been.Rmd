@@ -1,0 +1,167 @@
+---
+title: Where have I been
+author: ''
+date: '2018-02-25'
+slug: where-have-i-been
+categories:
+  - R
+tags:
+  - mapping
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(ggmap)
+library(ggrepel)
+library(geosphere)
+library(sp)
+library(here)
+
+# load data 
+## read in the trips and cities data
+trips <- read_csv(here("data", "trips.csv"))
+cities <- read_csv(here("data", "cities.csv"))
+
+## add coordinates to the full trips sheet
+trips <- trips %>% left_join(cities, by = c("To" = "city")) %>%
+  left_join(cities, by = c("From" = "city"))
+```
+
+Several weeks ago I was having a slow day and so I started browsing through my Google Trips app when I realized that the app has read through *all of my emails* and decided where I'd travelled. Interesting! 
+
+It turns out that Google Trips isn't perfect - some "trips" never occurred, but were planned with enough specificity that Google thinks I'd gone - but despite these errors, I figured it might be interesting to see a composite of where I'd travelled these past years. To do so, I'll take all trips from the past 8 years that I actually went on and map them out.  
+
+My initial spreadsheet, labeled "trips" contains the year I travelled as well as the source and destination of where I travelled with city names specific enough that I could geocode them using the ```ggmap``` package. The following code will also create a second spreadsheet that saves the geocoded cities -- this saves me from having to redefine the coordinates of these cities everytime I decide to add new cities to the list after travelling.
+
+```{r, eval = FALSE, echo = TRUE}
+library(tidyverse)
+library(ggmap)
+library(ggrepel)
+library(geosphere)
+library(sp)
+
+## read in the trips and cities data
+trips <- read_csv("trips.csv")
+cities <- read_csv("cities.csv")
+if (file.exists("cities.csv")) {
+  cities <- read.csv("cities.csv")
+} else cities <- data.frame(city = NA, lat = NA, lon = NA)
+
+## coordinates for cities added to the sheet
+all_cities <- unique(c(trips$From, trips$To))
+new_cities <- all_cities[!(all_cities %in% cities$city)]
+if (length(new_cities) != 0) {
+  coords <- geocode(new_cities)
+  new_cities <- data.frame(city = new_cities, coords)
+  cities <- bind_rows(cities, new_cities)
+  cities <- cities %>% filter(!is.na(city))
+  write.csv(cities, "cities.csv", row.names = FALSE)
+}
+
+## add coordinates to the full trips sheet
+trips <- trips %>% left_join(cities, by = c("To" = "city")) %>%
+  left_join(cities, by = c("From" = "city"))
+```
+
+Now that I have the latitiudes and longitudes of each city that I travelled from and to, I can think about mapping the last seven years of trips. But when looking at my trips - 5 of these 8 years I was in grad school - it's apparent that while I travelled a bit, I didn't travel that far afield. This means that using a full world map doesn't make the most sense. 
+
+Instead, I'm going to cut down my map by specific lat and long limits, and to ensure that I have a good looking map, I'm going to use a Mercator projection of a world map using the ggplot2 ```map_data``` command. 
+
+```{r echo = TRUE, message = FALSE}
+world <- map_data("world")
+
+ggplot(world, mapping = aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "black", colour = "grey") +
+  coord_map(projection = "mercator")
+```
+
+Well, that generally looks terrible, and I can't even begin to explain why, but since I never went to the Yukon, we're going to drop everthing north of the 54th parallel, which might avoid those bands. To do so, and keep the map projection, I can convert the standard lat/long into the proper Mercator coordinates (Thank you [Stack Overflow](https://stackoverflow.com/questions/40078257/setting-map-limits-in-ggplot2-with-mercator-projection)). 
+
+```{r echo = TRUE, message = FALSE, warning = FALSE}
+## mercator projection for mapping 
+worldmerc <-  SpatialPointsDataFrame(coords = data_frame(x = world$long, y = world$lat), 
+                                     data = world, 
+                                     proj4string = CRS("+proj=longlat +datum=WGS84")) %>%
+  subset((lat < 90 & lat > -90)) %>%   # needed because transform not defined at the poles !!!!
+  spTransform(CRS("+init=epsg:3857")) 
+
+worldmerc  <-  mutate(worldmerc@data, 
+                      longmerc = coordinates(worldmerc)[,1], 
+                      latmerc = coordinates(worldmerc)[,2])
+```
+
+Now that my underlying map data has been converted to the proper Mercator coordinates, I am also going to have to convert the coordinates I'm using for my own travel points, as well as the latitude and longitude limits I'm going to impose on this map. I plan on overlaying the points on cities I've been to, as well as arcs connecting the cities. The arcs require one additional step because I need converted lats/longs for the From and To cities.  
+
+One final step that is required is that I have to give all of my data a "group." I'm still not entirely sure why, but it's an easy step and it doesn't require much thought. 
+
+```{r echo = TRUE, message = FALSE, warning = FALSE}
+# Limits for my travels
+xlim = c(-150, 20)
+ylim = c(-10, 54)
+
+lims = SpatialPoints(coords = data_frame(x = xlim, y = ylim),
+                     proj4string = CRS("+proj=longlat +datum=WGS84"))%>%
+  spTransform(CRS("+init=epsg:3857"))
+
+# mercator projection for airport points
+cities_merc <- SpatialPointsDataFrame(coords = data_frame(x = cities$lon, y = cities$lat),
+                                        data = cities,
+                                      proj4string = CRS("+proj=longlat +datum=WGS84")) %>%
+  subset((lat < 90 & lat > -90)) %>%   # needed because transform not defined at the poles !!!!
+  spTransform(CRS("+init=epsg:3857"))
+#
+cities_merc  <-  mutate(cities_merc@data, longmerc = coordinates(cities_merc)[,1],
+                          latmerc = coordinates(cities_merc)[,2])
+
+# mercator projections for From city
+trips_merc.x <- SpatialPointsDataFrame(coords = data_frame(x = trips$lon.x, y = trips$lat.x),
+                                       data = trips, proj4string = CRS("+proj=longlat +datum=WGS84")) %>%
+  subset((lat.x < 90 & lat.x > -90)) %>%   # needed because transform not defined at the poles !!!!
+  spTransform(CRS("+init=epsg:3857"))
+##
+trips_merc.x  <-  mutate(trips_merc.x@data, longmerc.x = coordinates(trips_merc.x)[,1],
+                          latmerc.x = coordinates(trips_merc.x)[,2])
+
+# mercator projections for To city
+trips_merc.y <- SpatialPointsDataFrame(coords = data_frame(x = trips$lon.y, y = trips$lat.y),
+                                         data = trips, proj4string = CRS("+proj=longlat +datum=WGS84")) %>%
+  subset((lat.y < 90 & lat.y > -90)) %>%   # needed because transform not defined at the poles !!!!
+  spTransform(CRS("+init=epsg:3857"))
+trips_merc.y  <-  mutate(trips_merc.y@data, longmerc.y = coordinates(trips_merc.y)[,1],
+                          latmerc.y = coordinates(trips_merc.y)[,2])
+
+# join together
+trips_merc <- trips_merc.x %>% left_join(trips_merc.y)
+#
+## add in group variables
+cities_merc$group <- 1
+trips_merc$group <- 1
+```
+
+After all of that, I can now create the map of my travels from 2010 through 2018 and color code the arcs by year. Some of these cities were visited multiple times over the years, so I just arbitrarily chose a single year that I traveled there, but it gives a good sense of where I've been overall. 
+
+```{r}
+ggplot(worldmerc, mapping = aes(x = longmerc, y = latmerc, group = group)) +
+  geom_polygon(fill = "#252525", colour = "#252525") +
+  coord_fixed(xlim = coordinates(lims)[,1], ylim = coordinates(lims)[,2]) +
+  theme(plot.margin = unit(c(0,0,0,0), "cm")) +
+  geom_point(data=cities_merc, aes(x = longmerc, y = latmerc, group = group),
+             col = "red", size = 1) +
+  geom_curve(data=trips_merc, aes(x = longmerc.x, y = latmerc.x, xend = longmerc.y,
+                               yend = latmerc.y, group = Year,
+                               col = factor(Year)), size = .4, curvature = .2) +
+  geom_text_repel(data=cities_merc, aes(x = longmerc, y = latmerc,
+                                        label = city, group = group),
+                  col = "white", size = 2.5, segment.color = "white",
+                  segment.size = .1) +
+  theme_void() +
+  theme(panel.background = element_rect(fill="#74add1"),
+        legend.title = element_blank(),
+        legend.margin=margin(t=-.5, r=0, b=0, l=0, unit="cm"),
+        legend.position = "bottom") +
+  guides(colour = guide_legend(nrow = 1,
+                               override.aes = list(size = 2)))
+```
+
+That's kind of fun! Now, if I were really going to push this forward I would animate the trips. Maybe I'll get to that the next time I'm having a slow day at work. 
+
