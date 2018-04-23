@@ -3,11 +3,12 @@ title: 'Snippets: R upkeep'
 author: ''
 date: '2018-04-23'
 slug: snippets-r-upkeep
-categories:
-  - R
+categories: 
+- R
 tags:
-  - R
-  - RStudio
+- R
+- RStudio
+
 ---
 
 Snippet files periodically updated. These functions and commands are relevant for working with R and RStudio. 
