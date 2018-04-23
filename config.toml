@@ -21,6 +21,7 @@ disqusShortname = ""
 # googleAnalytics = "UA-123-45"
 paginate = 7
 canonifyurls = true
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [permalinks]
   post = "/:year/:month/:slug/"
@@ -166,7 +167,6 @@ canonifyurls = true
   # Your favicon path, default is "/favicon.png"
   favicon = "http://res.cloudinary.com/dn83gtg0l/image/upload/v1519580839/favicon.png"
 
-  ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
   # Header configuration
   # The link at the right of the header is customizable
   # You can add a link (as an icon) at the right of the header instead of the author's gravatar image or author's picture.
