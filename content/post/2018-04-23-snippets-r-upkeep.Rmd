@@ -1,0 +1,38 @@
+---
+title: 'Snippets: R upkeep'
+author: ''
+date: '2018-04-23'
+slug: snippets-r-upkeep
+categories:
+  - R
+tags:
+  - R
+  - RStudio
+---
+
+Snippet files periodically updated. These functions and commands are relevant for working with R and RStudio. 
+
+### Easily updating R
+
+The `updateR` package is fantastic. Just using this line of code with the admin_password set will update everything and keep all packages in the new version of R. 
+
+```{r, eval = FALSE}
+updateR(admin_password = "admin_password")
+```
+
+### Finding all functions in a package
+
+This is especially useful when using a dev version of a package. Often, there are github files, but it's sometimes easier to just use `asNamespace` to see functions. 
+
+For example, let's look at the functions available within the spotifyR package. 
+
+```{r, echo = TRUE}
+fns <- unclass(lsf.str(envir = asNamespace("spotifyr"), all = T))
+
+fns
+```
+
+
+
+
+
