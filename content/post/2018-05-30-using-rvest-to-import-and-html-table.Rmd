@@ -1,0 +1,94 @@
+---
+title: Using rvest to import and HTML table
+author: ''
+date: '2018-05-30'
+slug: using-rvest-to-import-and-html-table
+categories:
+  - R
+tags:
+  - rvest
+  - scraping
+---
+
+I've always used the `rvest` package in tandem with the SelectorGadget to select the CSS of a table on a website, but it turns out that there is a much simpler way of extracting data tables from the web. Thanks to [this]("https://www.r-bloggers.com/using-rvest-to-scrape-an-html-table/") post, which I had not seen until now. 
+
+We'll start with an easy example using a table from a Wikipedia page, in this case we'll grab the most watched television broadcasts in the United States. What we're going to do is get to the page in Google Chrome and then right click to inspect the element. From there, find the table within the code and then right click and select "Copy Xpath". This is what we're going to direct `rvest` to scrape.   
+
+```{r echo = TRUE}
+pacman::p_load(tidyverse, rvest)
+
+url <- "https://en.wikipedia.org/wiki/List_of_most_watched_television_broadcasts_in_the_United_States"
+
+wiki_tv <- url %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[1]') %>%
+  html_table()
+
+head(wiki_tv)
+
+```
+
+Wikipedia has incredibly well behaved tables. Occasionally, there will be a little more work that needs to be done, but overall this is it. 
+
+As an example of a table that requires a little more work, we'll use the site [fangraphs.com]("https://www.fangraphs.com/"), and the site's offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.
+
+```{r echo = TRUE}
+pacman::p_load(tidyverse, rvest)
+
+url <- "https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=y&type=8&season=2018&month=0&season1=2018&ind=0"
+
+fans_off <- url %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="LeaderBoard1_dg1_ctl00"]') %>%
+  html_table()
+
+str(fans_off, list.len = 5)
+
+```
+
+As can be seen, this returned a list, which isn't quite what we wanted. But we can converst this into a tibble or dataframe pretty simply. Here, we'll use the same code, but structure it as a tibble. 
+
+```{r echo = TRUE}
+pacman::p_load(tidyverse, rvest)
+
+url <- "https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=y&type=8&season=2018&month=0&season1=2018&ind=0"
+
+fans_off <- url %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="LeaderBoard1_dg1_ctl00"]') %>%
+  html_table() %>%
+  .[[1]] %>% # pull out the first member of the list
+  as_tibble() # and convert to tibble
+
+head(fans_off)
+
+```
+
+We're almost there, but we can still see a few issues with the data. Rows 1 and 3 aren't useful and should be dropped, and we really want our 2nd row as our column names. Additionally, there are two more potential issues - first, our walk and k percentage columns include `%` signs, and second, all of our data is considered character class.  
+
+We will address all of these issues in a single bit of dplyr piped code. 
+ 
+```{r echo = TRUE}
+pacman::p_load(tidyverse, rvest, janitor)
+
+url <- "https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=y&type=8&season=2018&month=0&season1=2018&ind=0"
+
+fans_off <- url %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="LeaderBoard1_dg1_ctl00"]') %>%
+  html_table() %>%
+  .[[1]] %>% # pull out the first member of the list
+  as_tibble() %>% # and convert to tibble
+  setNames(.[2,]) %>% # identify colnames by row
+  slice(-c(1:3)) %>% # then use -slice to drop the first 3 
+  clean_names() %>% # love the janitor package
+  mutate_at(vars(bb_percent, k_percent), 
+            funs(str_replace_all(., " %", ""))) %>% # lose the % signs
+  mutate_at(vars(g:war), funs(as.numeric)) %>% # convert everything to numeric
+  select(-number) # drop the unnecessary first column
+
+head(fans_off)
+
+```
+
+And that's it. A nice, clean tibble that's ready for use. 
