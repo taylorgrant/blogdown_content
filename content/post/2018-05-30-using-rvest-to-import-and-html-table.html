@@ -25,16 +25,21 @@ wiki_tv &lt;- url %&gt;%
   .[[1]] %&gt;%
   as.tibble()
 
-head(wiki_tv)</code></pre>
-<pre><code>## # A tibble: 6 x 5
-##     No. Show              `Viewership (millions)` Date             Network
-##   &lt;int&gt; &lt;chr&gt;             &lt;chr&gt;                   &lt;chr&gt;            &lt;chr&gt;  
-## 1     1 Super Bowl XLIX   114.4                   February 1, 2015 NBC    
-## 2     2 Super Bowl XLVIII 112.2                   February 2, 2014 Fox    
-## 3     3 Super Bowl 50     111.9                   February 7, 2016 CBS    
-## 4     4 Super Bowl LI     111.3                   February 5, 2017 Fox    
-## 5     5 Super Bowl XLVI   111.3                   February 5, 2012 NBC    
-## 6     6 Super Bowl XLV    111.0                   February 6, 2011 Fox</code></pre>
+wiki_tv</code></pre>
+<pre><code>## # A tibble: 21 x 5
+##      No. Show              `Viewership (millions)` Date            Network
+##    &lt;int&gt; &lt;chr&gt;             &lt;chr&gt;                   &lt;chr&gt;           &lt;chr&gt;  
+##  1     1 Super Bowl XLIX   114.4                   February 1, 20… NBC    
+##  2     2 Super Bowl XLVIII 112.2                   February 2, 20… Fox    
+##  3     3 Super Bowl 50     111.9                   February 7, 20… CBS    
+##  4     4 Super Bowl LI     111.3                   February 5, 20… Fox    
+##  5     5 Super Bowl XLVI   111.3                   February 5, 20… NBC    
+##  6     6 Super Bowl XLV    111.0                   February 6, 20… Fox    
+##  7     7 Super Bowl XLVII  108.7                   February 3, 20… CBS    
+##  8     8 Super Bowl XLIV   106.5                   February 7, 20… CBS    
+##  9     9 M*A*S*H (Finale)  105.9[4]                February 28, 1… CBS    
+## 10    10 Super Bowl LII    103.4                   February 4, 20… NBC    
+## # ... with 11 more rows</code></pre>
 <p>Wikipedia has incredibly well behaved tables. Occasionally, there will be a little more work that needs to be done, but overall this is it.</p>
 <p>As an example of a table that requires a little more work, we’ll use the site <a href="%22https://www.fangraphs.com/%22">fangraphs.com</a>, and the site’s offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.</p>
 <pre class="r"><code>pacman::p_load(tidyverse, rvest)

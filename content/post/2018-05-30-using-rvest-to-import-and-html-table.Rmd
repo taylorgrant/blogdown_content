@@ -26,7 +26,7 @@ wiki_tv <- url %>%
   .[[1]] %>%
   as.tibble()
 
-head(wiki_tv)
+wiki_tv
 
 ```
 
