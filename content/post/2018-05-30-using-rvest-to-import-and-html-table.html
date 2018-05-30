@@ -21,54 +21,20 @@ url &lt;- &quot;https://en.wikipedia.org/wiki/List_of_most_watched_television_br
 wiki_tv &lt;- url %&gt;%
   read_html() %&gt;%
   html_nodes(xpath = &#39;//*[@id=&quot;mw-content-text&quot;]/div/table[1]&#39;) %&gt;%
-  html_table()
+  html_table() %&gt;%
+  .[[1]] %&gt;%
+  as.tibble()
 
 head(wiki_tv)</code></pre>
-<pre><code>## [[1]]
-##    No.                            Show Viewership (millions)
-## 1    1                 Super Bowl XLIX                 114.4
-## 2    2               Super Bowl XLVIII                 112.2
-## 3    3                   Super Bowl 50                 111.9
-## 4    4                   Super Bowl LI                 111.3
-## 5    5                 Super Bowl XLVI                 111.3
-## 6    6                  Super Bowl XLV                 111.0
-## 7    7                Super Bowl XLVII                 108.7
-## 8    8                 Super Bowl XLIV                 106.5
-## 9    9                M*A*S*H (Finale)              105.9[4]
-## 10  10                  Super Bowl LII                 103.4
-## 11  11               Roots (Part VIII)              100.0[5]
-## 12  12                Super Bowl XLIII                  98.7
-## 13  13                 Super Bowl XLII                  97.4
-## 14  14                  Super Bowl XXX                  94.1
-## 15  15                  Super Bowl XLI                  93.2
-## 16  16                   Super Bowl XX                  92.6
-## 17  17                Super Bowl XXVII                  91.0
-## 18  18                   Super Bowl XL                  90.7
-## 19  19 Leon Spinks vs. Muhammad Ali II            90.0[6][7]
-## 20  20               Super Bowl XXVIII                  90.0
-## 21  20                Super Bowl XXXII                  90.0
-##                  Date Network
-## 1    February 1, 2015     NBC
-## 2    February 2, 2014     Fox
-## 3    February 7, 2016     CBS
-## 4    February 5, 2017     Fox
-## 5    February 5, 2012     NBC
-## 6    February 6, 2011     Fox
-## 7    February 3, 2013     CBS
-## 8    February 7, 2010     CBS
-## 9   February 28, 1983     CBS
-## 10   February 4, 2018     NBC
-## 11   January 30, 1977     ABC
-## 12   February 1, 2009     NBC
-## 13   February 3, 2008     Fox
-## 14   January 28, 1996     NBC
-## 15   February 4, 2007     CBS
-## 16   January 26, 1986     NBC
-## 17   January 31, 1993     NBC
-## 18   February 5, 2006     ABC
-## 19 September 15, 1978     ABC
-## 20   January 30, 1994     NBC
-## 21   January 25, 1998     NBC</code></pre>
+<pre><code>## # A tibble: 6 x 5
+##     No. Show              `Viewership (millions)` Date             Network
+##   &lt;int&gt; &lt;chr&gt;             &lt;chr&gt;                   &lt;chr&gt;            &lt;chr&gt;  
+## 1     1 Super Bowl XLIX   114.4                   February 1, 2015 NBC    
+## 2     2 Super Bowl XLVIII 112.2                   February 2, 2014 Fox    
+## 3     3 Super Bowl 50     111.9                   February 7, 2016 CBS    
+## 4     4 Super Bowl LI     111.3                   February 5, 2017 Fox    
+## 5     5 Super Bowl XLVI   111.3                   February 5, 2012 NBC    
+## 6     6 Super Bowl XLV    111.0                   February 6, 2011 Fox</code></pre>
 <p>Wikipedia has incredibly well behaved tables. Occasionally, there will be a little more work that needs to be done, but overall this is it.</p>
 <p>As an example of a table that requires a little more work, we’ll use the site <a href="%22https://www.fangraphs.com/%22">fangraphs.com</a>, and the site’s offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.</p>
 <pre class="r"><code>pacman::p_load(tidyverse, rvest)
@@ -89,7 +55,7 @@ str(fans_off, list.len = 5)</code></pre>
 ##   ..$ X4 : chr [1:33] &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;G&quot; &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;55&quot; ...
 ##   ..$ X5 : chr [1:33] &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;PA&quot; &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;244&quot; ...
 ##   .. [list output truncated]</code></pre>
-<p>As can be seen, this returned a list, which isn’t quite what we wanted. But we can converst this into a tibble or dataframe pretty simply. Here, we’ll use the same code, but structure it as a tibble.</p>
+<p>As can be seen, the <code>html_table</code> function returns a list, which isn’t quite what we wanted. But as we did above, we can convert our data into a tibble or dataframe pretty simply. Here, we’ll use the same code, but structure it as a tibble.</p>
 <pre class="r"><code>pacman::p_load(tidyverse, rvest)
 
 url &lt;- &quot;https://www.fangraphs.com/leaders.aspx?pos=all&amp;stats=bat&amp;lg=all&amp;qual=y&amp;type=8&amp;season=2018&amp;month=0&amp;season1=2018&amp;ind=0&quot;
@@ -113,7 +79,7 @@ head(fans_off)</code></pre>
 ## 6 3      Jose… Indi… 52    234   16    37    39    7     12.8… 10.3… .320 
 ## # ... with 10 more variables: X13 &lt;chr&gt;, X14 &lt;chr&gt;, X15 &lt;chr&gt;, X16 &lt;chr&gt;,
 ## #   X17 &lt;chr&gt;, X18 &lt;chr&gt;, X19 &lt;chr&gt;, X20 &lt;chr&gt;, X21 &lt;chr&gt;, X22 &lt;chr&gt;</code></pre>
-<p>We’re almost there, but we can still see a few issues with the data. Rows 1 and 3 aren’t useful and should be dropped, and we really want our 2nd row as our column names. Additionally, there are two more potential issues - first, our walk and k percentage columns include <code>%</code> signs, and second, all of our data is considered character class.</p>
+<p>This is closer to what we wanted, but we can still see a few issues with the data. Rows 1 and 3 aren’t useful and should be dropped, and we really want our 2nd row as our column names. Additionally, there are two more potential issues - first, our walk and k percentage columns include <code>%</code> signs, and second, all of our data is considered character class.</p>
 <p>We will address all of these issues in a single bit of dplyr piped code.</p>
 <pre class="r"><code>pacman::p_load(tidyverse, rvest, janitor)
 

@@ -22,7 +22,9 @@ url <- "https://en.wikipedia.org/wiki/List_of_most_watched_television_broadcasts
 wiki_tv <- url %>%
   read_html() %>%
   html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[1]') %>%
-  html_table()
+  html_table() %>%
+  .[[1]] %>%
+  as.tibble()
 
 head(wiki_tv)
 
@@ -46,7 +48,7 @@ str(fans_off, list.len = 5)
 
 ```
 
-As can be seen, this returned a list, which isn't quite what we wanted. But we can converst this into a tibble or dataframe pretty simply. Here, we'll use the same code, but structure it as a tibble. 
+As can be seen, the `html_table` function returns a list, which isn't quite what we wanted. But as we did above, we can convert our data into a tibble or dataframe pretty simply. Here, we'll use the same code, but structure it as a tibble. 
 
 ```{r echo = TRUE}
 pacman::p_load(tidyverse, rvest)
@@ -64,7 +66,7 @@ head(fans_off)
 
 ```
 
-We're almost there, but we can still see a few issues with the data. Rows 1 and 3 aren't useful and should be dropped, and we really want our 2nd row as our column names. Additionally, there are two more potential issues - first, our walk and k percentage columns include `%` signs, and second, all of our data is considered character class.  
+This is closer to what we wanted, but we can still see a few issues with the data. Rows 1 and 3 aren't useful and should be dropped, and we really want our 2nd row as our column names. Additionally, there are two more potential issues - first, our walk and k percentage columns include `%` signs, and second, all of our data is considered character class.  
 
 We will address all of these issues in a single bit of dplyr piped code. 
  
