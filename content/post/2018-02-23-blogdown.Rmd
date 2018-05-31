@@ -15,3 +15,32 @@ Last year, when I originally got the bug to create a blog as a way of memorializ
 
 Transition to today, and there is so much blogdown documentation, and it is so detailed, and clear, that I got this up and running in an hour. The book is great as a first read, but [this post](https://alison.rbind.io/post/up-and-running-with-blogdown/) has everything that is needed. 
 
+### Shortening the summary
+
+My blogdown blog relies on Hugo, and more specifically the [tranquilpeak]("https://themes.gohugo.io/hugo-tranquilpeak-theme/") theme. One issue with Hugo, is that it automatically provides a summary of each post that is 70 words long. Unfortunately, if within those first 70 words you happen to have headers or tables, Hugo makes no distinction and just throws it all in. 
+
+Looking through the `.toml` file didn't provide any answers, but luckily [issue 21]("https://github.com/rstudio/blogdown/issues/21") for the blogdown package was opened, and within that was the answer I was looking for. 
+
+With the tranquilpeak theme, a user can make a subtle change to the theme to control just what the summary is showing, and it doesn't even have to be the first `n` number of words. 
+
+Find the summary file in `themes/hugo-tranquilpeak-theme/layouts/_default/summary.html` and replace line 43 `{{ .Summary }}` with 
+`{{ if .Params.Summary }} {{ .Params.Summary | markdownify }} {{ else }} {{ .Summary }} {{ end }}`.
+
+Then, in the header include a specific `summary:` section and write your summary. 
+
+```{r, eval = FALSE}
+title: Blogdown
+author: ''
+date: '2018-02-23'
+slug: blogdown
+categories:
+  - R
+tags: 
+  - blogdown
+summary: "This is the summary..."
+
+
+```
+
+
+
