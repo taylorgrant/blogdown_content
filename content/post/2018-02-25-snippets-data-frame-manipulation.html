@@ -7,6 +7,7 @@ categories:
   - R
 tags:
   - dataframe
+summary: "These commands are relevant for data frames and their manipulation."
 ---
 
 
@@ -28,29 +29,32 @@ df &lt;- df %&gt;% map_if(is.factor, as.character) %&gt;% as_data_frame</code></
 </div>
 <div id="renaming-columns-with-special-characters" class="section level3">
 <h3>Renaming columns with special characters</h3>
-<p>This is primarily useful if special characters are necessary for graphing. For instance, when reading in a csv that has special characters such as a <code>%</code> or <code>+</code> sign, R converts these to dots <code>(.)</code>. But if we were to try to use these variables in graphs, we need to put these characters back into the variable names.</p>
+<p>This is primarily useful if special characters are necessary for graphing. For instance, if we were to use the <code>read.csv</code> command when reading in a csv that has special characters such as a <code>%</code> or <code>+</code> sign, R converts these to dots <code>(.)</code>. But if we were to try to use these variables in graphs, we need to put these characters back into the variable names.</p>
 <pre class="r"><code># can also reference with specific columns using names(df)[i:j]
 names(mlb)</code></pre>
-<pre><code>##  [1] &quot;X1&quot;    &quot;PA&quot;    &quot;BB.&quot;   &quot;K.&quot;    &quot;BB.K&quot;  &quot;AVG&quot;   &quot;OBP&quot;   &quot;SLG&quot;  
-##  [9] &quot;OPS&quot;   &quot;ISO&quot;   &quot;Spd&quot;   &quot;BABIP&quot; &quot;UBR&quot;   &quot;wGDP&quot;  &quot;wSB&quot;   &quot;wRC&quot;  
-## [17] &quot;wRAA&quot;  &quot;wOBA&quot;  &quot;wRC.&quot;</code></pre>
+<pre><code>##  [1] &quot;X.&quot;    &quot;Name&quot;  &quot;Team&quot;  &quot;G&quot;     &quot;PA&quot;    &quot;HR&quot;    &quot;R&quot;     &quot;RBI&quot;  
+##  [9] &quot;SB&quot;    &quot;BB.&quot;   &quot;K.&quot;    &quot;ISO&quot;   &quot;BABIP&quot; &quot;AVG&quot;   &quot;OBP&quot;   &quot;SLG&quot;  
+## [17] &quot;wOBA&quot;  &quot;wRC.&quot;  &quot;BsR&quot;   &quot;Off&quot;   &quot;Def&quot;   &quot;WAR&quot;</code></pre>
 <pre class="r"><code># choose which cols to name change
 names(mlb)[1:17] &lt;- gsub(x = names(mlb)[1:17], pattern = &quot;\\.&quot;, replacement = &quot;%&quot;)
 # now can add in the + to the final column
 names(mlb) &lt;- gsub(x = names(mlb), pattern = &quot;\\.&quot;, replacement = &quot;+&quot;)
 names(mlb)</code></pre>
-<pre><code>##  [1] &quot;X1&quot;    &quot;PA&quot;    &quot;BB%&quot;   &quot;K%&quot;    &quot;BB%K&quot;  &quot;AVG&quot;   &quot;OBP&quot;   &quot;SLG&quot;  
-##  [9] &quot;OPS&quot;   &quot;ISO&quot;   &quot;Spd&quot;   &quot;BABIP&quot; &quot;UBR&quot;   &quot;wGDP&quot;  &quot;wSB&quot;   &quot;wRC&quot;  
-## [17] &quot;wRAA&quot;  &quot;wOBA&quot;  &quot;wRC+&quot;</code></pre>
+<pre><code>##  [1] &quot;X%&quot;    &quot;Name&quot;  &quot;Team&quot;  &quot;G&quot;     &quot;PA&quot;    &quot;HR&quot;    &quot;R&quot;     &quot;RBI&quot;  
+##  [9] &quot;SB&quot;    &quot;BB%&quot;   &quot;K%&quot;    &quot;ISO&quot;   &quot;BABIP&quot; &quot;AVG&quot;   &quot;OBP&quot;   &quot;SLG&quot;  
+## [17] &quot;wOBA&quot;  &quot;wRC+&quot;  &quot;BsR&quot;   &quot;Off&quot;   &quot;Def&quot;   &quot;WAR&quot;</code></pre>
 </div>
 <div id="setting-nas-to-zero" class="section level3">
 <h3>Setting NAs to Zero</h3>
 <p>Assume a data frame that has NAs and you want to set any NA to zero, it is straightforward to do so.</p>
-<pre class="r"><code>df &lt;- tibble(x = c(1,NA,3,NA,5), 
-                 y = c(1:5),
-                 z = x ^ 2 + y) %&gt;%
+<pre class="r"><code>df = tibble(
+  x = c(1,NA,3,NA,5), 
+  y = c(1:5), 
+  z = x ^ 2 + y) %&gt;% 
   data.frame()
+
 df[is.na(df)] &lt;- 0
+
 head(df)</code></pre>
 <pre><code>##   x y  z
 ## 1 1 1  2
@@ -59,11 +63,14 @@ head(df)</code></pre>
 ## 4 0 4  0
 ## 5 5 5 30</code></pre>
 <p>We can also selectively choose the column to change by referencing it specifically</p>
-<pre class="r"><code>df &lt;- tibble(x = c(1,NA,3,NA,5), 
-                 y = c(1,NA,3,NA,5),
-                 z = 1:5) %&gt;%
+<pre class="r"><code>df = tibble(
+  x = c(1,NA,3,NA,5), 
+  y = c(1,NA,3,NA,5),
+  z = 1:5) %&gt;%
   data.frame()
+
 df$x[is.na(df$x)] &lt;- 0
+
 head(df)</code></pre>
 <pre><code>##   x  y z
 ## 1 1  1 1
@@ -106,8 +113,8 @@ df</code></pre>
   fill(date)</code></pre>
 <pre><code>## # A tibble: 20 x 2
 ## # Groups:   userID [2]
-##    userID       date
-##     &lt;dbl&gt;     &lt;fctr&gt;
+##    userID date      
+##     &lt;dbl&gt; &lt;fct&gt;     
 ##  1     21 2017-12-10
 ##  2     21 2017-12-10
 ##  3     21 2017-12-10

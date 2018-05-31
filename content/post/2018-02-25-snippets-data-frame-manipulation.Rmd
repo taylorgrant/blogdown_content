@@ -7,12 +7,28 @@ categories:
   - R
 tags:
   - dataframe
+summary: "These commands are relevant for data frames and their manipulation."
 ---
 
 ```{r , setup, include = FALSE}
 library(here)
 library(tidyverse)
-mlb <- read_csv(here('data', 'mlb.csv'))
+library(rvest)
+
+url <- "https://www.fangraphs.com/leaders.aspx?pos=all&stats=bat&lg=all&qual=y&type=8&season=2018&month=0&season1=2018&ind=0"
+
+url %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="LeaderBoard1_dg1_ctl00"]') %>%
+  html_table() %>%
+  .[[1]] %>% # pull out the first member of the list
+  as.data.frame() %>%
+  setNames(.[2,]) %>% # identify colnames by row
+  slice(-c(1:3)) %>%
+  write.csv(here("data", "mlb.csv"), row.names = FALSE)
+
+mlb <- read.csv(here("data", "mlb.csv"))
+
 ```
 
 Snippet files are periodically updated with how-to's for data wrangling. These commands are relevant for data frames and their manipulation. 
@@ -34,7 +50,7 @@ df <- df %>% map_if(is.factor, as.character) %>% as_data_frame
 ```
 
 ### Renaming columns with special characters
-This is primarily useful if special characters are necessary for graphing. For instance, when reading in a csv that has special characters such as a `%` or `+` sign, R converts these to dots `(.)`. But if we were to try to use these variables in graphs, we need to put these characters back into the variable names.  
+This is primarily useful if special characters are necessary for graphing. For instance, if we were to use the `read.csv` command when reading in a csv that has special characters such as a `%` or `+` sign, R converts these to dots `(.)`. But if we were to try to use these variables in graphs, we need to put these characters back into the variable names.  
 ```{r eval = TRUE}
 # can also reference with specific columns using names(df)[i:j]
 names(mlb)
@@ -46,23 +62,31 @@ names(mlb)
 ```
 
 ### Setting NAs to Zero 
+
 Assume a data frame that has NAs and you want to set any NA to zero, it is straightforward to do so. 
 ```{r eval = TRUE}
-df <- tibble(x = c(1,NA,3,NA,5), 
-                 y = c(1:5),
-                 z = x ^ 2 + y) %>%
+
+df = tibble(
+  x = c(1,NA,3,NA,5), 
+  y = c(1:5), 
+  z = x ^ 2 + y) %>% 
   data.frame()
+
 df[is.na(df)] <- 0
+
 head(df)
 ```
 
 We can also selectively choose the column to change by referencing it specifically 
 ```{r eval = TRUE}
-df <- tibble(x = c(1,NA,3,NA,5), 
-                 y = c(1,NA,3,NA,5),
-                 z = 1:5) %>%
+df = tibble(
+  x = c(1,NA,3,NA,5), 
+  y = c(1,NA,3,NA,5),
+  z = 1:5) %>%
   data.frame()
+
 df$x[is.na(df$x)] <- 0
+
 head(df)
 ```
 
