@@ -7,6 +7,7 @@ categories:
   - R
 tags:
   - tidyr
+summary: "These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use."
 ---
 
 Snippet files are periodically updated with how-to’s for data wrangling. These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use.
