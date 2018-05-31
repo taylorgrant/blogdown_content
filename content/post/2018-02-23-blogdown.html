@@ -19,7 +19,7 @@ tags:
 <p>My blogdown blog relies on Hugo, and more specifically the <a href="%22https://themes.gohugo.io/hugo-tranquilpeak-theme/%22">tranquilpeak</a> theme. One issue with Hugo, is that it automatically provides a summary of each post that is 70 words long. Unfortunately, if within those first 70 words you happen to have headers or tables, Hugo makes no distinction and just throws it all in.</p>
 <p>Looking through the <code>.toml</code> file didn’t provide any answers, but luckily <a href="%22https://github.com/rstudio/blogdown/issues/21%22">issue 21</a> for the blogdown package was opened, and within that was the answer I was looking for.</p>
 <p>With the tranquilpeak theme, a user can make a subtle change to the theme to control just what the summary is showing, and it doesn’t even have to be the first <code>n</code> number of words.</p>
-<p>Find the summary file in <code>themes/hugo-tranquilpeak-theme/layouts/_default/summary.html</code> and replace line 43 <code>{{ .Summary }}</code> with <code>{{ if .Params.Summary }} {{ .Params.Summary | markdownify }} {{ else }} {{ .Summary }} {{ end }}</code>.</p>
+<p>Find the summary file in <code>themes/hugo-tranquilpeak-theme/layouts/_default/summary.html</code> and replace line 43 <code>{{ .Summary }}</code> with <code>{{ if .Params.Summary }} {{ .Params.Summary | markdownify }} {{ else }} {{ .Summary }} {{ end }}</code></p>
 <p>Then, in the header include a specific <code>summary:</code> section and write your summary.</p>
 <pre class="r"><code>title: Blogdown
 author: &#39;&#39;

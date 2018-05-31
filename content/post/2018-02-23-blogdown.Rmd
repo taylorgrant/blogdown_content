@@ -24,7 +24,7 @@ Looking through the `.toml` file didn't provide any answers, but luckily [issue 
 With the tranquilpeak theme, a user can make a subtle change to the theme to control just what the summary is showing, and it doesn't even have to be the first `n` number of words. 
 
 Find the summary file in `themes/hugo-tranquilpeak-theme/layouts/_default/summary.html` and replace line 43 `{{ .Summary }}` with 
-`{{ if .Params.Summary }} {{ .Params.Summary | markdownify }} {{ else }} {{ .Summary }} {{ end }}`.
+`{{ if .Params.Summary }} {{ .Params.Summary | markdownify }} {{ else }} {{ .Summary }} {{ end }}`
 
 Then, in the header include a specific `summary:` section and write your summary. 
 
