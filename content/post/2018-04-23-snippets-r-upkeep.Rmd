@@ -8,7 +8,7 @@ categories:
 tags:
 - R
 - RStudio
-
+summary: "These functions and commands are relevant for working with R and RStudio."
 ---
 
 Snippet files periodically updated. These functions and commands are relevant for working with R and RStudio. 
@@ -28,6 +28,7 @@ This is especially useful when using a dev version of a package. Often, there ar
 For example, let's look at the functions available within the spotifyR package. 
 
 ```{r, echo = TRUE}
+library(spotifyr)
 fns <- unclass(lsf.str(envir = asNamespace("spotifyr"), all = T))
 
 fns
