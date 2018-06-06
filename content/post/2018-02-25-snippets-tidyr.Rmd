@@ -8,13 +8,15 @@ categories:
 tags:
   - tidyr
 summary: "These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use."
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
 Snippet files are periodically updated with how-to’s for data wrangling. These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use.
 
-<!-- toc -->
 
-### spread()
+# spread()
 
 Spread is based on the key, value pairing -- the key becomes the names of the new columns and the values are row values within each new column. 
 
@@ -27,7 +29,7 @@ dat
 dat %>% spread(key, value)
 ```
 
-### gather()
+# gather()
 
 `gather` is going to work in the opposite direction. It gathers the column names, puts them in a single column, and then matches the value to each row. Note that you need to specify the columns you want to bring into the gathering. 
 

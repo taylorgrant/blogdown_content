@@ -8,14 +8,25 @@ categories:
 tags:
   - tidyr
 summary: "These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use."
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
 
+<div id="TOC">
+<ul>
+<li><a href="#spread">spread()</a></li>
+<li><a href="#gather">gather()</a><ul>
+<li><a href="#separate">separate()</a></li>
+<li><a href="#unite">unite()</a></li>
+</ul></li>
+</ul>
+</div>
 
 <p>Snippet files are periodically updated with how-to’s for data wrangling. These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use.</p>
-<!-- toc -->
-<div id="spread" class="section level3">
-<h3>spread()</h3>
+<div id="spread" class="section level1">
+<h1>spread()</h1>
 <p>Spread is based on the key, value pairing – the key becomes the names of the new columns and the values are row values within each new column.</p>
 <pre class="r"><code>library(tidyverse)
 dat &lt;- read_csv(&quot;https://raw.githubusercontent.com/garrettgman/DSR/master/data-raw/table2.csv&quot;)
@@ -47,8 +58,8 @@ dat</code></pre>
 ## 5 China        1999 212258 1272915272
 ## 6 China        2000 213766 1280428583</code></pre>
 </div>
-<div id="gather" class="section level3">
-<h3>gather()</h3>
+<div id="gather" class="section level1">
+<h1>gather()</h1>
 <p><code>gather</code> is going to work in the opposite direction. It gathers the column names, puts them in a single column, and then matches the value to each row. Note that you need to specify the columns you want to bring into the gathering.</p>
 <pre class="r"><code>library(tidyverse)
 dat &lt;- read_csv(&quot;https://raw.githubusercontent.com/garrettgman/DSR/master/data-raw/table4.csv&quot;)
@@ -84,7 +95,6 @@ dat %&gt;% gather(year, cases, -country)</code></pre>
 ## 4 Afghanistan 2000    2666
 ## 5 Brazil      2000   80488
 ## 6 China       2000  213766</code></pre>
-</div>
 <div id="separate" class="section level3">
 <h3>separate()</h3>
 <p><code>separate</code> works when a dataframe includes compound variables - for instance, age and gender demographics. <code>separate</code> works in one of two ways - first, you can pass it a regular expression to split on, but if you choose not to give it, it will default to non-alphanumeric character to split on, as below.</p>
@@ -115,38 +125,38 @@ event &lt;- sample(letters, 15)
 data &lt;- data.frame(date, hour, min, second, event)
 data</code></pre>
 <pre><code>##          date hour min second event
-## 1  2018-01-01    4  54     16     h
-## 2  2018-01-02    1  20     14     g
-## 3  2018-01-03   21  26      6     c
-## 4  2018-01-04   20  13     11     y
-## 5  2018-01-05    6  29     20     j
-## 6  2018-01-06    3  38     33     p
-## 7  2018-01-07   15  39     17     t
-## 8  2018-01-08   17  46     27     s
-## 9  2018-01-09   12   6     40     u
-## 10 2018-01-10   11  25      9     k
-## 11 2018-01-11    8  59     23     a
-## 12 2018-01-12    9  48     59     b
-## 13 2018-01-13   16  60      8     x
-## 14 2018-01-14   10  31     52     q
-## 15 2018-01-15   18   9     51     r</code></pre>
+## 1  2018-01-01    2  37     47     w
+## 2  2018-01-02   17  11     56     d
+## 3  2018-01-03   13  42     13     z
+## 4  2018-01-04   20  15     37     x
+## 5  2018-01-05   21  38     26     t
+## 6  2018-01-06   14   2      5     l
+## 7  2018-01-07   15  12     35     h
+## 8  2018-01-08   16  16     41     k
+## 9  2018-01-09   11  36     21     f
+## 10 2018-01-10   10   8      4     p
+## 11 2018-01-11    5   9     20     b
+## 12 2018-01-12    8  25     53     m
+## 13 2018-01-13   22  28     59     u
+## 14 2018-01-14    7  49      6     g
+## 15 2018-01-15    1  20     50     v</code></pre>
 <pre class="r"><code>data %&gt;% unite(datetime, hour, min, second, sep = &quot;:&quot;)</code></pre>
 <pre><code>##          date datetime event
-## 1  2018-01-01  4:54:16     h
-## 2  2018-01-02  1:20:14     g
-## 3  2018-01-03  21:26:6     c
-## 4  2018-01-04 20:13:11     y
-## 5  2018-01-05  6:29:20     j
-## 6  2018-01-06  3:38:33     p
-## 7  2018-01-07 15:39:17     t
-## 8  2018-01-08 17:46:27     s
-## 9  2018-01-09  12:6:40     u
-## 10 2018-01-10  11:25:9     k
-## 11 2018-01-11  8:59:23     a
-## 12 2018-01-12  9:48:59     b
-## 13 2018-01-13  16:60:8     x
-## 14 2018-01-14 10:31:52     q
-## 15 2018-01-15  18:9:51     r</code></pre>
+## 1  2018-01-01  2:37:47     w
+## 2  2018-01-02 17:11:56     d
+## 3  2018-01-03 13:42:13     z
+## 4  2018-01-04 20:15:37     x
+## 5  2018-01-05 21:38:26     t
+## 6  2018-01-06   14:2:5     l
+## 7  2018-01-07 15:12:35     h
+## 8  2018-01-08 16:16:41     k
+## 9  2018-01-09 11:36:21     f
+## 10 2018-01-10   10:8:4     p
+## 11 2018-01-11   5:9:20     b
+## 12 2018-01-12  8:25:53     m
+## 13 2018-01-13 22:28:59     u
+## 14 2018-01-14   7:49:6     g
+## 15 2018-01-15  1:20:50     v</code></pre>
 <pre class="r"><code># the default separator is &quot;_&quot;, so if that doesn&#39;t work, change it as necessary</code></pre>
 <p>The <code>unite</code> function is also helpful when you need to spread multiple columns in a dataframe.</p>
 <pre class="r"><code>df &lt;- data.frame(quarter=rep(1:4,2),
@@ -182,4 +192,5 @@ df</code></pre>
 ## 2       2     0.7     0.7     0.9     0.7
 ## 3       3     0.6     0.8     1.0     0.5
 ## 4       4     0.8     0.5     0.6     0.9</code></pre>
+</div>
 </div>
