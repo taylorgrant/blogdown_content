@@ -12,6 +12,8 @@ summary: "These commands are relevant for tidying dataframes - to rearrange data
 
 Snippet files are periodically updated with how-to’s for data wrangling. These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use.
 
+<!-- toc -->
+
 ### spread()
 
 Spread is based on the key, value pairing -- the key becomes the names of the new columns and the values are row values within each new column. 
