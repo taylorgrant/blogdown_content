@@ -19,9 +19,10 @@ title = "A superbly produced duck"
 theme = "hugo-tranquilpeak-theme"
 disqusShortname = ""
 googleAnalytics = "UA-78751969-1"
-paginate = 7
+paginate = 10
 canonifyurls = true
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+enableEmoji = true
 
 [permalinks]
   post = "/:year/:month/:slug/"
