@@ -4,7 +4,8 @@ author: ''
 date: '2018-02-25'
 slug: snippets-tidyr
 categories:
-  - R
+  - R 
+  - code snippets
 tags:
   - tidyr
 summary: "These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use."
@@ -51,7 +52,7 @@ dat <- read_csv("https://raw.githubusercontent.com/garrettgman/DSR/master/data-r
 dat %>% gather(year, cases, -country)
 ```
 
-### separate()
+# separate()
 
 `separate` works when a dataframe includes compound variables - for instance, age and gender demographics. `separate` works in one of two ways - first, you can pass it a regular expression to split on, but if you choose not to give it, it will default to non-alphanumeric character to split on, as below. 
 
@@ -67,7 +68,7 @@ df <- data.frame(x = c(NA, "m14", "f20", "f45"))
 df %>% separate(x, c("Gender", "Age") , 1)
 ```
 
-### unite()
+# unite()
 
 The `unite` function is helpful in that it pulls disparate columns together into one. To see how it works, we'll make some fake data, and then use `unite` to pull the hour, min, and second into a single variable. 
 

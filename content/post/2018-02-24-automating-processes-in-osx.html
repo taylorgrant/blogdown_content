@@ -5,27 +5,66 @@ date: '2018-02-24'
 slug: automating-processes-in-osx
 categories:
   - OSX
+  - R
 tags:
-  - cron
+  - crontab
+  - launchd
+  - nano
+summary: "Automating OSX processes in two ways"
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
 
+<div id="TOC">
+<ul>
+<li><a href="#the-easy-way.-using-crontab">The easy way. Using crontab</a></li>
+<li><a href="#the-long-hard-way.-launchd">The long, hard way. launchd</a><ul>
+<li><a href="#create-a-bash-script-to-run">Create a bash script to run</a></li>
+<li><a href="#write-a-plist-file">Write a plist file</a></li>
+<li><a href="#load-the-plist-into-launchd">Load the plist into launchd</a></li>
+</ul></li>
+</ul>
+</div>
 
+<div id="the-easy-way.-using-crontab" class="section level1">
+<h1>The easy way. Using crontab</h1>
+<p>The easiest way to automate a process is to use <code>crontab</code> to schedule a job. To add a job to crontab, use the <code>nano</code> editor from the terminal.</p>
+<pre class="r"><code>env EDITOR=nano crontab -e</code></pre>
+<p>The time, date, and day of the week are specified upfront in a crontab job and each job specification follows the same format.</p>
+<pre class="r"><code>* * * * *  command to execute
+│ │ │ │ │
+│ │ │ │ └─── day of week (0 - 6) (0 to 6 are Sunday to Saturday, or use names; 7 is also Sunday)
+│ │ │ └──────── month (1 - 12)
+│ │ └───────────── day of month (1 - 31)
+│ └────────────────── hour (0 - 23)
+└─────────────────────── min (0 - 59)</code></pre>
+<p>The section of the code above “command to execute” is where you include the bash script that you want to run. To write and run a bash script for the first time, see below.</p>
+<p>Also, <code>nano</code> is a little clumsy to use through terminal. There are a lot of shortcuts that can be used and they can be found <a href="%22https://monovm.com/post/35/delete-line-in-nano%22">here</a>.</p>
+</div>
+<div id="the-long-hard-way.-launchd" class="section level1">
+<h1>The long, hard way. launchd</h1>
 <p>I recently had to set up an automated process on a Mac, and I’m writing this down so that I don’t have to struggle through this process again.</p>
-<p>The first thing to note is that Apple has moved away from cron, and instead moves users into the world of launchd. This means that if you’re using a Mac, the R package, <code>cronr</code> and its RStudio addins will unfortunately not work, nor will setting a cronjob through terminal (in my experience, cronjobs aren’t saved).</p>
+<p>The first thing to note is that Apple has (supposedly) moved away from cron, and instead moves users into the world of launchd. This means that if you’re using a Mac, the R package, <code>cronr</code> and its RStudio addins will unfortunately not work.</p>
 <p>In this case, let’s assume that we wanted to automate an R script that was going to run on a specific day of the week at a specific time. What follows is how to accomplish this goal. <br></p>
-<p><strong>1. Create a bash script that can be run through launchd.</strong></p>
+<div id="create-a-bash-script-to-run" class="section level2">
+<h2>Create a bash script to run</h2>
 <p>If we were to physically run an R script in terminal, we would simply use a command like this:</p>
 <p><code>Rscript ./path/to/script.R</code></p>
 <p>But as we’ll see, when a plist gets loaded, the Program Argument has to call the program to run, and it needs to be a single string; we can’t preface our command with <code>Rscript</code>. To get around this, we’ll create and call a bash script that will then call the Rscript that will eventually run.</p>
 <p>So, we open a new text file in RStudio, and we write the following:</p>
 <pre><code>#!/bin/bash
 
+PATH=/usr/local/bin:$PATH
+
 /usr/local/bin/Rscript &quot;path/to/our/script.R&quot;</code></pre>
-<p>The command <code>#!/bin/bash</code> tells the computer that this is a bash file. The full path to R is needed because when the process is run in launchd, my computer was having trouble locating R. This is the standard location of R when it’s installed, but it’s possible that R is elsewhere – to find its location, in terminal type <code>which R</code>. Finally, include the full path to the R script that should be run, don’t shorten with the <code>~/</code> prefix, on a Mac, start with <code>/Users/...</code></p>
+<p>The command <code>#!/bin/bash</code> tells the computer that this is a bash file, and the second line is included to ensure the computer is on the correct path. The full path to R is needed because when the process is run in launchd, my computer was having trouble locating R. This is the standard location of R when it’s installed, but it’s possible that R is elsewhere – to find its location, in terminal type <code>which R</code>. Finally, include the full path to the R script that should be run, don’t shorten with the <code>~/</code> prefix, on a Mac, start with <code>/Users/...</code></p>
 <p>Now save the bash file.</p>
 <p>Note that it’s a good idea to see if the bash file will run on its own in terminal. Run it with the command <code>bash /path/to/rShellScript.sh</code>, or if your script lives in the current directory, with <code>bash ./rShellScript.sh</code>. It may be the case that you have to give yourself permission to run the script; do so with the command <code>chmod +x /path/to/rShellScript.sh</code>.</p>
-<p><strong>2. Write a plist file.</strong></p>
+</div>
+<div id="write-a-plist-file" class="section level2">
+<h2>Write a plist file</h2>
 <p>plist files are awful. They are written in xml and they’re not at all intuitive to write. The site <a href="http:www.launchd.info" class="uri">http:www.launchd.info</a> provides a full breakdown of how to write a plist and all of the different configurations that can be had.</p>
 <p>If you don’t want to struggle through writing these things from scratch, there are applications that can do this for you. The easiest that I’ve found is Launch Control, which is a drag and drop application that helps to set all options that are necessary for your job. Launch Control can be found online, or if you have Homebrew, you can use <code>brew install launchcontrol</code> and it will download for you. Note that Launch Control used to be free, but now has a $10 license to create new jobs or modify current jobs.</p>
 <p>This is what my plist file looked like when I was through.</p>
@@ -60,8 +99,12 @@ tags:
 &lt;/plist&gt;</code></pre>
 <p>So, what’s going on here? First, is the label, this is how the computer will reference the job. The ProgramArguments has to provide the name of the script to run with the full location of where it’s found. RunAtLoad determines whether the script runs when it is first loaded into the launchctl. Setting this to True, and having the bash script call a simple R script is a good way of debugging the pathing and ensuring that the computer can find all programs and files. The Error and Out paths specify where error and output logs are stored. These aren’t necessary, but the error log is helpful. Finally, my plist references the calendar interval because I only want to run my script once per week. Weekday ranges from 0 to 7, Sundays are 0 and 7 (that makes no sense), Monday through Friday are 1 through 5 respectively, and Saturday is 6. As can be seen, this script is set to run at 6AM (my time) every Monday morning.</p>
 <p>Now that you have the plist, it needs to be saved as <code>com.LABEL_NAME.plist</code>, and where you save it depends on your permissions. If you are User Agent - meaning that you must be logged in - you save the file in <code>~Library/LaunchAgents</code>. See <a href="http:www.launchd.info">here</a> for the full breakdown of permissions and the requisite locations for the plist to go.</p>
-<p><strong>3. Load the plist into launchd</strong></p>
+</div>
+<div id="load-the-plist-into-launchd" class="section level2">
+<h2>Load the plist into launchd</h2>
 <p>Once it’s saved, open Terminal and it’s time to load the plist job into launchd.</p>
 <p>To load the job, you use <code>launchctl load /Users/path/to/LaunchAgents/com.LABEL_NAME.plist</code>. To unload, it’s the same command, but unload rather than load. I’m not positive about such things, but out of an abundance of caution if I make any changes to my plist file I unload and then reload it into launchd.</p>
 <p>All current jobs on the computer can be seen using the command <code>launchctl list</code>, or you can call your job specifically using <code>launchctl list | grep com.LABEL_NAME</code>. To the left of each plist job is a Status code. 0 status means everything is working, anything else probably means something is wrong. If the job returns a non-zero status, you can look up the code in terminal using <code>launchctl error #</code> where # is the Status code.</p>
 <p>And that, is basically that. The automation works as long as the computer is on and not in sleep mode. It’s certainly not as simple as simply setting a cronjob in Linux, but given the benefits of automation the process is worth it.</p>
+</div>
+</div>

@@ -5,17 +5,33 @@ date: '2018-02-23'
 slug: blogdown
 categories:
   - R
+  - lesson
 tags: 
   - blogdown
+summary: "Tips and tricks I've learned about blogdown and Hugo"
+output:
+  blogdown::html_page:
+    toc: true
 ---
+
 
 I decided the other day that I didn't really like the blog capabilities that RStudio and Github pages offered. It was super easy to create the Rmarkdown documents, but in the end, the design was limited and I was struggling with some internal navigation issues. 
 
 Last year, when I originally got the bug to create a blog as a way of memorializing what I was learning/doing in R, I had started with the ```blogdown``` package. At that time, the [blogdown book](https://bookdown.org/yihui/blogdown/) was still in development, and I struggled with exactly what was going on. I got everything up and running, but that was through luck, and brute force, trial-and-error efforts. I was never going to keep track of my code, or what I was learning if it was difficult, so I went with the standard setup instead. 
 
-Transition to today, and there is so much blogdown documentation, and it is so detailed, and clear, that I got this up and running in an hour. The book is great as a first read, but [this post](https://alison.rbind.io/post/up-and-running-with-blogdown/) has everything that is needed. 
+Transition to today, and there is so much blogdown documentation, and it is so detailed and clear, that I got this up and running in an hour. The book is great as a first read, but [this post](https://alison.rbind.io/post/up-and-running-with-blogdown/) has everything that is needed. 
 
-### Shortening the summary
+# Including a table of contents
+
+A table of contents is really simple to include, simply include the following in the YAML metadata of the Rmd document. Use the `serve_site()` command and you'll see it's included at the top of the page. 
+
+```
+output:
+  blogdown::html_page:
+    toc: true
+```
+
+# Shortening the front page summary
 
 My blogdown blog relies on Hugo, and more specifically the [tranquilpeak]("https://themes.gohugo.io/hugo-tranquilpeak-theme/") theme. One issue with Hugo, is that it automatically provides a summary of each post that is 70 words long. Unfortunately, if within those first 70 words you happen to have headers or tables, Hugo makes no distinction and just throws it all in. 
 

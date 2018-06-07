@@ -5,17 +5,50 @@ date: '2018-02-24'
 slug: automating-processes-in-osx
 categories:
   - OSX
+  - R
 tags:
-  - cron
+  - crontab
+  - launchd
+  - nano
+summary: "Automating OSX processes in two ways"
+output:
+  blogdown::html_page:
+    toc: true
 ---
+
+# The easy way. Using crontab 
+
+The easiest way to automate a process is to use `crontab` to schedule a job. To add a job to crontab, use the `nano` editor from the terminal. 
+
+```{r eval = FALSE} 
+env EDITOR=nano crontab -e
+```
+
+The time, date, and day of the week are specified upfront in a crontab job and each job specification follows the same format. 
+
+```{r eval = FALSE}
+* * * * *  command to execute
+│ │ │ │ │
+│ │ │ │ └─── day of week (0 - 6) (0 to 6 are Sunday to Saturday, or use names; 7 is also Sunday)
+│ │ │ └──────── month (1 - 12)
+│ │ └───────────── day of month (1 - 31)
+│ └────────────────── hour (0 - 23)
+└─────────────────────── min (0 - 59)
+```
+
+The section of the code above "command to execute" is where you include the bash script that you want to run. To write and run a bash script for the first time, see below. 
+
+Also, `nano` is a little clumsy to use through terminal. There are a lot of shortcuts that can be used and they can be found [here]("https://monovm.com/post/35/delete-line-in-nano").
+
+# The long, hard way. launchd
 
 I recently had to set up an automated process on a Mac, and I'm writing this down so that I don't have to struggle through this process again. 
 
-The first thing to note is that Apple has moved away from cron, and instead moves users into the world of launchd. This means that if you're using a Mac, the R package, ```cronr``` and its RStudio addins will unfortunately not work, nor will setting a cronjob through terminal (in my experience, cronjobs aren't saved). 
+The first thing to note is that Apple has (supposedly) moved away from cron, and instead moves users into the world of launchd. This means that if you're using a Mac, the R package, ```cronr``` and its RStudio addins will unfortunately not work. 
 
 In this case, let's assume that we wanted to automate an R script that was going to run on a specific day of the week at a specific time. What follows is how to accomplish this goal. <br>
 
-**1. Create a bash script that can be run through launchd.**
+## Create a bash script to run
 
 If we were to physically run an R script in terminal, we would simply use a command like this: 
 
@@ -28,16 +61,18 @@ So, we open a new text file in RStudio, and we write the following:
 ``` 
 #!/bin/bash
 
+PATH=/usr/local/bin:$PATH
+
 /usr/local/bin/Rscript "path/to/our/script.R"
 ```
 
-The command `#!/bin/bash` tells the computer that this is a bash file. The full path to R is needed because when the process is run in launchd, my computer was having trouble locating R. This is the standard location of R when it's installed, but it's possible that R is elsewhere -- to find its location, in terminal type `which R`. Finally, include the full path to the R script that should be run, don't shorten with the `~/` prefix, on a Mac, start with `/Users/...`
+The command `#!/bin/bash` tells the computer that this is a bash file, and the second line is included to ensure the computer is on the correct path. The full path to R is needed because when the process is run in launchd, my computer was having trouble locating R. This is the standard location of R when it's installed, but it's possible that R is elsewhere -- to find its location, in terminal type `which R`. Finally, include the full path to the R script that should be run, don't shorten with the `~/` prefix, on a Mac, start with `/Users/...`
 
 Now save the bash file. 
 
 Note that it's a good idea to see if the bash file will run on its own in terminal. Run it with the command `bash /path/to/rShellScript.sh`, or if your script lives in the current directory, with `bash ./rShellScript.sh`. It may be the case that you have to give yourself permission to run the script; do so with the command `chmod +x /path/to/rShellScript.sh`.
 
-**2. Write a plist file.** 
+## Write a plist file 
 
 plist files are awful. They are written in xml and they're not at all intuitive to write. The site [http:www.launchd.info](http:www.launchd.info) provides a full breakdown of how to write a plist and all of the different configurations that can be had. 
 
@@ -81,7 +116,7 @@ So, what's going on here? First, is the label, this is how the computer will ref
 
 Now that you have the plist, it needs to be saved as `com.LABEL_NAME.plist`, and where you save it depends on your permissions. If you are User Agent - meaning that you must be logged in - you save the file in `~Library/LaunchAgents`. See [here](http:www.launchd.info) for the full breakdown of permissions and the requisite locations for the plist to go. 
 
-**3. Load the plist into launchd**
+## Load the plist into launchd
 
 Once it's saved, open Terminal and it's time to load the plist job into launchd. 
 
