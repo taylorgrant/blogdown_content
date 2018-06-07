@@ -1,3 +1,18 @@
+---
+title: 'Snippets: tidyr'
+author: ''
+date: '2018-02-25'
+slug: snippets-tidyr
+categories:
+  - R 
+tags:
+  - tidyr
+summary: "These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use."
+output:
+  blogdown::html_page:
+    toc: true
+---
+
 
 <div id="TOC">
 <ul>
@@ -110,38 +125,38 @@ event &lt;- sample(letters, 15)
 data &lt;- data.frame(date, hour, min, second, event)
 data</code></pre>
 <pre><code>##          date hour min second event
-## 1  2018-01-01   15  36     14     e
-## 2  2018-01-02    8  26     52     u
-## 3  2018-01-03   14  23     21     g
-## 4  2018-01-04   11  13      4     f
-## 5  2018-01-05   24  20     36     s
-## 6  2018-01-06    1  34     42     z
-## 7  2018-01-07    5  41     40     l
-## 8  2018-01-08   18  16     25     a
-## 9  2018-01-09    3  42     18     v
-## 10 2018-01-10    6   8     32     c
-## 11 2018-01-11   19  24     59     n
-## 12 2018-01-12    7  47      9     w
-## 13 2018-01-13    9  45     54     q
-## 14 2018-01-14    4  44     34     x
-## 15 2018-01-15   20   9     48     k</code></pre>
+## 1  2018-01-01   14  26     44     k
+## 2  2018-01-02   20  52     59     x
+## 3  2018-01-03    7  35     54     s
+## 4  2018-01-04    6  21     46     l
+## 5  2018-01-05    9   6      7     d
+## 6  2018-01-06   23  32     10     i
+## 7  2018-01-07    8  36     35     v
+## 8  2018-01-08   15  16     11     e
+## 9  2018-01-09   21  38      2     t
+## 10 2018-01-10   22  60     38     u
+## 11 2018-01-11   18  33     40     a
+## 12 2018-01-12   16  49      9     y
+## 13 2018-01-13    1  24     39     h
+## 14 2018-01-14    4  41     15     f
+## 15 2018-01-15   12  10      4     g</code></pre>
 <pre class="r"><code>data %&gt;% unite(datetime, hour, min, second, sep = &quot;:&quot;)</code></pre>
 <pre><code>##          date datetime event
-## 1  2018-01-01 15:36:14     e
-## 2  2018-01-02  8:26:52     u
-## 3  2018-01-03 14:23:21     g
-## 4  2018-01-04  11:13:4     f
-## 5  2018-01-05 24:20:36     s
-## 6  2018-01-06  1:34:42     z
-## 7  2018-01-07  5:41:40     l
-## 8  2018-01-08 18:16:25     a
-## 9  2018-01-09  3:42:18     v
-## 10 2018-01-10   6:8:32     c
-## 11 2018-01-11 19:24:59     n
-## 12 2018-01-12   7:47:9     w
-## 13 2018-01-13  9:45:54     q
-## 14 2018-01-14  4:44:34     x
-## 15 2018-01-15  20:9:48     k</code></pre>
+## 1  2018-01-01 14:26:44     k
+## 2  2018-01-02 20:52:59     x
+## 3  2018-01-03  7:35:54     s
+## 4  2018-01-04  6:21:46     l
+## 5  2018-01-05    9:6:7     d
+## 6  2018-01-06 23:32:10     i
+## 7  2018-01-07  8:36:35     v
+## 8  2018-01-08 15:16:11     e
+## 9  2018-01-09  21:38:2     t
+## 10 2018-01-10 22:60:38     u
+## 11 2018-01-11 18:33:40     a
+## 12 2018-01-12  16:49:9     y
+## 13 2018-01-13  1:24:39     h
+## 14 2018-01-14  4:41:15     f
+## 15 2018-01-15  12:10:4     g</code></pre>
 <pre class="r"><code># the default separator is &quot;_&quot;, so if that doesn&#39;t work, change it as necessary</code></pre>
 <p>The <code>unite</code> function is also helpful when you need to spread multiple columns in a dataframe.</p>
 <pre class="r"><code>df &lt;- data.frame(quarter=rep(1:4,2),
