@@ -8,8 +8,13 @@ categories:
 tags:
   - rvest
   - scraping
-summary: "I've always used the `rvest` package in tandem with the SelectorGadget to select the CSS of a table on a website, but it turns out that there is a much simpler way of extracting data tables from the web."
+summary: "A simple way of extracting tables from HTML using `rvest` and Developer Tools"
+output:
+  blogdown::html_page:
+    toc: true
 ---
+
+# Simple tables
 
 I've always used the `rvest` package in tandem with the SelectorGadget to select the CSS of a table on a website, but it turns out that there is a much simpler way of extracting data tables from the web. Thanks to [this]("https://www.r-bloggers.com/using-rvest-to-scrape-an-html-table/") post, which I had not seen until now. 
 
@@ -24,14 +29,15 @@ wiki_tv <- url %>%
   read_html() %>%
   html_nodes(xpath = '//*[@id="mw-content-text"]/div/table[1]') %>%
   html_table() %>%
-  .[[1]] %>%
-  as.tibble()
+  flatten_df()
 
 wiki_tv
 
 ```
 
 Wikipedia has incredibly well behaved tables. Occasionally, there will be a little more work that needs to be done, but overall this is it. 
+
+# A little more cleaning
 
 As an example of a table that requires a little more work, we'll use the site [fangraphs.com]("https://www.fangraphs.com/"), and the site's offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.
 
@@ -60,8 +66,7 @@ fans_off <- url %>%
   read_html() %>%
   html_nodes(xpath = '//*[@id="LeaderBoard1_dg1_ctl00"]') %>%
   html_table() %>%
-  .[[1]] %>% # pull out the first member of the list
-  as_tibble() # and convert to tibble
+  flatten_df()
 
 head(fans_off)
 
@@ -80,8 +85,7 @@ fans_off <- url %>%
   read_html() %>%
   html_nodes(xpath = '//*[@id="LeaderBoard1_dg1_ctl00"]') %>%
   html_table() %>%
-  .[[1]] %>% # pull out the first member of the list
-  as_tibble() %>% # and convert to tibble
+  flatten_df() %>% # flatten list into df structure
   setNames(.[2,]) %>% # identify colnames by row
   slice(-c(1:3)) %>% # then use -slice to drop the first 3 
   clean_names() %>% # love the janitor package
