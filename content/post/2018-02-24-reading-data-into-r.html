@@ -2,15 +2,33 @@
 title: "Reading data into R"
 date: '2018-02-24'
 slug: reading-data-into-r
-categories: ["R"]
-tags: ["data ingest", "mapping", "broom"]
+categories:
+  - R
+  - lesson
+tags: 
+  - data ingest
+  - rvest
+  - broom
+summary: "5 different ways to get data into R"
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
 
+<div id="TOC">
+<ul>
+<li><a href="#built-in-data-sets">Built in data sets</a></li>
+<li><a href="#reading-in-data-from-a-url">Reading in data from a URL</a></li>
+<li><a href="#reading-in-a-zip-file">Reading in a zip file</a></li>
+<li><a href="#reading-in-from-google-sheets">Reading in from Google Sheets</a></li>
+<li><a href="#scraping-data-from-the-web">Scraping data from the web</a></li>
+</ul>
+</div>
 
 <p>This is intended to document the many ways of getting data into R. Here, I want to showcase how data can be read into a session from various sources, without having to download a csv file first. We’ll do it all in one step.</p>
-<div id="built-in-data-sets" class="section level2">
-<h2>Built in data sets</h2>
+<div id="built-in-data-sets" class="section level1">
+<h1>Built in data sets</h1>
 <p>There are so many packages that come with datasets, it can be hard to keep track of all of them. While there isn’t any one site that keeps track of all of them, Vincent Arel-Bundock has built out a pretty detailed composite of a lot of them <a href="https://vincentarelbundock.github.io/Rdatasets/datasets.html">here</a>.</p>
 <p>As an example, let’s load the airquality dataset and investigate the effects of ozone on air temperature.</p>
 <pre class="r"><code>data(airquality) 
@@ -22,8 +40,8 @@ ggplot(airquality, aes(x = Ozone, y = Temp)) +
   theme_minimal()</code></pre>
 <p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/airquality-1.png" width="672" /></p>
 </div>
-<div id="reading-in-data-from-a-url" class="section level2">
-<h2>Reading in data from a URL</h2>
+<div id="reading-in-data-from-a-url" class="section level1">
+<h1>Reading in data from a URL</h1>
 <p>As it has become the convention that data should be shared publicly, there are lots of wonderful places to find data online. For instance, here is one <a href="https://github.com/caesar0301/awesome-public-datasets">great collection</a> of data sources. An easy source for good data is the <a href="https://github.com/fivethirtyeight/data">FiveThirtyEight</a> data page on github, which provides data for all of their articles.</p>
 <p>Any csv that has a direct link to it can be downloaded using the <code>readr</code> package. In this case, we’ll read in the raw csv used for their <a href="https://fivethirtyeight.com/features/fandango-movies-ratings/">Fandango piece</a> and recreate a version of their data viz.</p>
 <pre class="r"><code>fan &lt;- read_csv(&quot;https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv&quot;)
@@ -51,8 +69,8 @@ fan %&gt;% gather(&quot;Site&quot;, &quot;Stars&quot;, c(7,14,16,18)) %&gt;%
        title = &quot;Fandango LOVES Movies&quot;)</code></pre>
 <p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/fandango-1.png" width="672" /></p>
 </div>
-<div id="reading-in-a-zip-file" class="section level2">
-<h2>Reading in a zip file</h2>
+<div id="reading-in-a-zip-file" class="section level1">
+<h1>Reading in a zip file</h1>
 <p>When datasets are kept in a compressed form like a zip file, R has the capability of downloading and unzipping those files. The first thing we do is create a temporary directory for the data, then download the archive, then unzip the files and read the data.</p>
 <p>As an example, we’ll download, read, and plot some of the data from the <a href="http://www.seanlahman.com/baseball-archive/statistics/">Lahman Baseball Database</a></p>
 <pre class="r"><code>library(tidyverse)
@@ -118,8 +136,8 @@ gg +
         legend.key.width=unit(1, &quot;lines&quot;))</code></pre>
 <p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/map-1.png" width="672" /></p>
 </div>
-<div id="reading-in-from-google-sheets" class="section level2">
-<h2>Reading in from Google Sheets</h2>
+<div id="reading-in-from-google-sheets" class="section level1">
+<h1>Reading in from Google Sheets</h1>
 <p>An option that may be of use given the prevalence of the gsuite is to read in data directly from Google Sheets using the <code>googlesheets</code> package.</p>
 <p>The first step, if you don’t know the name of the sheet you need, or want to make sure that you have the right sheet, is to pull the directory of all sheets. This is equivalent to what you would see were you to visit <a href="https://docs.google.com/spreadsheets/" class="uri">https://docs.google.com/spreadsheets/</a>.</p>
 <pre class="r"><code>library(googlesheets)
@@ -141,8 +159,8 @@ str(twitter)
 # 
 glimpse(twitter)</code></pre>
 </div>
-<div id="scraping-data-from-the-web" class="section level2">
-<h2>Scraping data from the web</h2>
+<div id="scraping-data-from-the-web" class="section level1">
+<h1>Scraping data from the web</h1>
 <p>When all else fails, it is also possible to scrape data using the <code>rvest</code> package. Here, we’ll scrape the <a href="https://www.fangraphs.com/">Fangraphs</a> website for the 2017 offensive players leaderboard.</p>
 <p>First, we’ll use the <code>robotstxt</code> pacakge to make sure that we’re allowed to scrape the site.</p>
 <pre class="r"><code>robotstxt::paths_allowed(&quot;http://www.fangraphs.com/leaders.aspx?&quot;)</code></pre>
@@ -193,12 +211,12 @@ df %&gt;%
 <pre><code>## # A tibble: 6 x 2
 ##   names r.squared
 ##   &lt;chr&gt;     &lt;dbl&gt;
-## 1   Off 0.8064795
-## 2  wRC+ 0.6956130
-## 3  wOBA 0.6872570
-## 4   OBP 0.6172160
-## 5   SLG 0.5410169
-## 6     R 0.4752081</code></pre>
+## 1 Off       0.802
+## 2 wRC+      0.690
+## 3 wOBA      0.682
+## 4 OBP       0.615
+## 5 SLG       0.534
+## 6 R         0.477</code></pre>
 <p>Now let’s graph the top 6 bivariate relationships in terms of variance explained by the model.</p>
 <pre class="r"><code>df %&gt;% select(WAR, Off, `wRC+`, wOBA, OBP, SLG, R) %&gt;%
   gather(&quot;stat&quot;, &quot;value&quot;, 2:7) %&gt;%

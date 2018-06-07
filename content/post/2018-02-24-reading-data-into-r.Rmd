@@ -2,8 +2,17 @@
 title: "Reading data into R"
 date: '2018-02-24'
 slug: reading-data-into-r
-categories: ["R"]
-tags: ["data ingest", "mapping", "broom"]
+categories:
+  - R
+  - lesson
+tags: 
+  - data ingest
+  - rvest
+  - broom
+summary: "5 different ways to get data into R"
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -15,7 +24,7 @@ library(here)
 
 This is intended to document the many ways of getting data into R. Here, I want to showcase how data can be read into a session from various sources, without having to download a csv file first. We'll do it all in one step. 
 
-## Built in data sets 
+# Built in data sets 
 
 There are so many packages that come with datasets, it can be hard to keep track of all of them. While there isn't any one site that keeps track of all of them, Vincent Arel-Bundock has built out a pretty detailed composite of a lot of them [here](https://vincentarelbundock.github.io/Rdatasets/datasets.html). 
 
@@ -31,7 +40,7 @@ ggplot(airquality, aes(x = Ozone, y = Temp)) +
   theme_minimal()
 ```
 
-## Reading in data from a URL
+# Reading in data from a URL
 
 As it has become the convention that data should be shared publicly, there are lots of wonderful places to find data online. For instance, here is one [great collection](https://github.com/caesar0301/awesome-public-datasets) of data sources. An easy source for good data is the [FiveThirtyEight](https://github.com/fivethirtyeight/data) data page on github, which provides data for all of their articles. 
 
@@ -63,7 +72,7 @@ fan %>% gather("Site", "Stars", c(7,14,16,18)) %>%
        title = "Fandango LOVES Movies")
 ```
 
-## Reading in a zip file
+# Reading in a zip file
 
 When datasets are kept in a compressed form like a zip file, R has the capability of downloading and unzipping those files. The first thing we do is create a temporary directory for the data, then download the archive, then unzip the files and read the data. 
 
@@ -96,7 +105,7 @@ unzip(path_unzip, exdir = "data/unzipped/.")
 
 With the data unzipped, we can read specific files in from the directory. In this case, we'll map out how many players were born in each US state since 1950. 
 
-```{r, cache = TRUE, map, warning = FALSE, message = FALSE}
+```{r, cache = FALSE, map, warning = FALSE, message = FALSE}
 # read in the csv, filter and tally
 players <- read_csv(here("data/unzipped/baseballdatabank-2017.1/core/Master.csv")) %>%
   filter(birthYear > 1950 & birthCountry == "USA") %>%
@@ -141,7 +150,7 @@ gg +
         legend.key.width=unit(1, "lines"))
 ```
 
-## Reading in from Google Sheets
+# Reading in from Google Sheets
 
 An option that may be of use given the prevalence of the gsuite is to read in data directly from Google Sheets using the ```googlesheets``` package. 
 
@@ -179,13 +188,13 @@ str(twitter)
 glimpse(twitter)
 ```
 
-## Scraping data from the web
+# Scraping data from the web
 
 When all else fails, it is also possible to scrape data using the ```rvest``` package. Here, we'll scrape the [Fangraphs](https://www.fangraphs.com/) website for the 2017 offensive players leaderboard. 
 
 First, we'll use the ```robotstxt``` pacakge to make sure that we're allowed to scrape the site. 
 
-```{r}
+```{r warning=FALSE}
 robotstxt::paths_allowed("http://www.fangraphs.com/leaders.aspx?")
 ```
 
