@@ -5,7 +5,6 @@ date: '2018-02-25'
 slug: snippets-tidyr
 categories:
   - R 
-  - code snippets
 tags:
   - tidyr
 summary: "These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use."
