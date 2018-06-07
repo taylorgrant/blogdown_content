@@ -8,18 +8,30 @@ categories:
 tags:
   - dataframe
 summary: "These commands are relevant for data frames and their manipulation."
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
 
+<div id="TOC">
+<ul>
+<li><a href="#multiple-character-columns-to-numeric">Multiple character columns to numeric</a></li>
+<li><a href="#data-frame-factor-to-character">Data frame factor to character</a></li>
+<li><a href="#renaming-columns-with-special-characters">Renaming columns with special characters</a></li>
+<li><a href="#setting-nas-to-zero">Setting NAs to Zero</a></li>
+<li><a href="#replacing-nas-with-previous-value-by-group">Replacing NAs with Previous Value by Group</a></li>
+</ul>
+</div>
 
 <p>Snippet files are periodically updated with how-to’s for data wrangling. These commands are relevant for data frames and their manipulation.</p>
-<div id="multiple-character-columns-to-numeric" class="section level3">
-<h3>Multiple character columns to numeric</h3>
+<div id="multiple-character-columns-to-numeric" class="section level1">
+<h1>Multiple character columns to numeric</h1>
 <pre class="r"><code># can either reference columns by position or names
 df[c(1,3,5,9)] &lt;- sapply(df[c(1,3,5,9)], as.numeric)</code></pre>
 </div>
-<div id="data-frame-factor-to-character" class="section level3">
-<h3>Data frame factor to character</h3>
+<div id="data-frame-factor-to-character" class="section level1">
+<h1>Data frame factor to character</h1>
 <pre class="r"><code>df &lt;- df %&gt;% mutate_if(is.factor, as.character)
 
 # this can also be done using the purrr package 
@@ -27,8 +39,8 @@ library(purrr)
 library(dplyr)
 df &lt;- df %&gt;% map_if(is.factor, as.character) %&gt;% as_data_frame</code></pre>
 </div>
-<div id="renaming-columns-with-special-characters" class="section level3">
-<h3>Renaming columns with special characters</h3>
+<div id="renaming-columns-with-special-characters" class="section level1">
+<h1>Renaming columns with special characters</h1>
 <p>This is primarily useful if special characters are necessary for graphing. For instance, if we were to use the <code>read.csv</code> command when reading in a csv that has special characters such as a <code>%</code> or <code>+</code> sign, R converts these to dots <code>(.)</code>. But if we were to try to use these variables in graphs, we need to put these characters back into the variable names.</p>
 <pre class="r"><code># can also reference with specific columns using names(df)[i:j]
 names(mlb)</code></pre>
@@ -44,8 +56,8 @@ names(mlb)</code></pre>
 ##  [9] &quot;SB&quot;    &quot;BB%&quot;   &quot;K%&quot;    &quot;ISO&quot;   &quot;BABIP&quot; &quot;AVG&quot;   &quot;OBP&quot;   &quot;SLG&quot;  
 ## [17] &quot;wOBA&quot;  &quot;wRC+&quot;  &quot;BsR&quot;   &quot;Off&quot;   &quot;Def&quot;   &quot;WAR&quot;</code></pre>
 </div>
-<div id="setting-nas-to-zero" class="section level3">
-<h3>Setting NAs to Zero</h3>
+<div id="setting-nas-to-zero" class="section level1">
+<h1>Setting NAs to Zero</h1>
 <p>Assume a data frame that has NAs and you want to set any NA to zero, it is straightforward to do so.</p>
 <pre class="r"><code>df = tibble(
   x = c(1,NA,3,NA,5), 
@@ -81,8 +93,8 @@ head(df)</code></pre>
 <p>Or, within a dplyr pipe, we can use this, and this will work across the entire data frame</p>
 <pre class="r"><code>mutate_all(funs(replace(., is.na(.), 0)))</code></pre>
 </div>
-<div id="replacing-nas-with-previous-value-by-group" class="section level3">
-<h3>Replacing NAs with Previous Value by Group</h3>
+<div id="replacing-nas-with-previous-value-by-group" class="section level1">
+<h1>Replacing NAs with Previous Value by Group</h1>
 <p>Occasionally you can end up with a data frame that has a series of NA, such as below. The goal is to replace those NA simply. The <code>tidyr</code> package can handle this with the <code>fill</code> command. Note that this is a slow process though, so if you have a large dataframe, this is probably not the best option.</p>
 <pre class="r"><code>df &lt;- data.frame(userID = c(rep(21, 10), rep(22, 10)), 
                  date = c(&quot;2017-12-10&quot;, rep(NA, 9), 
