@@ -4,6 +4,7 @@ author: ''
 date: '2018-05-30'
 slug: using-rvest-to-import-and-html-table
 categories:
+  - lesson
   - R
 tags:
   - rvest
@@ -14,7 +15,7 @@ output:
     toc: true
 ---
 
-# Simple tables
+# Capturing Simple tables
 
 I've always used the `rvest` package in tandem with the SelectorGadget to select the CSS of a table on a website, but it turns out that there is a much simpler way of extracting data tables from the web. Thanks to [this]("https://www.r-bloggers.com/using-rvest-to-scrape-an-html-table/") post, which I had not seen until now. 
 
