@@ -67,6 +67,21 @@ ott &lt;- url_1 %&gt;% read_html() %&gt;%
   as_tibble() %&gt;% 
   mutate(url_loc = row_number())
 ott[c(1:4, 35:38, 80:83),1:2]</code></pre>
+<pre><code>## # A tibble: 12 x 2
+##    value                                                          url_loc
+##    &lt;chr&gt;                                                            &lt;int&gt;
+##  1 #                                                                    1
+##  2 /content/pgatour/stats.html                                          2
+##  3 /content/pgatour/stats/categories.ROTT_INQ.html                      3
+##  4 /content/pgatour/stats/categories.RAPP_INQ.html                      4
+##  5 /content/pgatour/stats/stat.496.html                                35
+##  6 /content/pgatour/stats/stat.495.html                                36
+##  7 /content/pgatour/stats/stat.454.html                                37
+##  8 /content/pgatour/stats/stat.455.html                                38
+##  9 https://play.google.com/store/apps/details?id=com.tour.pgatour      80
+## 10 https://www.instagram.com/pgatour                                   81
+## 11 https://www.youtube.com/pgatour                                     82
+## 12 /content/pgatour/mobile.html                                        83</code></pre>
 <p>It’s clear that <code>rvest</code> is working from top to bottom as it collects all of the links. Links 3 and 4 are links to two of the category pages, and links 80 through 83 are tied to social icons found in the footer of the page. Our interest is in the links in the middle that include <code>/stats/stat/</code>. These are our statistics.</p>
 <p><img src = "/img/pga_stat_year.png"></img></p>
 <p>If we visit one of the stats pages and toggle the year we can see the overall url structure: <code>[domain]/[path].[stat_id].[year].html</code>. So as a first step, we need to write a function that visits each category page, grabs the appropriate links, and then mutates them into this basic form.</p>

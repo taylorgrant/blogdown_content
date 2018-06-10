@@ -71,7 +71,7 @@ Within each category page lie the links to our stats of interest, but how do we 
 
 Let's start with one category link and use the `rvest::html_attr` function to pull out all of the links on the page and inspect their structure.  
 
-```{r, eval = FALSE}
+```{r, eval = TRUE}
 url_1 <- "https://www.pgatour.com/stats/categories.ROTT_INQ.html"
 ott <- url_1 %>% read_html() %>%
     html_nodes(".clearfix a") %>% # we know the css by using Chrome's dev tools
