@@ -105,9 +105,54 @@ unzip(path_unzip, exdir = "data/unzipped/.")
 
 With the data unzipped, we can read specific files in from the directory. In this case, we'll map out how many players were born in each US state since 1950. 
 
-```{r, cache = FALSE, map, warning = FALSE, message = FALSE}
+```{r, eval = FALSE, cache = FALSE, map, warning = FALSE, message = FALSE}
 # read in the csv, filter and tally
 players <- read_csv(here("data/unzipped/baseballdatabank-2017.1/core/Master.csv")) %>%
+  filter(birthYear > 1950 & birthCountry == "USA") %>%
+  distinct(playerID, .keep_all = TRUE) %>%
+  group_by(birthState) %>% 
+  rename(iso_3166_2 = birthState) %>%
+  tally %>%
+  mutate(logN = log(n))
+    
+# get map data 
+library(pacman)
+p_load(albersusa, sf, sp, rgeos, maptools, ggplot2, 
+       ggalt, ggthemes, viridis, scales)
+
+us <- usa_composite()
+us_map <- fortify(us, region="name")
+# merge player dataframe into us data
+us@data <- us@data %>% left_join(players)
+
+# set the max for the brightest color
+max <- max(us@data$n)
+min <- min(us@data$n)
+
+
+# map it out 
+gg <- ggplot()
+gg <- gg + geom_map(data=us_map, map=us_map,
+                    aes(x=long, y=lat, map_id=id),
+                    color="#2b2b2b", size=0.1, fill=NA)
+gg <- gg + theme_map()
+
+gg + 
+  geom_map(data=us@data, map=us_map,
+           aes(fill=n, map_id=name),
+           color="white", size=0.1) +
+  coord_map("polyconic") +
+  labs(title = "Number of major leaguers from each state since 1950") + 
+  scale_fill_viridis(trans = "log", breaks = c(min(players$n), median(players$n), max(players$n)),
+                     option = "A") +
+  theme(legend.position="right", 
+        legend.title = element_blank(),
+        legend.key.width=unit(1, "lines"))
+```
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+# read in the csv, filter and tally
+players <- read_csv(here("static/data/mlb/unzipped/baseballdatabank-2017.1/core/Master.csv")) %>%
   filter(birthYear > 1950 & birthCountry == "USA") %>%
   distinct(playerID, .keep_all = TRUE) %>%
   group_by(birthState) %>% 

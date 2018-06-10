@@ -31,8 +31,8 @@ output:
 </ul>
 </div>
 
-<p>Building off of the <a href="%22https://taylorgrant.netlify.com/2018/05/using-rvest-to-import-and-html-table/%22">last post</a> about using <code>rvest</code> to easily scrape html tables, I wanted to extend the process so that I could programmatically scrape multiple tables from multiple pages while still returning tidy data.</p>
-<p>For this exercise my source of data is going to be the <a href="%22https://www.pgatour.com/%22">PGA Tour</a> website and its annual statistics. Not only are there literally hundreds of links to tour stats, but these stats range across multiple years and decades. Each statistic has its own url, and each stat-year has its own path.</p>
+<p>Building off of the <a href="https://taylorgrant.netlify.com/2018/05/using-rvest-to-import-and-html-table/">last post</a> about using <code>rvest</code> to easily scrape html tables, I wanted to extend the process so that I could programmatically scrape multiple tables from multiple pages while still returning tidy data.</p>
+<p>For this exercise my source of data is going to be the <a href="https://www.pgatour.com/" target="_blank">PGA Tour</a> website and its annual statistics. Not only are there literally hundreds of links to tour stats, but these stats range across multiple years and decades. Each statistic has its own url, and each stat-year has its own path.</p>
 <p>By the end of this, I’ll have effectively built a directory of all PGA statistics. Each row of the tibble will contain the stat name as well as a nested tibble with all links to all years of available data. This nested tibble can then be used to query as many, or as few, statistics as necessary.</p>
 <p>In order to do this I need a few functions, and we’ll deal with each before putting them all together.</p>
 <div id="getting-the-link-structure" class="section level1">
@@ -48,7 +48,7 @@ output:
  pgatour.com</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <p>Ok, so it looks like we’re ok to move forward. Let’s start by figuring out where the statistics are within the site as well as the structure of the urls of each.</p>
-<p>If we navigate to the <a href="%22https://www.pgatour.com/stats.html%22">stats</a> page for the PGA Tour we can see that there is a main navigation bar below the hero image that contains 9 tabs linked to different stat categories. We’ll ignore the Overview tab, which only contains current Top-5 type stats, and focus on the other 8 categories.</p>
+<p>If we navigate to the <a href="https://www.pgatour.com/stats.html">stats</a> page for the PGA Tour we can see that there is a main navigation bar below the hero image that contains 9 tabs linked to different stat categories. We’ll ignore the Overview tab, which only contains current Top-5 type stats, and focus on the other 8 categories.</p>
 <p><img src = "/img/pga_stats.png"></img></p>
 <p>Each of these tabs has a similar url structure with only one portion of the path changing based upon the stat category. We can easily create a vector of our stat categories.</p>
 <pre class="r"><code>base_url &lt;- &quot;https://www.pgatour.com/stats/categories.&quot;

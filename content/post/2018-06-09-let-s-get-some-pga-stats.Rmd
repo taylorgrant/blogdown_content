@@ -22,6 +22,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 pacman::p_load(tidyverse, rvest)
+
 load("~/Github/blogdown_content/static/data/pga/pga_data.RData")
 ```
 
@@ -51,7 +52,7 @@ robotstxt::paths_allowed(
 
 Ok, so it looks like we're ok to move forward. Let's start by figuring out where the statistics are within the site as well as the structure of the urls of each. 
 
-If we navigate to the [stats](https://www.pgatour.com/stats.html){target="_blank"} page for the PGA Tour we can see that there is a main navigation bar below the hero image that contains 9 tabs linked to different stat categories. We'll ignore the Overview tab, which only contains current Top-5 type stats, and focus on the other 8 categories.  
+If we navigate to the [stats](https://www.pgatour.com/stats.html) page for the PGA Tour we can see that there is a main navigation bar below the hero image that contains 9 tabs linked to different stat categories. We'll ignore the Overview tab, which only contains current Top-5 type stats, and focus on the other 8 categories.  
 
 <img src = "/img/pga_stats.png"></img>
 
