@@ -336,7 +336,7 @@ head(dir_links)</code></pre>
 ##   title            data             
 ##   &lt;chr&gt;            &lt;list&gt;           
 ## 1 Driving Distance &lt;tibble [39 × 3]&gt;</code></pre>
-<p>When we unnest this tibble, we’ll find more nested data. This is actually useful if you want to only keep a select number of years, and want to see how much data is available within each year.</p>
+<p>When we unnest this tibble, we’ll find more nested data. This is actually useful if you want to only keep a select number of years, or if you want to see how much data is available within each year.</p>
 <pre class="r"><code>dd %&gt;% unnest() %&gt;% head()</code></pre>
 <pre><code>## # A tibble: 6 x 4
 ##   title            cat          year data              
