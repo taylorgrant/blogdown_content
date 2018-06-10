@@ -40,7 +40,7 @@ sapply(str_split(urlPath, "/"), "[[", 3)
 
 # Remove commas and convert string to numeric
 
-This is actually taken directly from [hrbrmstr](https://rud.is/b/2017/11/02/yet-another-power-outages-post-full-tidyverse-edition/), who is fantastic. 
+This is actually taken directly from [hrbrmstr](https://rud.is/b/2017/11/02/yet-another-power-outages-post-full-tidyverse-edition/){target="_blank"}, who is fantastic. 
 ```{r}
 to_num <- function(x) { as.numeric(stringi::stri_replace_all_fixed(x, ",", "")) }
 stringnum <- "100,954"

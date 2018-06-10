@@ -56,7 +56,7 @@ wiki_tv</code></pre>
 </div>
 <div id="a-little-more-cleaning" class="section level1">
 <h1>A little more cleaning</h1>
-<p>As an example of a table that requires a little more work, we’ll use the site <a href="%22https://www.fangraphs.com/%22">fangraphs.com</a>, and the site’s offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.</p>
+<p>As an example of a table that requires a little more work, we’ll use the site <a href="https://www.fangraphs.com/" target="_blank">fangraphs.com</a>, and the site’s offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.</p>
 <pre class="r"><code>pacman::p_load(tidyverse, rvest)
 
 url &lt;- &quot;https://www.fangraphs.com/leaders.aspx?pos=all&amp;stats=bat&amp;lg=all&amp;qual=y&amp;type=8&amp;season=2018&amp;month=0&amp;season1=2018&amp;ind=0&quot;

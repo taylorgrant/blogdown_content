@@ -40,7 +40,7 @@ Wikipedia has incredibly well behaved tables. Occasionally, there will be a litt
 
 # A little more cleaning
 
-As an example of a table that requires a little more work, we'll use the site [fangraphs.com]("https://www.fangraphs.com/"), and the site's offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.
+As an example of a table that requires a little more work, we'll use the site [fangraphs.com](https://www.fangraphs.com/){target="_blank"}, and the site's offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.
 
 ```{r echo = TRUE}
 pacman::p_load(tidyverse, rvest)

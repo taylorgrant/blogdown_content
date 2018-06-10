@@ -26,7 +26,7 @@ This is intended to document the many ways of getting data into R. Here, I want 
 
 # Built in data sets 
 
-There are so many packages that come with datasets, it can be hard to keep track of all of them. While there isn't any one site that keeps track of all of them, Vincent Arel-Bundock has built out a pretty detailed composite of a lot of them [here](https://vincentarelbundock.github.io/Rdatasets/datasets.html). 
+There are so many packages that come with datasets, it can be hard to keep track of all of them. While there isn't any one site that keeps track of all of them, Vincent Arel-Bundock has built out a pretty detailed composite of a lot of them [here](https://vincentarelbundock.github.io/Rdatasets/datasets.html){target="_blank"}. 
 
 As an example, let's load the airquality dataset and investigate the effects of ozone on air temperature. 
 
@@ -42,9 +42,9 @@ ggplot(airquality, aes(x = Ozone, y = Temp)) +
 
 # Reading in data from a URL
 
-As it has become the convention that data should be shared publicly, there are lots of wonderful places to find data online. For instance, here is one [great collection](https://github.com/caesar0301/awesome-public-datasets) of data sources. An easy source for good data is the [FiveThirtyEight](https://github.com/fivethirtyeight/data) data page on github, which provides data for all of their articles. 
+As it has become the convention that data should be shared publicly, there are lots of wonderful places to find data online. For instance, here is one [great collection](https://github.com/caesar0301/awesome-public-datasets){target="_blank"} of data sources. An easy source for good data is the [FiveThirtyEight](https://github.com/fivethirtyeight/data){target="_blank"} data page on github, which provides data for all of their articles. 
 
-Any csv that has a direct link to it can be downloaded using the ```readr``` package. In this case, we'll read in the raw csv used for their [Fandango piece](https://fivethirtyeight.com/features/fandango-movies-ratings/) and recreate a version of their data viz. 
+Any csv that has a direct link to it can be downloaded using the ```readr``` package. In this case, we'll read in the raw csv used for their [Fandango piece](https://fivethirtyeight.com/features/fandango-movies-ratings/){target="_blank"} and recreate a version of their data viz. 
 
 ```{r , fandango, message = FALSE, warning = FALSE}
 fan <- read_csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv")
@@ -76,7 +76,7 @@ fan %>% gather("Site", "Stars", c(7,14,16,18)) %>%
 
 When datasets are kept in a compressed form like a zip file, R has the capability of downloading and unzipping those files. The first thing we do is create a temporary directory for the data, then download the archive, then unzip the files and read the data. 
 
-As an example, we'll download, read, and plot some of the data from the [Lahman Baseball Database](http://www.seanlahman.com/baseball-archive/statistics/)
+As an example, we'll download, read, and plot some of the data from the [Lahman Baseball Database](http://www.seanlahman.com/baseball-archive/statistics/){target="_blank"}
 
 ```{r eval = FALSE} 
 library(tidyverse)
@@ -190,7 +190,7 @@ glimpse(twitter)
 
 # Scraping data from the web
 
-When all else fails, it is also possible to scrape data using the ```rvest``` package. Here, we'll scrape the [Fangraphs](https://www.fangraphs.com/) website for the 2017 offensive players leaderboard. 
+When all else fails, it is also possible to scrape data using the ```rvest``` package. Here, we'll scrape the [Fangraphs](https://www.fangraphs.com/){target="_blank"} website for the 2017 offensive players leaderboard. 
 
 First, we'll use the ```robotstxt``` pacakge to make sure that we're allowed to scrape the site. 
 
