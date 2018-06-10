@@ -213,7 +213,7 @@ dir_links %>% filter(title == "Driving Distance") %>%
 
 # Using the directory
 
-So now that we have the completed directory, we just need to put it to work. This will require one last function. The `pull_data` function will take each stat-year link from our directory and then capture the html table containing the statistics for that year. We're also going to pass the year through so that our output will include a year column.  
+So now that we have the completed directory, we just need to put it to work. This will require one last function. The `pull_data` function will take each stat-year link from our directory and then capture the html table containing the statistics for that year.  
 
 ```{r, eval = FALSE}
 pull_data <- function(url){

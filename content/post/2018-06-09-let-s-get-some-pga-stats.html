@@ -312,7 +312,7 @@ head(dir_links)</code></pre>
 </div>
 <div id="using-the-directory" class="section level1">
 <h1>Using the directory</h1>
-<p>So now that we have the completed directory, we just need to put it to work. This will require one last function. The <code>pull_data</code> function will take each stat-year link from our directory and then capture the html table containing the statistics for that year. We’re also going to pass the year through so that our output will include a year column.</p>
+<p>So now that we have the completed directory, we just need to put it to work. This will require one last function. The <code>pull_data</code> function will take each stat-year link from our directory and then capture the html table containing the statistics for that year.</p>
 <pre class="r"><code>pull_data &lt;- function(url){
   out &lt;-  url %&gt;%
     read_html() %&gt;%
