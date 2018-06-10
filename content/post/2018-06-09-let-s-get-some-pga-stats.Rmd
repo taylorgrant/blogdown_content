@@ -25,7 +25,7 @@ pacman::p_load(tidyverse, rvest)
 load("~/Github/blogdown_content/static/data/pga/pga_data.RData")
 ```
 
-Building off of the [last post](https://taylorgrant.netlify.com/2018/05/using-rvest-to-import-and-html-table/){target="_blank"} about using `rvest` to easily scrape html tables, I wanted to extend the process so that I could programmatically scrape multiple tables from multiple pages while still returning tidy data.
+Building off of the [last post](https://taylorgrant.netlify.com/2018/05/using-rvest-to-import-and-html-table/) about using `rvest` to easily scrape html tables, I wanted to extend the process so that I could programmatically scrape multiple tables from multiple pages while still returning tidy data.
 
 For this exercise my source of data is going to be the [PGA Tour](https://www.pgatour.com/){target="_blank"} website and its annual statistics. Not only are there literally hundreds of links to tour stats, but these stats range across multiple years and decades. Each statistic has its own url, and each stat-year has its own path. 
 
