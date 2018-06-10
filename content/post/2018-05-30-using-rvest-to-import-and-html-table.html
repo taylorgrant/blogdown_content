@@ -25,7 +25,7 @@ output:
 
 <div id="capturing-simple-tables" class="section level1">
 <h1>Capturing Simple tables</h1>
-<p>I’ve always used the <code>rvest</code> package in tandem with the SelectorGadget to select the CSS of a table on a website, but it turns out that there is a much simpler way of extracting data tables from the web. Thanks to <a href="%22https://www.r-bloggers.com/using-rvest-to-scrape-an-html-table/%22">this</a> post, which I had not seen until now.</p>
+<p>I’ve always used the <code>rvest</code> package in tandem with the SelectorGadget to select the CSS of a table on a website, but it turns out that there is a much simpler way of extracting data tables from the web. Thanks to <a href="https://www.r-bloggers.com/using-rvest-to-scrape-an-html-table/">this</a> post, which I had not seen until now.</p>
 <p>We’ll start with an easy example using a table from a Wikipedia page, in this case we’ll grab the most watched television broadcasts in the United States. What we’re going to do is get to the page in Google Chrome and then right click to inspect the element. From there, find the table within the code and then right click and select “Copy Xpath”. This is what we’re going to direct <code>rvest</code> to scrape.</p>
 <pre class="r"><code>pacman::p_load(tidyverse, rvest)
 
