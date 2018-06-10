@@ -34,7 +34,7 @@ In order to do this I need a few functions, and we'll deal with each before putt
 # Getting the link structure
 
 ```{r}
-pacman::p_load(tidyverse, rvest)
+pacman::p_load(tidyverse, rvest, janitor)
 ```
 
 I think that PGA Tour once had an API, but in poking around I wasn't able to find any current public API, so scraping looks like an appropriate way of getting some data. Before beginning, I'll first use the `robotstxt` package to ensure that I'm actually allowed to scrape the site. The  `paths_allowed()` function will call on the robots.txt file at the root of a domain (i.e., https://www.pgatour.com/robots.txt) to determine if web crawlers, spiders, etc., are allowed to access certain paths on that domain.

@@ -35,7 +35,7 @@ output:
 <p>In order to do this I need a few functions, and we’ll deal with each before putting them all together.</p>
 <div id="getting-the-link-structure" class="section level1">
 <h1>Getting the link structure</h1>
-<pre class="r"><code>pacman::p_load(tidyverse, rvest)</code></pre>
+<pre class="r"><code>pacman::p_load(tidyverse, rvest, janitor)</code></pre>
 <p>I think that PGA Tour once had an API, but in poking around I wasn’t able to find any current public API, so scraping looks like an appropriate way of getting some data. Before beginning, I’ll first use the <code>robotstxt</code> package to ensure that I’m actually allowed to scrape the site. The <code>paths_allowed()</code> function will call on the robots.txt file at the root of a domain (i.e., <a href="https://www.pgatour.com/robots.txt" class="uri">https://www.pgatour.com/robots.txt</a>) to determine if web crawlers, spiders, etc., are allowed to access certain paths on that domain.</p>
 <pre class="r"><code>robotstxt::paths_allowed(
   domain = &quot;pgatour.com&quot;,
