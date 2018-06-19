@@ -29,7 +29,7 @@ output:
 <p>This is intended to document the many ways of getting data into R. Here, I want to showcase how data can be read into a session from various sources, without having to download a csv file first. We’ll do it all in one step.</p>
 <div id="built-in-data-sets" class="section level1">
 <h1>Built in data sets</h1>
-<p>There are so many packages that come with datasets, it can be hard to keep track of all of them. While there isn’t any one site that keeps track of all of them, Vincent Arel-Bundock has built out a pretty detailed composite of a lot of them <a href="https://vincentarelbundock.github.io/Rdatasets/datasets.html">here</a>.</p>
+<p>There are so many packages that come with datasets, it can be hard to keep track of all of them. While there isn’t any one site that keeps track of all of them, Vincent Arel-Bundock has built out a pretty detailed composite of a lot of them <a href="https://vincentarelbundock.github.io/Rdatasets/datasets.html" target="_blank">here</a>.</p>
 <p>As an example, let’s load the airquality dataset and investigate the effects of ozone on air temperature.</p>
 <pre class="r"><code>data(airquality) 
 
@@ -42,8 +42,8 @@ ggplot(airquality, aes(x = Ozone, y = Temp)) +
 </div>
 <div id="reading-in-data-from-a-url" class="section level1">
 <h1>Reading in data from a URL</h1>
-<p>As it has become the convention that data should be shared publicly, there are lots of wonderful places to find data online. For instance, here is one <a href="https://github.com/caesar0301/awesome-public-datasets">great collection</a> of data sources. An easy source for good data is the <a href="https://github.com/fivethirtyeight/data">FiveThirtyEight</a> data page on github, which provides data for all of their articles.</p>
-<p>Any csv that has a direct link to it can be downloaded using the <code>readr</code> package. In this case, we’ll read in the raw csv used for their <a href="https://fivethirtyeight.com/features/fandango-movies-ratings/">Fandango piece</a> and recreate a version of their data viz.</p>
+<p>As it has become the convention that data should be shared publicly, there are lots of wonderful places to find data online. For instance, here is one <a href="https://github.com/caesar0301/awesome-public-datasets" target="_blank">great collection</a> of data sources. An easy source for good data is the <a href="https://github.com/fivethirtyeight/data" target="_blank">FiveThirtyEight</a> data page on github, which provides data for all of their articles.</p>
+<p>Any csv that has a direct link to it can be downloaded using the <code>readr</code> package. In this case, we’ll read in the raw csv used for their <a href="https://fivethirtyeight.com/features/fandango-movies-ratings/" target="_blank">Fandango piece</a> and recreate a version of their data viz.</p>
 <pre class="r"><code>fan &lt;- read_csv(&quot;https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv&quot;)
 
 starseq &lt;- data.frame(Site = c(rep(&quot;Fandango_Stars&quot;,10), rep(&quot;IMDB_norm_round&quot;,10),
@@ -72,7 +72,7 @@ fan %&gt;% gather(&quot;Site&quot;, &quot;Stars&quot;, c(7,14,16,18)) %&gt;%
 <div id="reading-in-a-zip-file" class="section level1">
 <h1>Reading in a zip file</h1>
 <p>When datasets are kept in a compressed form like a zip file, R has the capability of downloading and unzipping those files. The first thing we do is create a temporary directory for the data, then download the archive, then unzip the files and read the data.</p>
-<p>As an example, we’ll download, read, and plot some of the data from the <a href="http://www.seanlahman.com/baseball-archive/statistics/">Lahman Baseball Database</a></p>
+<p>As an example, we’ll download, read, and plot some of the data from the <a href="http://www.seanlahman.com/baseball-archive/statistics/" target="_blank">Lahman Baseball Database</a></p>
 <pre class="r"><code>library(tidyverse)
 
 # create temporary directory for data
@@ -134,7 +134,7 @@ gg +
   theme(legend.position=&quot;right&quot;, 
         legend.title = element_blank(),
         legend.key.width=unit(1, &quot;lines&quot;))</code></pre>
-<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/map-1.png" width="672" /></p>
+<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
 <div id="reading-in-from-google-sheets" class="section level1">
 <h1>Reading in from Google Sheets</h1>
@@ -161,7 +161,7 @@ glimpse(twitter)</code></pre>
 </div>
 <div id="scraping-data-from-the-web" class="section level1">
 <h1>Scraping data from the web</h1>
-<p>When all else fails, it is also possible to scrape data using the <code>rvest</code> package. Here, we’ll scrape the <a href="https://www.fangraphs.com/">Fangraphs</a> website for the 2017 offensive players leaderboard.</p>
+<p>When all else fails, it is also possible to scrape data using the <code>rvest</code> package. Here, we’ll scrape the <a href="https://www.fangraphs.com/" target="_blank">Fangraphs</a> website for the 2017 offensive players leaderboard.</p>
 <p>First, we’ll use the <code>robotstxt</code> pacakge to make sure that we’re allowed to scrape the site.</p>
 <pre class="r"><code>robotstxt::paths_allowed(&quot;http://www.fangraphs.com/leaders.aspx?&quot;)</code></pre>
 <pre><code>## 
@@ -228,8 +228,8 @@ df %&gt;%
   labs(x = &quot;WAR&quot;, y = &quot;Statistic Value&quot;) + 
   theme(
     strip.background = element_rect(fill=&quot;gray&quot;, colour = &quot;transparent&quot;))</code></pre>
-<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<p>Compare this with the 6 statistics that explain the lowest amount of the variance.</p>
 <p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Compare this with the 6 statistics that explain the lowest amount of the variance.</p>
+<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p><sub>fin</sub></p>
 </div>

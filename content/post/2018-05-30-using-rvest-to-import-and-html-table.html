@@ -4,6 +4,7 @@ author: ''
 date: '2018-05-30'
 slug: using-rvest-to-import-and-html-table
 categories:
+  - lesson
   - R
 tags:
   - rvest
@@ -17,14 +18,14 @@ output:
 
 <div id="TOC">
 <ul>
-<li><a href="#simple-tables">Simple tables</a></li>
+<li><a href="#capturing-simple-tables">Capturing Simple tables</a></li>
 <li><a href="#a-little-more-cleaning">A little more cleaning</a></li>
 </ul>
 </div>
 
-<div id="simple-tables" class="section level1">
-<h1>Simple tables</h1>
-<p>I’ve always used the <code>rvest</code> package in tandem with the SelectorGadget to select the CSS of a table on a website, but it turns out that there is a much simpler way of extracting data tables from the web. Thanks to <a href="%22https://www.r-bloggers.com/using-rvest-to-scrape-an-html-table/%22">this</a> post, which I had not seen until now.</p>
+<div id="capturing-simple-tables" class="section level1">
+<h1>Capturing Simple tables</h1>
+<p>I’ve always used the <code>rvest</code> package in tandem with the SelectorGadget to select the CSS of a table on a website, but it turns out that there is a much simpler way of extracting data tables from the web. Thanks to <a href="https://www.r-bloggers.com/using-rvest-to-scrape-an-html-table/" target="_blank">this</a> post, which I had not seen until now.</p>
 <p>We’ll start with an easy example using a table from a Wikipedia page, in this case we’ll grab the most watched television broadcasts in the United States. What we’re going to do is get to the page in Google Chrome and then right click to inspect the element. From there, find the table within the code and then right click and select “Copy Xpath”. This is what we’re going to direct <code>rvest</code> to scrape.</p>
 <pre class="r"><code>pacman::p_load(tidyverse, rvest)
 
@@ -55,7 +56,7 @@ wiki_tv</code></pre>
 </div>
 <div id="a-little-more-cleaning" class="section level1">
 <h1>A little more cleaning</h1>
-<p>As an example of a table that requires a little more work, we’ll use the site <a href="%22https://www.fangraphs.com/%22">fangraphs.com</a>, and the site’s offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.</p>
+<p>As an example of a table that requires a little more work, we’ll use the site <a href="https://www.fangraphs.com/" target="_blank">fangraphs.com</a>, and the site’s offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.</p>
 <pre class="r"><code>pacman::p_load(tidyverse, rvest)
 
 url &lt;- &quot;https://www.fangraphs.com/leaders.aspx?pos=all&amp;stats=bat&amp;lg=all&amp;qual=y&amp;type=8&amp;season=2018&amp;month=0&amp;season1=2018&amp;ind=0&quot;
@@ -71,8 +72,8 @@ str(fans_off, list.len = 5)</code></pre>
 ##   ..$ X1 : chr [1:33] &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;#&quot; &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;1&quot; ...
 ##   ..$ X2 : chr [1:33] &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;Name&quot; &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;Mike Trout&quot; ...
 ##   ..$ X3 : chr [1:33] &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;Team&quot; &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;Angels&quot; ...
-##   ..$ X4 : chr [1:33] &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;G&quot; &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;62&quot; ...
-##   ..$ X5 : chr [1:33] &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;PA&quot; &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;273&quot; ...
+##   ..$ X4 : chr [1:33] &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;G&quot; &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;64&quot; ...
+##   ..$ X5 : chr [1:33] &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;PA&quot; &quot;123456\r\n\t\t\t\t\r\n\t\t\t\t\t\r\n\t\t\t\t\r\n\t\t\t\t\tPage size:\r\n\t\t\t\t\t\tselect10203050\r\n\t\t\t\t\&quot;| __truncated__ &quot;281&quot; ...
 ##   .. [list output truncated]</code></pre>
 <p>As can be seen, the <code>html_table</code> function returns a list, which isn’t quite what we wanted. But as we did above, we can convert our data into a tibble or dataframe pretty simply. Here, we’ll use the same code, but structure it as a tibble.</p>
 <pre class="r"><code>pacman::p_load(tidyverse, rvest)
@@ -92,8 +93,8 @@ head(fans_off)</code></pre>
 ## 1 &quot;1234… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123…
 ## 2 #      Name  Team  G     PA    HR    R     RBI   SB    BB%   K%    ISO  
 ## 3 &quot;1234… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123… &quot;123…
-## 4 1      Mike… Ange… 62    273   19    52    39    13    18.7… 17.9… .356 
-## 5 2      Jose… Indi… 58    261   19    43    42    7     13.4… 10.7… .333 
+## 4 1      Mike… Ange… 64    281   19    52    39    13    18.5… 18.9… .345 
+## 5 2      Jose… Indi… 60    269   19    44    43    7     13.8… 10.8… .329 
 ## 6 3      Mook… Red … 48    213   17    52    37    13    11.3… 11.7… .391 
 ## # ... with 10 more variables: X13 &lt;chr&gt;, X14 &lt;chr&gt;, X15 &lt;chr&gt;, X16 &lt;chr&gt;,
 ## #   X17 &lt;chr&gt;, X18 &lt;chr&gt;, X19 &lt;chr&gt;, X20 &lt;chr&gt;, X21 &lt;chr&gt;, X22 &lt;chr&gt;</code></pre>
@@ -120,12 +121,12 @@ head(fans_off)</code></pre>
 <pre><code>## # A tibble: 6 x 21
 ##   name      team      g    pa    hr     r   rbi    sb bb_percent k_percent
 ##   &lt;chr&gt;     &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;
-## 1 Mike Tro… Ange…    62   273    19    52    39    13       18.7      17.9
-## 2 Jose Ram… Indi…    58   261    19    43    42     7       13.4      10.7
+## 1 Mike Tro… Ange…    64   281    19    52    39    13       18.5      18.9
+## 2 Jose Ram… Indi…    60   269    19    44    43     7       13.8      10.8
 ## 3 Mookie B… Red …    48   213    17    52    37    13       11.3      11.7
-## 4 Francisc… Indi…    58   275    14    45    35     6        9.5      17.8
+## 4 Francisc… Indi…    60   284    14    46    35     6        9.5      18.3
 ## 5 Andrelto… Ange…    59   244     4    32    34     5        9.8       4.1
-## 6 Manny Ma… Orio…    59   258    18    32    48     3       10.5      14  
+## 6 Freddie … Brav…    63   284    11    39    44     5       13.7      16.2
 ## # ... with 11 more variables: iso &lt;dbl&gt;, babip &lt;dbl&gt;, avg &lt;dbl&gt;,
 ## #   obp &lt;dbl&gt;, slg &lt;dbl&gt;, w_oba &lt;dbl&gt;, w_rc &lt;dbl&gt;, bs_r &lt;dbl&gt;, off &lt;dbl&gt;,
 ## #   def &lt;dbl&gt;, war &lt;dbl&gt;</code></pre>

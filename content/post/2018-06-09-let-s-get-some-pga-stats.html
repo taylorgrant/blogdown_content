@@ -1,0 +1,554 @@
+---
+title: Let’s get some PGA stats
+author: ''
+date: '2018-06-09'
+slug: let-s-get-some-pga-stats
+categories:
+  - lesson
+  - R
+tags:
+  - rvest
+  - purrr
+  - map
+  - tidy data
+  - functionals
+thumbnailImagePosition: left
+thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1528601498/augusta13th.jpg
+summary: "Programmatically finding links, scraping the data, and returning tidy data. All thanks to the `map()` function..."
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#getting-the-link-structure">Getting the link structure</a></li>
+<li><a href="#getting-the-stat-names">Getting the stat names</a></li>
+<li><a href="#generate-links-for-each-stat-year">Generate links for each stat year</a></li>
+<li><a href="#putting-this-all-together">Putting this all together</a></li>
+<li><a href="#using-the-directory">Using the directory</a></li>
+</ul>
+</div>
+
+<p>Building off of the <a href="https://taylorgrant.netlify.com/2018/05/using-rvest-to-import-and-html-table/" target="_blank">last post</a> about using <code>rvest</code> to easily scrape html tables, I wanted to extend the process so that I could programmatically scrape multiple tables from multiple pages while still returning tidy data.</p>
+<p>For this exercise my source of data is going to be the <a href="https://www.pgatour.com/" target="_blank">PGA Tour</a> website and its annual statistics. Not only are there literally hundreds of links to tour stats, but these stats range across multiple years and decades. Each statistic has its own url, and each stat-year has its own path.</p>
+<p>By the end of this, I’ll have effectively built a directory of all PGA statistics. Each row of the tibble will contain the stat name as well as a nested tibble with all links to all years of available data. This nested tibble can then be used to query as many, or as few, statistics as necessary.</p>
+<p>In order to do this I need a few functions, and we’ll deal with each before putting them all together.</p>
+<div id="getting-the-link-structure" class="section level1">
+<h1>Getting the link structure</h1>
+<pre class="r"><code>pacman::p_load(tidyverse, rvest, janitor)</code></pre>
+<p>I think that PGA Tour once had an API, but in poking around I wasn’t able to find any current public API, so scraping looks like an appropriate way of getting some data. Before beginning, I’ll first use the <code>robotstxt</code> package to ensure that I’m actually allowed to scrape the site. The <code>paths_allowed()</code> function will call on the robots.txt file at the root of a domain (i.e., <a href="https://www.pgatour.com/robots.txt" class="uri">https://www.pgatour.com/robots.txt</a>) to determine if web crawlers, spiders, etc., are allowed to access certain paths on that domain.</p>
+<pre class="r"><code>robotstxt::paths_allowed(
+  domain = &quot;pgatour.com&quot;,
+  path = &quot;/&quot;,
+  bot = &quot;*&quot;
+)</code></pre>
+<pre><code>## 
+ pgatour.com</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>Ok, so it looks like we’re ok to move forward. Let’s start by figuring out where the statistics are within the site as well as the structure of the urls of each.</p>
+<p>If we navigate to the <a href="https://www.pgatour.com/stats.html" target="_blank">stats</a> page for the PGA Tour we can see that there is a main navigation bar below the hero image that contains 9 tabs linked to different stat categories. We’ll ignore the Overview tab, which only contains current Top-5 type stats, and focus on the other 8 categories.</p>
+<p><img src = "/img/pga_stats.png"></img></p>
+<p>Each of these tabs has a similar url structure with only one portion of the path changing based upon the stat category. We can easily create a vector of our stat categories.</p>
+<pre class="r"><code>base_url &lt;- &quot;https://www.pgatour.com/stats/categories.&quot;
+categories &lt;- c(&quot;ROTT_INQ.html&quot;, &quot;RAPP_INQ.html&quot;, &quot;RARG_INQ.html&quot;,
+                &quot;RPUT_INQ.html&quot;, &quot;RSCR_INQ.html&quot;, &quot;RSTR_INQ.html&quot;,
+                &quot;RMNY_INQ.html&quot;, &quot;RPTS_INQ.html&quot;)
+
+link_urls &lt;- tibble(
+  cat = c(&quot;off_the_tee&quot;, &quot;approach_the_green&quot;, &quot;around_the_green&quot;, 
+          &quot;putting&quot;, &quot;scoring&quot;, &quot;streaks&quot;, &quot;money_finishes&quot;, &quot;points_rankings&quot;),
+  links = str_c(base_url, categories))</code></pre>
+<p>Within each category page lie the links to our stats of interest, but how do we collect them all?</p>
+<p>Let’s start with one category link and use the <code>rvest::html_attr</code> function to pull out all of the links on the page and inspect their structure.</p>
+<pre class="r"><code>url_1 &lt;- &quot;https://www.pgatour.com/stats/categories.ROTT_INQ.html&quot;
+ott &lt;- url_1 %&gt;% read_html() %&gt;%
+    html_nodes(&quot;.clearfix a&quot;) %&gt;% # we know the css by using Chrome&#39;s dev tools
+    html_attr(&#39;href&#39;) %&gt;% 
+  as_tibble() %&gt;% 
+  mutate(url_loc = row_number())
+ott[c(1:4, 35:38, 80:83),1:2]</code></pre>
+<pre><code>## # A tibble: 12 x 2
+##    value                                                          url_loc
+##    &lt;chr&gt;                                                            &lt;int&gt;
+##  1 #                                                                    1
+##  2 /content/pgatour/stats.html                                          2
+##  3 /content/pgatour/stats/categories.ROTT_INQ.html                      3
+##  4 /content/pgatour/stats/categories.RAPP_INQ.html                      4
+##  5 /content/pgatour/stats/stat.496.html                                35
+##  6 /content/pgatour/stats/stat.495.html                                36
+##  7 /content/pgatour/stats/stat.454.html                                37
+##  8 /content/pgatour/stats/stat.455.html                                38
+##  9 https://play.google.com/store/apps/details?id=com.tour.pgatour      80
+## 10 https://www.instagram.com/pgatour                                   81
+## 11 https://www.youtube.com/pgatour                                     82
+## 12 /content/pgatour/mobile.html                                        83</code></pre>
+<p>It’s clear that <code>rvest</code> is working from top to bottom as it collects all of the links. Links 3 and 4 are links to two of the category pages, and links 80 through 83 are tied to social icons found in the footer of the page. Our interest is in the links in the middle that include <code>/stats/stat/</code>. These are our statistics.</p>
+<p><img src = "/img/pga_stat_year.png"></img></p>
+<p>If we visit one of the stats pages and toggle the year we can see the overall url structure: <code>[domain]/[path].[stat_id].[year].html</code>. So as a first step, we need to write a function that visits each category page, grabs the appropriate links, and then mutates them into this basic form.</p>
+<p>This is what <code>get_stat_links</code> will accomplish.</p>
+<pre class="r"><code>get_stat_links &lt;- function(l, cat) {
+  link &lt;- l %&gt;% read_html() %&gt;%
+    html_nodes(&quot;.clearfix a&quot;) %&gt;% 
+    html_attr(&#39;href&#39;) %&gt;%
+    as_tibble() %&gt;%
+    filter(str_detect(value, &quot;stats/stat&quot;)) %&gt;%
+    mutate(value = gsub(&quot;/.*/(.*)/&quot;, &quot;&quot;, value)) %&gt;%
+    mutate(cat = cat, 
+           link = paste0(&quot;https://www.pgatour.com/stats/&quot;, value),
+           partial = str_replace_all(link, &quot;html&quot;, &quot;&quot;)) %&gt;% 
+    select(-value)
+  return(link)
+  }</code></pre>
+<p>We can now use this function to iterate over each category and return all links. Because I’m interested in being able to filter my future directory by category, I’m passing two arguments into my function - the link as well as the category name - and this means that I have to use the <code>map2()</code> function.</p>
+<pre class="r"><code>stat_links_list &lt;- map2(link_urls$links, link_urls$cat, get_stat_links)</code></pre>
+<p>Running this function returns a list of 8 elements, one for each category, and within each list we can find the category name, the link to the overall stat, and the partial url that we’re going to eventually use to gather data for all years.</p>
+<pre><code>## [[1]]
+## # A tibble: 60 x 3
+##    cat         link                                          partial      
+##    &lt;chr&gt;       &lt;chr&gt;                                         &lt;chr&gt;        
+##  1 off_the_tee https://www.pgatour.com/stats/stat.02674.html https://www.…
+##  2 off_the_tee https://www.pgatour.com/stats/stat.02567.html https://www.…
+##  3 off_the_tee https://www.pgatour.com/stats/stat.159.html   https://www.…
+##  4 off_the_tee https://www.pgatour.com/stats/stat.101.html   https://www.…
+##  5 off_the_tee https://www.pgatour.com/stats/stat.496.html   https://www.…
+##  6 off_the_tee https://www.pgatour.com/stats/stat.495.html   https://www.…
+##  7 off_the_tee https://www.pgatour.com/stats/stat.454.html   https://www.…
+##  8 off_the_tee https://www.pgatour.com/stats/stat.455.html   https://www.…
+##  9 off_the_tee https://www.pgatour.com/stats/stat.456.html   https://www.…
+## 10 off_the_tee https://www.pgatour.com/stats/stat.457.html   https://www.…
+## # ... with 50 more rows
+## 
+## [[2]]
+## # A tibble: 100 x 3
+##    cat                link                        partial                 
+##    &lt;chr&gt;              &lt;chr&gt;                       &lt;chr&gt;                   
+##  1 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
+##  2 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
+##  3 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
+##  4 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
+##  5 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
+##  6 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
+##  7 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
+##  8 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
+##  9 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
+## 10 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
+## # ... with 90 more rows
+## 
+## [[3]]
+## # A tibble: 30 x 3
+##    cat              link                                          partial 
+##    &lt;chr&gt;            &lt;chr&gt;                                         &lt;chr&gt;   
+##  1 around_the_green https://www.pgatour.com/stats/stat.02569.html https:/…
+##  2 around_the_green https://www.pgatour.com/stats/stat.111.html   https:/…
+##  3 around_the_green https://www.pgatour.com/stats/stat.370.html   https:/…
+##  4 around_the_green https://www.pgatour.com/stats/stat.371.html   https:/…
+##  5 around_the_green https://www.pgatour.com/stats/stat.372.html   https:/…
+##  6 around_the_green https://www.pgatour.com/stats/stat.373.html   https:/…
+##  7 around_the_green https://www.pgatour.com/stats/stat.130.html   https:/…
+##  8 around_the_green https://www.pgatour.com/stats/stat.362.html   https:/…
+##  9 around_the_green https://www.pgatour.com/stats/stat.363.html   https:/…
+## 10 around_the_green https://www.pgatour.com/stats/stat.364.html   https:/…
+## # ... with 20 more rows
+## 
+## [[4]]
+## # A tibble: 95 x 3
+##    cat     link                                          partial          
+##    &lt;chr&gt;   &lt;chr&gt;                                         &lt;chr&gt;            
+##  1 putting https://www.pgatour.com/stats/stat.02564.html https://www.pgat…
+##  2 putting https://www.pgatour.com/stats/stat.413.html   https://www.pgat…
+##  3 putting https://www.pgatour.com/stats/stat.414.html   https://www.pgat…
+##  4 putting https://www.pgatour.com/stats/stat.415.html   https://www.pgat…
+##  5 putting https://www.pgatour.com/stats/stat.416.html   https://www.pgat…
+##  6 putting https://www.pgatour.com/stats/stat.417.html   https://www.pgat…
+##  7 putting https://www.pgatour.com/stats/stat.418.html   https://www.pgat…
+##  8 putting https://www.pgatour.com/stats/stat.420.html   https://www.pgat…
+##  9 putting https://www.pgatour.com/stats/stat.421.html   https://www.pgat…
+## 10 putting https://www.pgatour.com/stats/stat.422.html   https://www.pgat…
+## # ... with 85 more rows
+## 
+## [[5]]
+## # A tibble: 209 x 3
+##    cat     link                                          partial          
+##    &lt;chr&gt;   &lt;chr&gt;                                         &lt;chr&gt;            
+##  1 scoring https://www.pgatour.com/stats/stat.02675.html https://www.pgat…
+##  2 scoring https://www.pgatour.com/stats/stat.120.html   https://www.pgat…
+##  3 scoring https://www.pgatour.com/stats/stat.108.html   https://www.pgat…
+##  4 scoring https://www.pgatour.com/stats/stat.116.html   https://www.pgat…
+##  5 scoring https://www.pgatour.com/stats/stat.02417.html https://www.pgat…
+##  6 scoring https://www.pgatour.com/stats/stat.299.html   https://www.pgat…
+##  7 scoring https://www.pgatour.com/stats/stat.152.html   https://www.pgat…
+##  8 scoring https://www.pgatour.com/stats/stat.153.html   https://www.pgat…
+##  9 scoring https://www.pgatour.com/stats/stat.112.html   https://www.pgat…
+## 10 scoring https://www.pgatour.com/stats/stat.113.html   https://www.pgat…
+## # ... with 199 more rows
+## 
+## [[6]]
+## # A tibble: 21 x 3
+##    cat     link                                        partial            
+##    &lt;chr&gt;   &lt;chr&gt;                                       &lt;chr&gt;              
+##  1 streaks https://www.pgatour.com/stats/stat.297.html https://www.pgatou…
+##  2 streaks https://www.pgatour.com/stats/stat.298.html https://www.pgatou…
+##  3 streaks https://www.pgatour.com/stats/stat.296.html https://www.pgatou…
+##  4 streaks https://www.pgatour.com/stats/stat.295.html https://www.pgatou…
+##  5 streaks https://www.pgatour.com/stats/stat.483.html https://www.pgatou…
+##  6 streaks https://www.pgatour.com/stats/stat.294.html https://www.pgatou…
+##  7 streaks https://www.pgatour.com/stats/stat.474.html https://www.pgatou…
+##  8 streaks https://www.pgatour.com/stats/stat.475.html https://www.pgatou…
+##  9 streaks https://www.pgatour.com/stats/stat.476.html https://www.pgatou…
+## 10 streaks https://www.pgatour.com/stats/stat.477.html https://www.pgatou…
+## # ... with 11 more rows
+## 
+## [[7]]
+## # A tibble: 11 x 3
+##    cat            link                                          partial   
+##    &lt;chr&gt;          &lt;chr&gt;                                         &lt;chr&gt;     
+##  1 money_finishes https://www.pgatour.com/stats/stat.109.html   https://w…
+##  2 money_finishes https://www.pgatour.com/stats/stat.110.html   https://w…
+##  3 money_finishes https://www.pgatour.com/stats/stat.014.html   https://w…
+##  4 money_finishes https://www.pgatour.com/stats/stat.139.html   https://w…
+##  5 money_finishes https://www.pgatour.com/stats/stat.02444.html https://w…
+##  6 money_finishes https://www.pgatour.com/stats/stat.154.html   https://w…
+##  7 money_finishes https://www.pgatour.com/stats/stat.194.html   https://w…
+##  8 money_finishes https://www.pgatour.com/stats/stat.02337.html https://w…
+##  9 money_finishes https://www.pgatour.com/stats/stat.02447.html https://w…
+## 10 money_finishes https://www.pgatour.com/stats/stat.138.html   https://w…
+## 11 money_finishes https://www.pgatour.com/stats/stat.300.html   https://w…
+## 
+## [[8]]
+## # A tibble: 34 x 3
+##    cat             link                                          partial  
+##    &lt;chr&gt;           &lt;chr&gt;                                         &lt;chr&gt;    
+##  1 points_rankings https://www.pgatour.com/stats/stat.02394.html https://…
+##  2 points_rankings https://www.pgatour.com/stats/stat.02395.html https://…
+##  3 points_rankings https://www.pgatour.com/stats/stat.02562.html https://…
+##  4 points_rankings https://www.pgatour.com/stats/stat.131.html   https://…
+##  5 points_rankings https://www.pgatour.com/stats/stat.132.html   https://…
+##  6 points_rankings https://www.pgatour.com/stats/stat.140.html   https://…
+##  7 points_rankings https://www.pgatour.com/stats/stat.187.html   https://…
+##  8 points_rankings https://www.pgatour.com/stats/stat.439.html   https://…
+##  9 points_rankings https://www.pgatour.com/stats/stat.499.html   https://…
+## 10 points_rankings https://www.pgatour.com/stats/stat.02396.html https://…
+## # ... with 24 more rows</code></pre>
+<p>We can now bind the rows together to move this from a list to a dataframe.</p>
+<pre class="r"><code>stat_links &lt;- stat_links_list %&gt;% reduce(bind_rows) %&gt;%
+  distinct(link, .keep_all = TRUE)</code></pre>
+</div>
+<div id="getting-the-stat-names" class="section level1">
+<h1>Getting the stat names</h1>
+<p>With the “partial” column above, we now have the overall format that we’ll use to build each statistic-year. But there is an additional wrinkle - the url structure doesn’t include the name of the statistic, and the statistic isn’t included within the table. We’re going to need this information if the directory is going to have any use.</p>
+<p>With the “link” column above we can use <code>rvest</code> to grab the name of each stat.</p>
+<pre class="r"><code>get_stat_name &lt;- function(ll) {
+  out &lt;- ll %&gt;%
+    read_html() %&gt;%
+    html_nodes(&quot;.current&quot;) %&gt;%
+    html_text() 
+  return(out)
+}</code></pre>
+<p>And we’ll use the <code>map()</code> function to iterate over all the links and return the statistic names.</p>
+<pre class="r"><code>stat_names &lt;- stat_links$link %&gt;% 
+    map(get_stat_name)</code></pre>
+</div>
+<div id="generate-links-for-each-stat-year" class="section level1">
+<h1>Generate links for each stat year</h1>
+<p>The last function that we need is one that simply takes each partial url from above and appends all possible stat years to it. The earliest year for which stats are available is 1980, and because we don’t know when the data for each stat begins, we’re just going to assume that each begin in 1980 and ends in 2018.</p>
+<p>Note that this function includes the <code>nest()</code> function within it. When we put this all together, we’re going to use this function to create nested tibble for each statistic. As we’ll see, this will leave us with a much cleaner, more manageable directory to all possible statistics.</p>
+<pre class="r"><code>app_yrs &lt;- function(d){
+  yrs &lt;- seq(1980, 2018,1)
+  out &lt;- str_c(d, yrs, &quot;.html&quot;) %&gt;%
+    as_tibble() %&gt;%
+    nest() %&gt;%
+    flatten_df %&gt;% 
+    mutate(year = yrs)
+  return(out)
+}</code></pre>
+</div>
+<div id="putting-this-all-together" class="section level1">
+<h1>Putting this all together</h1>
+<p>Now that we have defined each step of the process we can consolidate everything into a single function that will return a <code>tbl_df</code>. We are going to use each of the functions described above. First, <code>get_stat_links</code> will gather category names as well as the general links to each stat within each category. Then <code>get_stat_name</code> is going to pull the names of each statistic and bind them to the general links. Then, for each statistic, we’re going to use <code>app_yrs</code> to create a url for each possible year and nest all of these links within in each row. Finally, after a little cleanup we’ve created our directory.</p>
+<pre class="r"><code>stat_data &lt;- function(links) {
+  
+  stat_links_list &lt;- map2(link_urls$links, link_urls$cat, get_stat_links)
+  
+  ## get out of list form into dataframe 
+  stat_links_list &lt;- stat_links_list[!is.na(stat_links_list)]
+  stat_links &lt;- stat_links_list %&gt;% 
+    reduce(bind_rows) %&gt;% 
+    distinct(link, .keep_all = TRUE) # de-duplicate the links
+  
+  # get stat name
+  stat_names &lt;- stat_links$link %&gt;% 
+    map(get_stat_name) 
+  
+  df &lt;- stat_links %&gt;%
+    bind_cols(title = unlist(stat_names)) %&gt;% # unlist stat names and bind cols 
+    mutate(year_links = map(partial, app_yrs)) %&gt;% # 
+    select(-c(link:partial))
+  return(df)
+}
+
+dir_links &lt;- stat_data(link_urls)
+head(dir_links)</code></pre>
+<pre><code>## # A tibble: 6 x 3
+##   cat         title                           year_links       
+##   &lt;chr&gt;       &lt;chr&gt;                           &lt;list&gt;           
+## 1 off_the_tee SG: Tee-to-Green                &lt;tibble [39 × 2]&gt;
+## 2 off_the_tee SG: Off-the-Tee                 &lt;tibble [39 × 2]&gt;
+## 3 off_the_tee Longest Drives                  &lt;tibble [39 × 2]&gt;
+## 4 off_the_tee Driving Distance                &lt;tibble [39 × 2]&gt;
+## 5 off_the_tee Driving Pct. 320+ (Measured)    &lt;tibble [39 × 2]&gt;
+## 6 off_the_tee Driving Pct. 300-320 (Measured) &lt;tibble [39 × 2]&gt;</code></pre>
+<p>This is nice and tidy, each row is a different statistic, and nested within the <code>year_links</code> column is the link to each year’s data table. We can see what is going on within the nested tibbles by expanding one of them.</p>
+<pre class="r"><code>dir_links %&gt;% filter(title == &quot;Driving Distance&quot;) %&gt;%
+  unnest(year_links) %&gt;% head()</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##   cat         title            value                                  year
+##   &lt;chr&gt;       &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
+## 1 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1980
+## 2 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1981
+## 3 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1982
+## 4 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1983
+## 5 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1984
+## 6 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1985</code></pre>
+</div>
+<div id="using-the-directory" class="section level1">
+<h1>Using the directory</h1>
+<p>So now that we have the completed directory, we just need to put it to work. This will require one last function. The <code>pull_data</code> function will take each stat-year link from our directory and then capture the html table containing the statistics for that year.</p>
+<pre class="r"><code>pull_data &lt;- function(url){
+  out &lt;-  url %&gt;%
+    read_html() %&gt;%
+    html_nodes(xpath = &#39;//*[@id=&quot;statsTable&quot;]&#39;) %&gt;%
+    html_table() %&gt;%
+    flatten_df() %&gt;%
+    janitor::clean_names()
+  return(out)
+}</code></pre>
+<p>We’re also going to use error handling for this function. Not every statistic has data going back to 1980 and we don’t want our function to fail when a url is invalid.</p>
+<pre class="r"><code>try_pull_data &lt;- possibly(pull_data, otherwise = NA_character_)</code></pre>
+<p>With this function, we can now grab any and all data that we want. This could be made into a function, but we’ll just use dplyr to pipe our commands together. For instance, let’s assume we wanted to pull data for Driving Distance. We’re going to take our directory, filter for the statistic of interest, and then run our unnested links through our function. We’re then going to re-nest our data so that we are left with tidy data.</p>
+<pre class="r"><code>dd &lt;- dir_links %&gt;% 
+  filter(title == &quot;Driving Distance&quot;) %&gt;% 
+  unnest(year_links) %&gt;% 
+  mutate(data = map(value, try_pull_data)) %&gt;%
+  group_by(title) %&gt;% 
+  nest(-c(value))</code></pre>
+<p>The result is a single row with the data in a nested tibble.</p>
+<pre><code>## # A tibble: 1 x 2
+##   title            data             
+##   &lt;chr&gt;            &lt;list&gt;           
+## 1 Driving Distance &lt;tibble [39 × 3]&gt;</code></pre>
+<p>When we unnest this tibble, we’ll find more nested data. This is actually useful if you want to only keep a select number of years, or if you want to see how much data is available within each year.</p>
+<pre class="r"><code>dd %&gt;% unnest() %&gt;% head()</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##   title            cat          year data              
+##   &lt;chr&gt;            &lt;chr&gt;       &lt;dbl&gt; &lt;list&gt;            
+## 1 Driving Distance off_the_tee  1980 &lt;tibble [175 × 7]&gt;
+## 2 Driving Distance off_the_tee  1981 &lt;tibble [162 × 7]&gt;
+## 3 Driving Distance off_the_tee  1982 &lt;tibble [161 × 7]&gt;
+## 4 Driving Distance off_the_tee  1983 &lt;tibble [174 × 7]&gt;
+## 5 Driving Distance off_the_tee  1984 &lt;tibble [182 × 7]&gt;
+## 6 Driving Distance off_the_tee  1985 &lt;tibble [179 × 7]&gt;</code></pre>
+<p>Or you can simply unnest twice and retrieve all data.</p>
+<pre class="r"><code>dd %&gt;% unnest() %&gt;% 
+  unnest() %&gt;% 
+  tail(10) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">title</th>
+<th align="left">cat</th>
+<th align="right">year</th>
+<th align="left">rank_this_week</th>
+<th align="left">rank_last_week</th>
+<th align="left">player_name</th>
+<th align="right">rounds</th>
+<th align="right">avg</th>
+<th align="left">total_distance</th>
+<th align="right">total_drives</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">197</td>
+<td align="left">197</td>
+<td align="left">Camilo Villegas</td>
+<td align="right">45</td>
+<td align="right">281.5</td>
+<td align="left">20,828</td>
+<td align="right">74</td>
+</tr>
+<tr class="even">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">198</td>
+<td align="left">198</td>
+<td align="left">Billy Hurley III</td>
+<td align="right">42</td>
+<td align="right">281.1</td>
+<td align="left">22,486</td>
+<td align="right">80</td>
+</tr>
+<tr class="odd">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">199</td>
+<td align="left">200</td>
+<td align="left">Ben Crane</td>
+<td align="right">49</td>
+<td align="right">279.8</td>
+<td align="left">22,940</td>
+<td align="right">82</td>
+</tr>
+<tr class="even">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">200</td>
+<td align="left">199</td>
+<td align="left">K.J. Choi</td>
+<td align="right">40</td>
+<td align="right">279.6</td>
+<td align="left">19,015</td>
+<td align="right">68</td>
+</tr>
+<tr class="odd">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">201</td>
+<td align="left">201</td>
+<td align="left">Wesley Bryan</td>
+<td align="right">50</td>
+<td align="right">279.2</td>
+<td align="left">20,102</td>
+<td align="right">72</td>
+</tr>
+<tr class="even">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">202</td>
+<td align="left">T202</td>
+<td align="left">D.A. Points</td>
+<td align="right">45</td>
+<td align="right">278.7</td>
+<td align="left">21,742</td>
+<td align="right">78</td>
+</tr>
+<tr class="odd">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">203</td>
+<td align="left">T202</td>
+<td align="left">Brian Stuard</td>
+<td align="right">72</td>
+<td align="right">278.0</td>
+<td align="left">37,811</td>
+<td align="right">136</td>
+</tr>
+<tr class="even">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">204</td>
+<td align="left">204</td>
+<td align="left">Zac Blair</td>
+<td align="right">36</td>
+<td align="right">276.3</td>
+<td align="left">18,785</td>
+<td align="right">68</td>
+</tr>
+<tr class="odd">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">205</td>
+<td align="left">205</td>
+<td align="left">Jim Furyk</td>
+<td align="right">28</td>
+<td align="right">273.7</td>
+<td align="left">14,234</td>
+<td align="right">52</td>
+</tr>
+<tr class="even">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">206</td>
+<td align="left">206</td>
+<td align="left">Colt Knost</td>
+<td align="right">28</td>
+<td align="right">271.9</td>
+<td align="left">11,962</td>
+<td align="right">44</td>
+</tr>
+</tbody>
+</table>
+<p>Because this function returns tidy data, we can pull multiple statistics and each one will return nested data within each row. Let’s pull two statistics for Strokes Gained and see that this what happens.</p>
+<pre class="r"><code>sg2 &lt;- dir_links %&gt;% 
+  filter(str_detect(title, &quot;SG&quot;)) %&gt;% 
+  unnest(year_links) %&gt;% 
+  mutate(data = map(value, try_pull_data)) %&gt;%
+  group_by(title) %&gt;% 
+  nest(-c(value))</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   title            data             
+##   &lt;chr&gt;            &lt;list&gt;           
+## 1 SG: Tee-to-Green &lt;tibble [39 × 3]&gt;
+## 2 SG: Off-the-Tee  &lt;tibble [39 × 3]&gt;</code></pre>
+<p>Strokes Gained is a relatively new statistic that was only first calculated and collected in 2004. But we are trying to pull data since 1980. What is returned for early years for which no data is actually available?</p>
+<pre class="r"><code>sg2 %&gt;% filter(title == &quot;SG: Tee-to-Green&quot;) %&gt;% unnest()</code></pre>
+<pre><code>## # A tibble: 39 x 4
+##    title            cat          year data            
+##    &lt;chr&gt;            &lt;chr&gt;       &lt;dbl&gt; &lt;list&gt;          
+##  1 SG: Tee-to-Green off_the_tee  1980 &lt;tibble [0 × 3]&gt;
+##  2 SG: Tee-to-Green off_the_tee  1981 &lt;tibble [0 × 3]&gt;
+##  3 SG: Tee-to-Green off_the_tee  1982 &lt;tibble [0 × 3]&gt;
+##  4 SG: Tee-to-Green off_the_tee  1983 &lt;tibble [0 × 3]&gt;
+##  5 SG: Tee-to-Green off_the_tee  1984 &lt;tibble [0 × 3]&gt;
+##  6 SG: Tee-to-Green off_the_tee  1985 &lt;tibble [0 × 3]&gt;
+##  7 SG: Tee-to-Green off_the_tee  1986 &lt;tibble [0 × 3]&gt;
+##  8 SG: Tee-to-Green off_the_tee  1987 &lt;tibble [0 × 3]&gt;
+##  9 SG: Tee-to-Green off_the_tee  1988 &lt;tibble [0 × 3]&gt;
+## 10 SG: Tee-to-Green off_the_tee  1989 &lt;tibble [0 × 3]&gt;
+## # ... with 29 more rows</code></pre>
+<p>Very cool! The function simply returns empty tibbles, and when we unnest for a second time, these are simply ignored. So, who led the PGA Tour in Strokes Gained in 2017, both off the tee and from tee to green?</p>
+<pre class="r"><code>sg2 %&gt;% unnest() %&gt;%
+  unnest() %&gt;% %&gt;%
+  group_by(title) %&gt;%
+  filter(year == 2017 &amp; rank_this_week == 1) %&gt;% 
+  select(title, year, rank = rank_this_week, player_name) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">title</th>
+<th align="right">year</th>
+<th align="left">rank</th>
+<th align="left">player_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SG: Tee-to-Green</td>
+<td align="right">2017</td>
+<td align="left">1</td>
+<td align="left">Dustin Johnson</td>
+</tr>
+<tr class="even">
+<td align="left">SG: Off-the-Tee</td>
+<td align="right">2017</td>
+<td align="left">1</td>
+<td align="left">Dustin Johnson</td>
+</tr>
+</tbody>
+</table>
+</div>

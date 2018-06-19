@@ -4,6 +4,7 @@ author: ''
 date: '2018-05-30'
 slug: using-rvest-to-import-and-html-table
 categories:
+  - lesson
   - R
 tags:
   - rvest
@@ -14,9 +15,9 @@ output:
     toc: true
 ---
 
-# Simple tables
+# Capturing Simple tables
 
-I've always used the `rvest` package in tandem with the SelectorGadget to select the CSS of a table on a website, but it turns out that there is a much simpler way of extracting data tables from the web. Thanks to [this]("https://www.r-bloggers.com/using-rvest-to-scrape-an-html-table/") post, which I had not seen until now. 
+I've always used the `rvest` package in tandem with the SelectorGadget to select the CSS of a table on a website, but it turns out that there is a much simpler way of extracting data tables from the web. Thanks to [this](https://www.r-bloggers.com/using-rvest-to-scrape-an-html-table/){target="_blank"} post, which I had not seen until now. 
 
 We'll start with an easy example using a table from a Wikipedia page, in this case we'll grab the most watched television broadcasts in the United States. What we're going to do is get to the page in Google Chrome and then right click to inspect the element. From there, find the table within the code and then right click and select "Copy Xpath". This is what we're going to direct `rvest` to scrape.   
 
@@ -39,7 +40,7 @@ Wikipedia has incredibly well behaved tables. Occasionally, there will be a litt
 
 # A little more cleaning
 
-As an example of a table that requires a little more work, we'll use the site [fangraphs.com]("https://www.fangraphs.com/"), and the site's offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.
+As an example of a table that requires a little more work, we'll use the site [fangraphs.com](https://www.fangraphs.com/){target="_blank"}, and the site's offensive leaderboard for 2018. We do the same as above - get the url, inspect the element, find the table, copy the xpath, and use the rvest code.
 
 ```{r echo = TRUE}
 pacman::p_load(tidyverse, rvest)

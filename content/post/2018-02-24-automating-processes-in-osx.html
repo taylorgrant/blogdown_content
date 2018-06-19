@@ -41,7 +41,7 @@ output:
 │ └────────────────── hour (0 - 23)
 └─────────────────────── min (0 - 59)</code></pre>
 <p>The section of the code above “command to execute” is where you include the bash script that you want to run. To write and run a bash script for the first time, see below.</p>
-<p>Also, <code>nano</code> is a little clumsy to use through terminal. There are a lot of shortcuts that can be used and they can be found <a href="%22https://monovm.com/post/35/delete-line-in-nano%22">here</a>.</p>
+<p>Also, <code>nano</code> is a little clumsy to use through terminal. There are a lot of shortcuts that can be used and they can be found <a href="https://monovm.com/post/35/delete-line-in-nano" target="_blank">here</a>.</p>
 </div>
 <div id="the-long-hard-way.-launchd" class="section level1">
 <h1>The long, hard way. launchd</h1>
@@ -98,7 +98,7 @@ PATH=/usr/local/bin:$PATH
 &lt;/dict&gt;
 &lt;/plist&gt;</code></pre>
 <p>So, what’s going on here? First, is the label, this is how the computer will reference the job. The ProgramArguments has to provide the name of the script to run with the full location of where it’s found. RunAtLoad determines whether the script runs when it is first loaded into the launchctl. Setting this to True, and having the bash script call a simple R script is a good way of debugging the pathing and ensuring that the computer can find all programs and files. The Error and Out paths specify where error and output logs are stored. These aren’t necessary, but the error log is helpful. Finally, my plist references the calendar interval because I only want to run my script once per week. Weekday ranges from 0 to 7, Sundays are 0 and 7 (that makes no sense), Monday through Friday are 1 through 5 respectively, and Saturday is 6. As can be seen, this script is set to run at 6AM (my time) every Monday morning.</p>
-<p>Now that you have the plist, it needs to be saved as <code>com.LABEL_NAME.plist</code>, and where you save it depends on your permissions. If you are User Agent - meaning that you must be logged in - you save the file in <code>~Library/LaunchAgents</code>. See <a href="http:www.launchd.info">here</a> for the full breakdown of permissions and the requisite locations for the plist to go.</p>
+<p>Now that you have the plist, it needs to be saved as <code>com.LABEL_NAME.plist</code>, and where you save it depends on your permissions. If you are User Agent - meaning that you must be logged in - you save the file in <code>~Library/LaunchAgents</code>. See <a href="http:www.launchd.info" target="_blank">here</a> for the full breakdown of permissions and the requisite locations for the plist to go.</p>
 </div>
 <div id="load-the-plist-into-launchd" class="section level2">
 <h2>Load the plist into launchd</h2>

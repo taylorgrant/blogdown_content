@@ -50,7 +50,7 @@ sapply(str_split(urlPath, &quot;/&quot;), &quot;[[&quot;, 3)</code></pre>
 </div>
 <div id="remove-commas-and-convert-string-to-numeric" class="section level1">
 <h1>Remove commas and convert string to numeric</h1>
-<p>This is actually taken directly from <a href="https://rud.is/b/2017/11/02/yet-another-power-outages-post-full-tidyverse-edition/">hrbrmstr</a>, who is fantastic.</p>
+<p>This is actually taken directly from <a href="https://rud.is/b/2017/11/02/yet-another-power-outages-post-full-tidyverse-edition/" target="_blank">hrbrmstr</a>, who is fantastic.</p>
 <pre class="r"><code>to_num &lt;- function(x) { as.numeric(stringi::stri_replace_all_fixed(x, &quot;,&quot;, &quot;&quot;)) }
 stringnum &lt;- &quot;100,954&quot;
 to_num(stringnum)</code></pre>
