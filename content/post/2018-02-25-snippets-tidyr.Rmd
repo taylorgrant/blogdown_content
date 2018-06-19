@@ -1,5 +1,5 @@
 ---
-title: 'Snippets: tidyr'
+title: 'Snippets: tidy data'
 author: ''
 date: '2018-02-25'
 slug: snippets-tidyr
@@ -21,7 +21,7 @@ Snippet files are periodically updated with how-to’s for data wrangling. These
 Spread is based on the key, value pairing -- the key becomes the names of the new columns and the values are row values within each new column. 
 
 ```{r, warning = FALSE, message = FALSE}
-library(tidyverse)
+pacman::p_load(tidyverse, blogdown, glue, here)
 dat <- read_csv("https://raw.githubusercontent.com/garrettgman/DSR/master/data-raw/table2.csv")
 
 dat
@@ -112,3 +112,24 @@ df <- df %>%
 df
 ```
 
+# Multiple left_joins using dplyr
+
+It's always possible to use multiple `left_join` functions, but the easiest way to do merge multiple data sets together may be to put everything into a list and then use the `Reduce` function. I had used `map` to work over a lot of data, so everything was in a list. I then took the data I wanted to use as my base and concatenated it to the list. 
+
+```
+tmp <- c(list(df), original_list)
+```
+
+Then, using dplyr commands was able to join all of the data. In this case, my original list had 30 separate dataframes.
+
+```
+mass_df <- tmp %>% Reduce(function(df1, df2), left_join(df1, df2), .)
+```
+The `left_join` command can be further defined to specify what we're joining by, or to select only specific columns that will be joined. 
+```
+# using "matches" to pull out specific variables
+mass_df <- tmp %>% Reduce(function(df1, df2), left_join(df1, select(df2, matches("avar|bvar"))), .)
+
+# specifying what the join is by
+mass_df <- tmp %>% Reduce(function(df1, df2), left_join(df1, df2, by = "index"), .)
+```
