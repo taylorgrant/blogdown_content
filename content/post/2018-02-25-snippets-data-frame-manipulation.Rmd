@@ -115,4 +115,22 @@ df %>% group_by(userID) %>%
   fill(date)
 ```
 
+# Getting rid of NULL values within dataframe
+
+Occasionally, I'll be working with data containing cells that, rather than simply being left empty, have been populated with 'NULL'. This can be a pain, especially when trying to determine how much data is missing. 
+
+This is a quick function to overwrite all 'NULL' values and then replace with NA. 
+
+```{r, eval = FALSE}
+#function 
+rm_null <- function(x){
+  str_replace_all(x, "NULL", "")
+}
+
+# apply to data
+df_clean <- df %>% mutate_all(funs(rm_null))
+# replace with NA
+df_clean[df_clean == ""] <- NA
+
+```
 

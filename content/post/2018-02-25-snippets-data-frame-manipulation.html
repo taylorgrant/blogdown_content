@@ -22,6 +22,7 @@ output:
 <li><a href="#renaming-columns-with-special-characters">Renaming columns with special characters</a></li>
 <li><a href="#setting-nas-to-zero">Setting NAs to Zero</a></li>
 <li><a href="#replacing-nas-with-previous-value-by-group">Replacing NAs with Previous Value by Group</a></li>
+<li><a href="#getting-rid-of-null-values-within-dataframe">Getting rid of NULL values within dataframe</a></li>
 </ul>
 </div>
 
@@ -148,4 +149,18 @@ df</code></pre>
 ## 18     22 2017-12-11
 ## 19     22 2017-12-11
 ## 20     22 2017-12-11</code></pre>
+</div>
+<div id="getting-rid-of-null-values-within-dataframe" class="section level1">
+<h1>Getting rid of NULL values within dataframe</h1>
+<p>Occasionally, I’ll be working with data containing cells that, rather than simply being left empty, have been populated with ‘NULL’. This can be a pain, especially when trying to determine how much data is missing.</p>
+<p>This is a quick function to overwrite all ‘NULL’ values and then replace with NA.</p>
+<pre class="r"><code>#function 
+rm_null &lt;- function(x){
+  str_replace_all(x, &quot;NULL&quot;, &quot;&quot;)
+}
+
+# apply to data
+df_clean &lt;- df %&gt;% mutate_all(funs(rm_null))
+# replace with NA
+df_clean[df_clean == &quot;&quot;] &lt;- NA</code></pre>
 </div>
