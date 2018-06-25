@@ -1,0 +1,69 @@
+---
+title: 'Snippets: Working within the tidyverse'
+author: ''
+date: '2018-06-25'
+slug: snippets-working-within-the-tidyverse
+categories:
+  - R
+tags:
+  - tidy data
+  - tidyverse
+  - dplyr
+summary: "Commands, tips, and tricks that are useful within the tidyverse of packages, especially when using piped operations."
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+Snippet files are periodically updated with tips and tricks as I learn them. These commands are relevant for packages within the `tidyverse`.
+
+```{r setup, include = FALSE}
+pacman::p_load(tidyverse)
+```
+
+# Using setNames to change column names
+
+The `colnames` function can be used, as can `rename()`, but for ease of use while piping commands, the `setNames()` function is the easiest. You can either reference a vector of names or you can also reference a specific row within the data if that's necessary. For example, in [this post](https://taylorgrant.netlify.com/2018/05/using-rvest-to-import-and-html-table/){target="_blank"} after scraping an html table the column names were in the second row. In that case, we can just reference the row by its location - `%>% setNames(.[2,])` 
+
+```{r}
+names <- c("name1", "name2", "name3", "name4")
+
+df <- tibble(
+  a = sample(letters, 4),
+  b = sample(1:100, 4),
+  c = sample(1:100, 4),
+  d = sample(letters, 4)
+)
+
+df %>% setNames(names)
+```
+
+# Mutate and Summarise multiple columns 
+
+This is well summarised [here](https://dplyr.tidyverse.org/reference/summarise_all.html){target="_blank"}, but a few examples are below. When using either `mutate_at()` or `summarise_at` it's important to include the "vars(), funs()" format. 
+
+```{r} 
+mtcars %>% 
+  group_by(cyl) %>%
+  summarise_at(vars(disp, drat, mpg), funs(median, mean))
+```
+
+The [helper functions](https://dplyr.tidyverse.org/reference/select_helpers.html){target="_blank"} for `select()` are also useful for selecting variables. Though note that when using helpers such as `contains()` that you can only include one term. For instance, this will work.
+
+```{r}
+mtcars %>% 
+  summarise_at(vars(contains("ar")), funs(mean))
+```
+
+But this won't
+```{r}
+mtcars %>%
+  summarise_at(vars(contains("ar|mp")), funs(mean))
+```
+
+If you want to match across multiple expressions, the `matches()` function will do the trick. 
+
+```{r}
+mtcars %>%
+  summarise_at(vars(matches("ar|mp")), funs(mean))
+```
