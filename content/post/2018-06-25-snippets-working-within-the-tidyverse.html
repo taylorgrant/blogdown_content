@@ -40,10 +40,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 m        10    43 z    
-## 2 c        82    73 n    
-## 3 k        50    59 q    
-## 4 h        95    62 w</code></pre>
+## 1 k       100    39 h    
+## 2 h        67    43 m    
+## 3 a         4    30 z    
+## 4 v        19    41 r</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -57,7 +57,7 @@ df %&gt;% setNames(names)</code></pre>
 ## 1     4        108         4.08       26        105.      4.07     26.7
 ## 2     6        168.        3.9        19.7      183.      3.59     19.7
 ## 3     8        350.        3.12       15.2      353.      3.23     15.1</code></pre>
-<p>The <a href="https://dplyr.tidyverse.org/reference/select_helpers.html" target="_blank">helper functions</a> for <code>select()</code> are also useful for selecting variables. Though note that when using helpers such as <code>contains()</code> that you can only include one term. For instance, this will work.</p>
+<p>The <a href="https://dplyr.tidyverse.org/reference/select_helpers.html" target="_blank">helper functions</a> for <code>select()</code> are also useful for selecting variables. Though note that when using helpers such as <code>contains()</code> that you can only include one string. For instance, this will work.</p>
 <pre class="r"><code>mtcars %&gt;% 
   summarise_at(vars(contains(&quot;ar&quot;)), funs(mean))</code></pre>
 <pre><code>##     gear   carb
@@ -66,7 +66,7 @@ df %&gt;% setNames(names)</code></pre>
 <pre class="r"><code>mtcars %&gt;%
   summarise_at(vars(contains(&quot;ar|mp&quot;)), funs(mean))</code></pre>
 <pre><code>## data frame with 0 columns and 0 rows</code></pre>
-<p>If you want to match across multiple expressions, the <code>matches()</code> function will do the trick.</p>
+<p>If you want to match across multiple strings, the <code>matches()</code> function will do the trick.</p>
 <pre class="r"><code>mtcars %&gt;%
   summarise_at(vars(matches(&quot;ar|mp&quot;)), funs(mean))</code></pre>
 <pre><code>##        mpg   gear   carb

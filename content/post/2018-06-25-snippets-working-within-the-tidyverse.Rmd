@@ -48,7 +48,7 @@ mtcars %>%
   summarise_at(vars(disp, drat, mpg), funs(median, mean))
 ```
 
-The [helper functions](https://dplyr.tidyverse.org/reference/select_helpers.html){target="_blank"} for `select()` are also useful for selecting variables. Though note that when using helpers such as `contains()` that you can only include one term. For instance, this will work.
+The [helper functions](https://dplyr.tidyverse.org/reference/select_helpers.html){target="_blank"} for `select()` are also useful for selecting variables. Though note that when using helpers such as `contains()` that you can only include one string. For instance, this will work.
 
 ```{r}
 mtcars %>% 
@@ -61,7 +61,7 @@ mtcars %>%
   summarise_at(vars(contains("ar|mp")), funs(mean))
 ```
 
-If you want to match across multiple expressions, the `matches()` function will do the trick. 
+If you want to match across multiple strings, the `matches()` function will do the trick. 
 
 ```{r}
 mtcars %>%
