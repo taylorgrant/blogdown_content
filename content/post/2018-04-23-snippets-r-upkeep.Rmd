@@ -1,8 +1,8 @@
 ---
-title: 'Snippets: R upkeep'
+title: 'Snippets: General R'
 author: ''
 date: '2018-04-23'
-slug: snippets-r-upkeep
+slug: snippets-r-general
 categories: 
 - R
 tags:
@@ -13,7 +13,7 @@ summary: "These functions and commands are relevant for working with R and RStud
 
 Snippet files periodically updated. These functions and commands are relevant for working with R and RStudio. 
 
-### Easily updating R
+# Easily updating R
 
 The `updateR` package is fantastic. Just using this line of code with the admin_password set will update everything and keep all packages in the new version of R. 
 
@@ -21,7 +21,7 @@ The `updateR` package is fantastic. Just using this line of code with the admin_
 updateR(admin_password = "admin_password")
 ```
 
-### Finding all functions in a package
+# Finding all functions in a package
 
 This is especially useful when using a dev version of a package. Often, there are github files, but it's sometimes easier to just use `asNamespace` to see functions. 
 
@@ -34,6 +34,16 @@ fns <- unclass(lsf.str(envir = asNamespace("spotifyr"), all = T))
 fns
 ```
 
+# Loading all functions within a folder
+
+The `R.utils` package also has a command for this, but this is a simple way to source all of your functions at once. 
+
+```{r eval = FALSE}
+# set directory location, or use here() rather than glue
+# load functions
+file.sources = list.files(path = glue(dir, "functions"), pattern="*.R")
+sapply(glue("{dir}functions/{file.sources}"), source, .GlobalEnv)
+```
 
 
 

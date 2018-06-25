@@ -1,8 +1,8 @@
 ---
-title: 'Snippets: R upkeep'
+title: 'Snippets: General R'
 author: ''
 date: '2018-04-23'
-slug: snippets-r-upkeep
+slug: snippets-r-general
 categories: 
 - R
 tags:
@@ -14,13 +14,13 @@ summary: "These functions and commands are relevant for working with R and RStud
 
 
 <p>Snippet files periodically updated. These functions and commands are relevant for working with R and RStudio.</p>
-<div id="easily-updating-r" class="section level3">
-<h3>Easily updating R</h3>
+<div id="easily-updating-r" class="section level1">
+<h1>Easily updating R</h1>
 <p>The <code>updateR</code> package is fantastic. Just using this line of code with the admin_password set will update everything and keep all packages in the new version of R.</p>
 <pre class="r"><code>updateR(admin_password = &quot;admin_password&quot;)</code></pre>
 </div>
-<div id="finding-all-functions-in-a-package" class="section level3">
-<h3>Finding all functions in a package</h3>
+<div id="finding-all-functions-in-a-package" class="section level1">
+<h1>Finding all functions in a package</h1>
 <p>This is especially useful when using a dev version of a package. Often, there are github files, but it’s sometimes easier to just use <code>asNamespace</code> to see functions.</p>
 <p>For example, let’s look at the functions available within the spotifyR package.</p>
 <pre class="r"><code>library(spotifyr)
@@ -41,4 +41,12 @@ fns</code></pre>
 ## &lt;environment: namespace:spotifyr&gt;
 ## attr(,&quot;mode&quot;)
 ## [1] &quot;function&quot;</code></pre>
+</div>
+<div id="loading-all-functions-within-a-folder" class="section level1">
+<h1>Loading all functions within a folder</h1>
+<p>The <code>R.utils</code> package also has a command for this, but this is a simple way to source all of your functions at once.</p>
+<pre class="r"><code># set directory location, or use here() rather than glue
+# load functions
+file.sources = list.files(path = glue(dir, &quot;functions&quot;), pattern=&quot;*.R&quot;)
+sapply(glue(&quot;{dir}functions/{file.sources}&quot;), source, .GlobalEnv)</code></pre>
 </div>
