@@ -23,6 +23,7 @@ thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dot
 <li><a href="#using-setnames-to-change-column-names">Using setNames to change column names</a></li>
 <li><a href="#mutate-and-summarise-multiple-columns">Mutate and Summarise multiple columns</a></li>
 <li><a href="#mutating-multiple-date-formats-within-the-same-column">Mutating multiple date formats within the same column</a></li>
+<li><a href="#multiple-left_joins-using-dplyr">Multiple left_joins using dplyr</a></li>
 </ul>
 </div>
 
@@ -43,10 +44,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 x        46    33 n    
-## 2 l        83    45 i    
-## 3 r        91    89 l    
-## 4 n        51    27 h</code></pre>
+## 1 z        93    20 e    
+## 2 n        67    27 c    
+## 3 y        94    64 r    
+## 4 j        70    32 g</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -102,4 +103,17 @@ df %&gt;%
 ##   &lt;chr&gt;            &lt;date&gt;       &lt;chr&gt; &lt;dttm&gt;             
 ## 1 30/05/2017 07:20 2017-05-30   07:20 2017-05-30 07:20:00
 ## 2 19/6/17 13:47    2017-06-19   13:47 2017-06-19 13:47:00</code></pre>
+</div>
+<div id="multiple-left_joins-using-dplyr" class="section level1">
+<h1>Multiple left_joins using dplyr</h1>
+<p>It’s always possible to use multiple <code>left_join</code> functions, but the easiest way to do merge multiple data sets together may be to put everything into a list and then use the <code>Reduce</code> function. I had used <code>map</code> to work over a lot of data, so everything was in a list. I then took the data I wanted to use as my base and concatenated it to the list.</p>
+<pre><code>tmp &lt;- c(list(df), original_list)</code></pre>
+<p>Then, using dplyr commands was able to join all of the data. In this case, my original list had 30 separate dataframes.</p>
+<pre><code>mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, df2), .)</code></pre>
+<p>The <code>left_join</code> command can be further defined to specify what we’re joining by, or to select only specific columns that will be joined.</p>
+<pre><code># using &quot;matches&quot; to pull out specific variables
+mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, select(df2, matches(&quot;avar|bvar&quot;))), .)
+
+# specifying what the join is by
+mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, df2, by = &quot;index&quot;), .)</code></pre>
 </div>

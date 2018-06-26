@@ -22,7 +22,6 @@ thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dot
 <li><a href="#gather">gather()</a></li>
 <li><a href="#separate">separate()</a></li>
 <li><a href="#unite">unite()</a></li>
-<li><a href="#multiple-left_joins-using-dplyr">Multiple left_joins using dplyr</a></li>
 </ul>
 </div>
 
@@ -128,38 +127,38 @@ event &lt;- sample(letters, 15)
 data &lt;- data.frame(date, hour, min, second, event)
 data</code></pre>
 <pre><code>##          date hour min second event
-## 1  2018-01-01   18  27     40     z
-## 2  2018-01-02   13   9      7     q
-## 3  2018-01-03   21  18     39     p
-## 4  2018-01-04   20  28     21     e
-## 5  2018-01-05    8   3     11     j
-## 6  2018-01-06   17  10     58     r
-## 7  2018-01-07    1  31     16     n
-## 8  2018-01-08   14  55     38     t
-## 9  2018-01-09    4  20     44     d
-## 10 2018-01-10    3  11     20     l
-## 11 2018-01-11   11  22      1     h
-## 12 2018-01-12    2  52     48     u
-## 13 2018-01-13   22  14     33     s
-## 14 2018-01-14    6  41     43     k
-## 15 2018-01-15   24  23     17     x</code></pre>
+## 1  2018-01-01   12  28     58     e
+## 2  2018-01-02    6  16     13     x
+## 3  2018-01-03    4  54     45     t
+## 4  2018-01-04   11   5     28     o
+## 5  2018-01-05   17   7     47     m
+## 6  2018-01-06   14  22     27     d
+## 7  2018-01-07   21  34     32     k
+## 8  2018-01-08    5  50     18     l
+## 9  2018-01-09   19  48      7     p
+## 10 2018-01-10    3  49     42     i
+## 11 2018-01-11   24  37     29     n
+## 12 2018-01-12   15  40      1     s
+## 13 2018-01-13    2  42     12     g
+## 14 2018-01-14    8  11     26     z
+## 15 2018-01-15   13  47     51     r</code></pre>
 <pre class="r"><code>data %&gt;% unite(datetime, hour, min, second, sep = &quot;:&quot;)</code></pre>
 <pre><code>##          date datetime event
-## 1  2018-01-01 18:27:40     z
-## 2  2018-01-02   13:9:7     q
-## 3  2018-01-03 21:18:39     p
-## 4  2018-01-04 20:28:21     e
-## 5  2018-01-05   8:3:11     j
-## 6  2018-01-06 17:10:58     r
-## 7  2018-01-07  1:31:16     n
-## 8  2018-01-08 14:55:38     t
-## 9  2018-01-09  4:20:44     d
-## 10 2018-01-10  3:11:20     l
-## 11 2018-01-11  11:22:1     h
-## 12 2018-01-12  2:52:48     u
-## 13 2018-01-13 22:14:33     s
-## 14 2018-01-14  6:41:43     k
-## 15 2018-01-15 24:23:17     x</code></pre>
+## 1  2018-01-01 12:28:58     e
+## 2  2018-01-02  6:16:13     x
+## 3  2018-01-03  4:54:45     t
+## 4  2018-01-04  11:5:28     o
+## 5  2018-01-05  17:7:47     m
+## 6  2018-01-06 14:22:27     d
+## 7  2018-01-07 21:34:32     k
+## 8  2018-01-08  5:50:18     l
+## 9  2018-01-09  19:48:7     p
+## 10 2018-01-10  3:49:42     i
+## 11 2018-01-11 24:37:29     n
+## 12 2018-01-12  15:40:1     s
+## 13 2018-01-13  2:42:12     g
+## 14 2018-01-14  8:11:26     z
+## 15 2018-01-15 13:47:51     r</code></pre>
 <pre class="r"><code># the default separator is &quot;_&quot;, so if that doesn&#39;t work, change it as necessary</code></pre>
 <p>The <code>unite</code> function is also helpful when you need to spread multiple columns in a dataframe.</p>
 <pre class="r"><code>df &lt;- data.frame(quarter=rep(1:4,2),
@@ -195,17 +194,4 @@ df</code></pre>
 ## 2       2     0.7     0.7     0.9     0.7
 ## 3       3     0.6     0.8     1.0     0.5
 ## 4       4     0.8     0.5     0.6     0.9</code></pre>
-</div>
-<div id="multiple-left_joins-using-dplyr" class="section level1">
-<h1>Multiple left_joins using dplyr</h1>
-<p>It’s always possible to use multiple <code>left_join</code> functions, but the easiest way to do merge multiple data sets together may be to put everything into a list and then use the <code>Reduce</code> function. I had used <code>map</code> to work over a lot of data, so everything was in a list. I then took the data I wanted to use as my base and concatenated it to the list.</p>
-<pre><code>tmp &lt;- c(list(df), original_list)</code></pre>
-<p>Then, using dplyr commands was able to join all of the data. In this case, my original list had 30 separate dataframes.</p>
-<pre><code>mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, df2), .)</code></pre>
-<p>The <code>left_join</code> command can be further defined to specify what we’re joining by, or to select only specific columns that will be joined.</p>
-<pre><code># using &quot;matches&quot; to pull out specific variables
-mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, select(df2, matches(&quot;avar|bvar&quot;))), .)
-
-# specifying what the join is by
-mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, df2, by = &quot;index&quot;), .)</code></pre>
 </div>
