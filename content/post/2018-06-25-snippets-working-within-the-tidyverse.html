@@ -22,6 +22,7 @@ thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dot
 <ul>
 <li><a href="#using-setnames-to-change-column-names">Using setNames to change column names</a></li>
 <li><a href="#mutate-and-summarise-multiple-columns">Mutate and Summarise multiple columns</a></li>
+<li><a href="#mutating-multiple-date-formats-within-the-same-column">Mutating multiple date formats within the same column</a></li>
 </ul>
 </div>
 
@@ -42,10 +43,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 n        54    35 f    
-## 2 f        81     3 a    
-## 3 s        77    94 t    
-## 4 d        88    73 z</code></pre>
+## 1 x        46    33 n    
+## 2 l        83    45 i    
+## 3 r        91    89 l    
+## 4 n        51    27 h</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -73,4 +74,32 @@ df %&gt;% setNames(names)</code></pre>
   summarise_at(vars(matches(&quot;ar|mp&quot;)), funs(mean))</code></pre>
 <pre><code>##        mpg   gear   carb
 ## 1 20.09062 3.6875 2.8125</code></pre>
+</div>
+<div id="mutating-multiple-date-formats-within-the-same-column" class="section level1">
+<h1>Mutating multiple date formats within the same column</h1>
+<p>I was recently dealing with several large datasets that contain multiple date formats. I had been trying to set the dates as <code>as.POSIXct</code> formats, and it wasn’t until trying to use the <code>difftime</code> function that several years were in two digit, rather than four digit format. The problem is that when specifying the date format, a two digit year pads itself with two extra zeros.</p>
+<pre class="r"><code>df &lt;- tibble(
+  dates = c(&quot;30/05/2017 07:20&quot;, &quot;19/6/17 13:47&quot;)
+)
+
+df %&gt;% mutate(try_date = as.POSIXct(dates, tz = &quot;&quot;, format = &quot;%d/%m/%Y %H:%M&quot;))</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   dates            try_date           
+##   &lt;chr&gt;            &lt;dttm&gt;             
+## 1 30/05/2017 07:20 2017-05-30 07:20:00
+## 2 19/6/17 13:47    0017-06-19 13:47:00</code></pre>
+<p>To get around this, we can use the <code>lubridate</code> package to solve our issues. In this case, I’m splitting out my dates and times before gluing them back together. the <code>dmy()</code> function automatically converts the <code>%y</code> into <code>%Y</code>.</p>
+<pre class="r"><code>df &lt;- tibble(
+  dates = c(&quot;30/05/2017 07:20&quot;, &quot;19/6/17 13:47&quot;)
+)
+
+df %&gt;% 
+  mutate(working_date = lubridate::dmy(gsub(&quot;\\ .*&quot;, &quot;&quot;, dates)),
+         hour = gsub(&quot;.*\\ &quot;, &quot;&quot;, dates),
+         final_date = as.POSIXct(glue(&quot;{working_date} {hour}&quot;), tz=&quot;&quot;, format = &quot;%Y-%m-%d %H:%M&quot;))</code></pre>
+<pre><code>## # A tibble: 2 x 4
+##   dates            working_date hour  final_date         
+##   &lt;chr&gt;            &lt;date&gt;       &lt;chr&gt; &lt;dttm&gt;             
+## 1 30/05/2017 07:20 2017-05-30   07:20 2017-05-30 07:20:00
+## 2 19/6/17 13:47    2017-06-19   13:47 2017-06-19 13:47:00</code></pre>
 </div>

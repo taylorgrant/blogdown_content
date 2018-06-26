@@ -20,7 +20,7 @@ thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dot
 Snippet files are periodically updated with tips and tricks as I learn them. These commands are relevant for packages within the `tidyverse`.
 
 ```{r setup, include = FALSE}
-pacman::p_load(tidyverse)
+pacman::p_load(tidyverse, glue)
 ```
 
 # Using setNames to change column names
@@ -68,4 +68,29 @@ If you want to match across multiple strings, the `matches()` function will do t
 ```{r}
 mtcars %>%
   summarise_at(vars(matches("ar|mp")), funs(mean))
+```
+
+# Mutating multiple date formats within the same column
+
+I was recently dealing with several large datasets that contain multiple date formats. I had been trying to set the dates as `as.POSIXct` formats, and it wasn't until trying to use the `difftime` function that several years were in two digit, rather than four digit format. The problem is that when specifying the date format, a two digit year pads itself with two extra zeros.
+
+```{r}
+df <- tibble(
+  dates = c("30/05/2017 07:20", "19/6/17 13:47")
+)
+
+df %>% mutate(try_date = as.POSIXct(dates, tz = "", format = "%d/%m/%Y %H:%M"))
+```
+
+To get around this, we can use the `lubridate` package to solve our issues. In this case, I'm splitting out my dates and times before gluing them back together. the `dmy()` function automatically converts the `%y` into `%Y`.  
+
+```{r, warning = FALSE}
+df <- tibble(
+  dates = c("30/05/2017 07:20", "19/6/17 13:47")
+)
+
+df %>% 
+  mutate(working_date = lubridate::dmy(gsub("\\ .*", "", dates)),
+         hour = gsub(".*\\ ", "", dates),
+         final_date = as.POSIXct(glue("{working_date} {hour}"), tz="", format = "%Y-%m-%d %H:%M"))
 ```
