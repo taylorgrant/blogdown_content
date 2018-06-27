@@ -24,6 +24,7 @@ thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dot
 <li><a href="#mutate-and-summarise-multiple-columns">Mutate and Summarise multiple columns</a></li>
 <li><a href="#mutating-multiple-date-formats-within-the-same-column">Mutating multiple date formats within the same column</a></li>
 <li><a href="#multiple-left_joins-using-dplyr">Multiple left_joins using dplyr</a></li>
+<li><a href="#calculating-quantiles-the-tidy-way">Calculating quantiles the tidy way</a></li>
 </ul>
 </div>
 
@@ -44,10 +45,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 z        93    20 e    
-## 2 n        67    27 c    
-## 3 y        94    64 r    
-## 4 j        70    32 g</code></pre>
+## 1 i        44    17 h    
+## 2 x        55    34 x    
+## 3 y        10    52 p    
+## 4 s        78    95 n</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -116,4 +117,28 @@ mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, select(df2, m
 
 # specifying what the join is by
 mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, df2, by = &quot;index&quot;), .)</code></pre>
+</div>
+<div id="calculating-quantiles-the-tidy-way" class="section level1">
+<h1>Calculating quantiles the tidy way</h1>
+<p>Straight from Stack Overflow, but this has come in handy. “probs” can be added based upon needs.</p>
+<pre class="r"><code>mtcars %&gt;%
+  nest(-cyl) %&gt;% 
+  mutate(quantiles = map(data, ~ quantile(.$mpg))) %&gt;%
+  unnest(map(quantiles, broom::tidy))</code></pre>
+<pre><code>##    cyl names     x
+## 1    6    0% 17.80
+## 2    6   25% 18.65
+## 3    6   50% 19.70
+## 4    6   75% 21.00
+## 5    6  100% 21.40
+## 6    4    0% 21.40
+## 7    4   25% 22.80
+## 8    4   50% 26.00
+## 9    4   75% 30.40
+## 10   4  100% 33.90
+## 11   8    0% 10.40
+## 12   8   25% 14.40
+## 13   8   50% 15.20
+## 14   8   75% 16.25
+## 15   8  100% 19.20</code></pre>
 </div>

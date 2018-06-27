@@ -116,3 +116,14 @@ mass_df <- tmp %>% Reduce(function(df1, df2), left_join(df1, select(df2, matches
 # specifying what the join is by
 mass_df <- tmp %>% Reduce(function(df1, df2), left_join(df1, df2, by = "index"), .)
 ```
+
+# Calculating quantiles the tidy way
+
+Straight from Stack Overflow, but this has come in handy. "probs" can be added based upon needs. 
+
+```{r}
+mtcars %>%
+  nest(-cyl) %>% 
+  mutate(quantiles = map(data, ~ quantile(.$mpg))) %>%
+  unnest(map(quantiles, broom::tidy))
+```
