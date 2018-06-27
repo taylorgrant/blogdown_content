@@ -45,10 +45,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 m        73    44 l    
-## 2 f        75    13 n    
-## 3 n        14     3 m    
-## 4 y        52     4 o</code></pre>
+## 1 f        90    48 e    
+## 2 n        19    82 k    
+## 3 p        34    72 h    
+## 4 m        48    20 f</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -79,7 +79,7 @@ df %&gt;% setNames(names)</code></pre>
 </div>
 <div id="mutating-multiple-date-formats-within-the-same-column" class="section level1">
 <h1>Mutating multiple date formats within the same column</h1>
-<p>I was recently dealing with several large datasets that contain multiple date formats. I had been trying to set the dates as <code>as.POSIXct</code> formats, and it wasn’t until trying to use the <code>difftime</code> function that I realized several years were in two digit, rather than four digit format. The problem is that when specifying the date format, a two digit year pads itself with two extra zeros.</p>
+<p>I was recently dealing with several large datasets that contain multiple date formats. I had been trying to set the dates as <code>as.POSIXct</code> formats, and it wasn’t until trying to use the <code>difftime</code> function that I realized several years were in two digit, rather than four digit format. The problem is that when specifying the date format, a two digit year pads itself with two extra zeros as seen below in the try_date column.</p>
 <pre class="r"><code>df &lt;- tibble(
   dates = c(&quot;30/05/2017 07:20&quot;, &quot;19/6/17 13:47&quot;)
 )
@@ -120,7 +120,7 @@ mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, df2, by = &qu
 </div>
 <div id="calculating-quantiles-the-tidy-way" class="section level1">
 <h1>Calculating quantiles the tidy way</h1>
-<p>Straight from Stack Overflow, but this has come in handy. “probs” can be added based upon needs.</p>
+<p>This is straight from Stack Overflow, but comes in handy. Note that “probs” can be added to the <code>quantile</code> command depending on specific needs.</p>
 <pre class="r"><code>mtcars %&gt;%
   nest(-cyl) %&gt;% 
   mutate(quantiles = map(data, ~ quantile(.$mpg))) %&gt;%

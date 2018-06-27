@@ -72,7 +72,7 @@ mtcars %>%
 
 # Mutating multiple date formats within the same column
 
-I was recently dealing with several large datasets that contain multiple date formats. I had been trying to set the dates as `as.POSIXct` formats, and it wasn't until trying to use the `difftime` function that I realized several years were in two digit, rather than four digit format. The problem is that when specifying the date format, a two digit year pads itself with two extra zeros.
+I was recently dealing with several large datasets that contain multiple date formats. I had been trying to set the dates as `as.POSIXct` formats, and it wasn't until trying to use the `difftime` function that I realized several years were in two digit, rather than four digit format. The problem is that when specifying the date format, a two digit year pads itself with two extra zeros as seen below in the try_date column.
 
 ```{r}
 df <- tibble(
@@ -119,7 +119,7 @@ mass_df <- tmp %>% Reduce(function(df1, df2), left_join(df1, df2, by = "index"),
 
 # Calculating quantiles the tidy way
 
-Straight from Stack Overflow, but this has come in handy. "probs" can be added based upon needs. 
+This is straight from Stack Overflow, but comes in handy. Note that "probs" can be added to the `quantile` command depending on specific needs. 
 
 ```{r}
 mtcars %>%
