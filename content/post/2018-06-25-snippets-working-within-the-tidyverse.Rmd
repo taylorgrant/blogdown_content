@@ -40,6 +40,23 @@ df <- tibble(
 df %>% setNames(names)
 ```
 
+# Using rename_at to rename specific columns 
+
+Occasionally, you'll only want to rename certain columns and the `rename_at` function offers this capability, in much the same way as `mutate_at` or `summarise_at`. 
+
+```{r}
+df <- tibble(
+  a = sample(letters, 4),
+  b = sample(1:100, 4),
+  c = sample(1:100, 4),
+  d = sample(letters, 4)
+)
+
+df <- df %>% 
+  rename_at(vars(b,d), ~ paste0("pastedName_", .))
+df
+```
+
 # Mutate and Summarise multiple columns 
 
 This is well summarised [here](https://dplyr.tidyverse.org/reference/summarise_all.html){target="_blank"}, but a few examples are below. When using either `mutate_at()` or `summarise_at` it's important to include the "vars(), funs()" format. 

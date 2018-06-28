@@ -21,6 +21,7 @@ thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dot
 <div id="TOC">
 <ul>
 <li><a href="#using-setnames-to-change-column-names">Using setNames to change column names</a></li>
+<li><a href="#using-rename_at-to-rename-specific-columns">Using rename_at to rename specific columns</a></li>
 <li><a href="#mutate-and-summarise-multiple-columns">Mutate and Summarise multiple columns</a></li>
 <li><a href="#mutating-multiple-date-formats-within-the-same-column">Mutating multiple date formats within the same column</a></li>
 <li><a href="#multiple-left_joins-using-dplyr">Multiple left_joins using dplyr</a></li>
@@ -45,10 +46,31 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 f        90    48 e    
-## 2 n        19    82 k    
-## 3 p        34    72 h    
-## 4 m        48    20 f</code></pre>
+## 1 e        39    57 l    
+## 2 u        13    16 k    
+## 3 a        76    87 b    
+## 4 r        73    40 c</code></pre>
+</div>
+<div id="using-rename_at-to-rename-specific-columns" class="section level1">
+<h1>Using rename_at to rename specific columns</h1>
+<p>Occasionally, you’ll only want to rename certain columns and the <code>rename_at</code> function offers this capability, in much the same way as <code>mutate_at</code> or <code>summarise_at</code>.</p>
+<pre class="r"><code>df &lt;- tibble(
+  a = sample(letters, 4),
+  b = sample(1:100, 4),
+  c = sample(1:100, 4),
+  d = sample(letters, 4)
+)
+
+df &lt;- df %&gt;% 
+  rename_at(vars(b,d), ~ paste0(&quot;pastedName_&quot;, .))
+df</code></pre>
+<pre><code>## # A tibble: 4 x 4
+##   a     pastedName_b     c pastedName_d
+##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;chr&gt;       
+## 1 a               28    10 c           
+## 2 x                3    64 k           
+## 3 t               98    96 m           
+## 4 q               48    32 r</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
