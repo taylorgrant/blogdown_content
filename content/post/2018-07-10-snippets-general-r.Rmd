@@ -9,6 +9,9 @@ tags:
   - R
   - RStudio
 summary: "Tips and useful commands for general R and RStudio."
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
