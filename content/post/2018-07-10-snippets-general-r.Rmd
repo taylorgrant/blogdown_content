@@ -1,14 +1,14 @@
 ---
 title: 'Snippets: General R'
 author: ''
-date: '2018-04-23'
-slug: snippets-r-general
-categories: 
-- R
+date: '2018-07-10'
+slug: snippets-general-r
+categories:
+  - R
 tags:
-- R
-- RStudio
-summary: "These functions and commands are relevant for working with R and RStudio."
+  - R
+  - RStudio
+  summary: "Tips for various commands when working with R and RStudio."
 output:
   blogdown::html_page:
     toc: true
@@ -49,7 +49,3 @@ The `R.utils` package also has a command for this, but this is a simple way to s
 file.sources = list.files(path = glue(dir, "functions"), pattern="*.R")
 sapply(glue("{dir}functions/{file.sources}"), source, .GlobalEnv)
 ```
-
-
-
-
