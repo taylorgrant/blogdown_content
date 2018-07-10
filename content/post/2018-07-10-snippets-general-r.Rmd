@@ -8,13 +8,18 @@ categories:
 tags:
   - R
   - RStudio
-  summary: "Tips for various commands when working with R and RStudio."
+summary: "Tips for various commands when working with R and RStudio."
 output:
   blogdown::html_page:
     toc: true
 thumbnailImagePosition: left
 thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dots.jpg
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse, here, blogdown)
+```
 
 Snippet files periodically updated. These functions and commands are relevant for working with R and RStudio. 
 
@@ -38,6 +43,31 @@ fns <- unclass(lsf.str(envir = asNamespace("spotifyr"), all = T))
 
 fns
 ```
+
+# Getting the names of datasets within a package
+
+If in RStudio, you can simply use `data(package = "package_name")` and a new window will open up with a list. 
+
+Or by using the `data()` function we can find datasets and information about each. 
+
+```{r}
+d <- data(package = "dplyr")
+# names can be pulled 
+d$results[, 'Item']
+```
+
+While it's probably not necessary to do this, it's also possible to pull the dimensions for the promised data. 
+
+```{r}
+d <- data(package = "dplyr")
+# assign 
+nm <- d$results[, 'Item']
+# call the promised data
+data(list = nm, package = "dplyr")
+# get dimensions
+lapply(mget(nm), dim)
+```
+
 
 # Loading all functions within a folder
 
