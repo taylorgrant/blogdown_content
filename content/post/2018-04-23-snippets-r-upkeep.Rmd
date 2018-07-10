@@ -39,14 +39,6 @@ fns <- unclass(lsf.str(envir = asNamespace("spotifyr"), all = T))
 fns
 ```
 
-# Finding all the data sets within a package
-
-To find all the named datasets within a package, simply use the `data()` and package name. Within RStudio, this will open a new window with the datasets included.  
-
-```{r, eval = FALSE}
-data(package = "forecast")
-```
-
 # Loading all functions within a folder
 
 The `R.utils` package also has a command for this, but this is a simple way to source all of your functions at once. 
