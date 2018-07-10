@@ -1,0 +1,30 @@
+---
+title: New Test with R Commands
+author: ''
+date: '2018-07-10'
+slug: new-test-with-r-commands
+categories: []
+tags: []
+---
+
+
+
+<p>Will this render?</p>
+<p>what if I add in some math</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.0.0     ✔ purrr   0.2.5
+## ✔ tibble  1.4.2     ✔ dplyr   0.7.6
+## ✔ tidyr   0.8.1     ✔ stringr 1.3.1
+## ✔ readr   1.1.1     ✔ forcats 0.3.0</code></pre>
+<pre><code>## Warning: package &#39;dplyr&#39; was built under R version 3.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>a &lt;- tibble(a = letters[1:4],
+            b = seq(1:4))</code></pre>
+<p>And a graph</p>
+<pre class="r"><code>library(tidyverse)
+ggplot(mtcars, aes(x = mpg, y = hp)) + 
+  geom_point()</code></pre>
+<p><img src="/post/2018-07-10-new-test-with-r-commands_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
