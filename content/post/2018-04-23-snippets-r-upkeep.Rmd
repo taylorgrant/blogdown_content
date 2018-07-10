@@ -41,9 +41,9 @@ fns
 
 # Finding all the data sets within a package
 
-To find all the named datasets within a package, simply use the `data()` and package name. 
+To find all the named datasets within a package, simply use the `data()` and package name. Within RStudio, this will open a new window with the datasets included.  
 
-```{r, echo = TRUE}
+```{r, eval = FALSE}
 data(package = "forecast")
 ```
 
