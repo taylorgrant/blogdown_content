@@ -70,6 +70,21 @@ names(mlb) <- gsub(x = names(mlb), pattern = "\\.", replacement = "+")
 names(mlb)
 ```
 
+# Finding missing columns and adding to data frame if missing
+
+This can be a problem if you're programmatically using `mutate()` across named columns that may or may not be present within a specific dataset. 
+
+```{r}
+df <- data.frame(a = 1:4, e = 4:1)
+nms <- c("a", "b", "c", "d", "e") # columns expected in the data frame
+
+Missing <- setdiff(nms, names(df)) # find names of missing columns
+df[Missing] <- 0                  # add them with 0's
+df <- df[nms]                     # set columns in proper order
+
+df
+```
+
 # Setting NAs to Zero 
 
 Assume a data frame that has NAs and you want to set any NA to zero, it is straightforward to do so. 

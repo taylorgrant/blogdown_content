@@ -22,6 +22,7 @@ thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dot
 <li><a href="#multiple-character-columns-to-numeric">Multiple character columns to numeric</a></li>
 <li><a href="#data-frame-factor-to-character">Data frame factor to character</a></li>
 <li><a href="#renaming-columns-with-special-characters">Renaming columns with special characters</a></li>
+<li><a href="#finding-missing-columns-and-adding-to-data-frame-if-missing">Finding missing columns and adding to data frame if missing</a></li>
 <li><a href="#setting-nas-to-zero">Setting NAs to Zero</a></li>
 <li><a href="#replacing-nas-with-previous-value-by-group">Replacing NAs with Previous Value by Group</a></li>
 <li><a href="#getting-rid-of-null-values-within-dataframe">Getting rid of NULL values within dataframe</a></li>
@@ -59,6 +60,23 @@ names(mlb)</code></pre>
 <pre><code>##  [1] &quot;X%&quot;    &quot;Name&quot;  &quot;Team&quot;  &quot;G&quot;     &quot;PA&quot;    &quot;HR&quot;    &quot;R&quot;     &quot;RBI&quot;  
 ##  [9] &quot;SB&quot;    &quot;BB%&quot;   &quot;K%&quot;    &quot;ISO&quot;   &quot;BABIP&quot; &quot;AVG&quot;   &quot;OBP&quot;   &quot;SLG&quot;  
 ## [17] &quot;wOBA&quot;  &quot;wRC+&quot;  &quot;BsR&quot;   &quot;Off&quot;   &quot;Def&quot;   &quot;WAR&quot;</code></pre>
+</div>
+<div id="finding-missing-columns-and-adding-to-data-frame-if-missing" class="section level1">
+<h1>Finding missing columns and adding to data frame if missing</h1>
+<p>This can be a problem if you’re programmatically using <code>mutate()</code> across named columns that may or may not be present within a specific dataset.</p>
+<pre class="r"><code>df &lt;- data.frame(a = 1:4, e = 4:1)
+nms &lt;- c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;, &quot;e&quot;) # columns expected in the data frame
+
+Missing &lt;- setdiff(nms, names(df)) # find names of missing columns
+df[Missing] &lt;- 0                  # add them with 0&#39;s
+df &lt;- df[nms]                     # set columns in proper order
+
+df</code></pre>
+<pre><code>##   a b c d e
+## 1 1 0 0 0 4
+## 2 2 0 0 0 3
+## 3 3 0 0 0 2
+## 4 4 0 0 0 1</code></pre>
 </div>
 <div id="setting-nas-to-zero" class="section level1">
 <h1>Setting NAs to Zero</h1>
