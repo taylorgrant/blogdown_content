@@ -23,6 +23,11 @@ output:
 <li><a href="#reading-in-a-zip-file">Reading in a zip file</a></li>
 <li><a href="#reading-in-from-google-sheets">Reading in from Google Sheets</a></li>
 <li><a href="#scraping-data-from-the-web">Scraping data from the web</a></li>
+<li><a href="#reading-in-multiple-files-from-folder">Reading in multiple files from folder</a><ul>
+<li><a href="#using-the-readr-package">Using the readr package</a></li>
+<li><a href="#using-data.table-package">Using data.table package</a></li>
+<li><a href="#reading-in-multiple-files-and-skipping-lines">Reading in multiple files and skipping lines</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -165,7 +170,7 @@ glimpse(twitter)</code></pre>
 <p>First, we’ll use the <code>robotstxt</code> pacakge to make sure that we’re allowed to scrape the site.</p>
 <pre class="r"><code>robotstxt::paths_allowed(&quot;http://www.fangraphs.com/leaders.aspx?&quot;)</code></pre>
 <pre><code>## 
- www.fangraphs.com</code></pre>
+ www.fangraphs.com                      No encoding supplied: defaulting to UTF-8.</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <p>We are allowed to, so we are going to scrape 3 pages of data from the site. After scraping the first page to see what the data looked like, I found that rows 1 and 3 weren’t necessary, and row 2 is actually the column header. The <code>getData</code> function below clears that up before binding the rows in the loop.</p>
 <pre class="r"><code>library(rvest)
@@ -208,14 +213,16 @@ df %&gt;%
   dplyr::arrange(desc(x)) %&gt;% 
   rename(r.squared = x) %&gt;%
   slice(1:6)</code></pre>
+<pre><code>## Warning: &#39;tidy.numeric&#39; is deprecated.
+## See help(&quot;Deprecated&quot;)</code></pre>
 <pre><code>## # A tibble: 6 x 2
 ##   names r.squared
 ##   &lt;chr&gt;     &lt;dbl&gt;
-## 1 Off       0.802
-## 2 wRC+      0.690
-## 3 wOBA      0.682
-## 4 OBP       0.615
-## 5 SLG       0.534
+## 1 Off       0.803
+## 2 wRC+      0.692
+## 3 wOBA      0.681
+## 4 OBP       0.611
+## 5 SLG       0.535
 ## 6 R         0.477</code></pre>
 <p>Now let’s graph the top 6 bivariate relationships in terms of variance explained by the model.</p>
 <pre class="r"><code>df %&gt;% select(WAR, Off, `wRC+`, wOBA, OBP, SLG, R) %&gt;%
@@ -231,5 +238,29 @@ df %&gt;%
 <p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>Compare this with the 6 statistics that explain the lowest amount of the variance.</p>
 <p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+<div id="reading-in-multiple-files-from-folder" class="section level1">
+<h1>Reading in multiple files from folder</h1>
+<p>If all csv’s are in the same folder, then it is simple to read them all in and bind them together.</p>
+<div id="using-the-readr-package" class="section level3">
+<h3>Using the readr package</h3>
+<pre class="r"><code>library(tidyverse)
+files &lt;- list.files(path = &quot;[if not working directory]&quot;, pattern = &quot;*.csv&quot;)
+df &lt;- lapply(files, read_csv) %&gt;% bind_rows()</code></pre>
+<p>If the files are large, the readr package will be slower than the <code>data.table</code> package</p>
+</div>
+<div id="using-data.table-package" class="section level3">
+<h3>Using data.table package</h3>
+<pre class="r"><code>library(data.table)
+files &lt;- list.files(pattern = &quot;*.csv&quot;)
+DT = rbindlist(lapply(files, fread))</code></pre>
+</div>
+<div id="reading-in-multiple-files-and-skipping-lines" class="section level2">
+<h2>Reading in multiple files and skipping lines</h2>
+<p>If you’re going to be reading in multiple files and binding them, then you need the variable names in the head. With a single file and the <code>readr</code> pacakge, that would be simple:</p>
+<pre class="r"><code>df &lt;- readr::read_csv(&quot;filename.csv&quot;, skip = 10)</code></pre>
+<p>But with multiple files you write the following after identifying your files.</p>
+<pre class="r"><code>df &lt;- do.call(rbind, lapply(files, read_csv, skip = 10))</code></pre>
 <p><sub>fin</sub></p>
+</div>
 </div>
