@@ -326,4 +326,38 @@ df %>% select(WAR, G, `K%`, SB, BsR, PA, Def) %>%
     strip.background = element_rect(fill="gray", colour = "transparent"))
 ```
 
+# Reading in multiple files from folder
+
+If all csv's are in the same folder, then it is simple to read them all in and bind them together. 
+
+### Using the readr package
+```{r eval = FALSE}
+library(tidyverse)
+files <- list.files(path = "[if not working directory]", pattern = "*.csv")
+df <- lapply(files, read_csv) %>% bind_rows()
+```
+
+If the files are large, the readr package will be slower than the `data.table` package
+
+### Using data.table package
+```{r eval = FALSE}
+library(data.table)
+files <- list.files(pattern = "*.csv")
+DT = rbindlist(lapply(files, fread))
+```
+
+## Reading in multiple files and skipping lines
+
+If you're going to be reading in multiple files and binding them, then you need the variable names in the head. With a single file and the `readr` pacakge, that would be simple: 
+
+```{r eval = FALSE}
+df <- readr::read_csv("filename.csv", skip = 10)
+```
+
+But with multiple files you write the following after identifying your files.
+
+```{r eval =FALSE}
+df <- do.call(rbind, lapply(files, read_csv, skip = 10))
+```
+
 ~fin~
