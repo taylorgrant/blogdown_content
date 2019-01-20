@@ -151,3 +151,18 @@ df_clean[df_clean == ""] <- NA
 
 ```
 
+# Cross dataframe multiplication based on column names
+
+This is a niche case. 
+
+```{r}
+dfa <- tibble(g1_var = sample(1:6000,5,replace=T), 
+              g2_var = letters[1:5],
+              g3_var = seq(10,50,10))
+
+dfb <- tibble(g1_var = 2, g3_var = 100)
+
+df_matched <-  mapply("/", dfa[intersect(names(dfa), names(dfb))],
+               dfb[intersect(names(dfa), names(dfb))])
+df_matched
+```

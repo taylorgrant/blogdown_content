@@ -1,21 +1,3 @@
----
-title: 'Snippets: data frame manipulation'
-author: ''
-date: '2018-02-25'
-slug: snippets-data-frame-manipulation
-categories:
-  - R
-tags:
-  - data frame
-  - NA
-summary: "These commands are relevant for data frames and their manipulation."
-output:
-  blogdown::html_page:
-    toc: true
-thumbnailImagePosition: left
-thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dots.jpg
----
-
 
 <div id="TOC">
 <ul>
@@ -26,6 +8,7 @@ thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dot
 <li><a href="#setting-nas-to-zero">Setting NAs to Zero</a></li>
 <li><a href="#replacing-nas-with-previous-value-by-group">Replacing NAs with Previous Value by Group</a></li>
 <li><a href="#getting-rid-of-null-values-within-dataframe">Getting rid of NULL values within dataframe</a></li>
+<li><a href="#cross-dataframe-multiplication-based-on-column-names">Cross dataframe multiplication based on column names</a></li>
 </ul>
 </div>
 
@@ -183,4 +166,23 @@ rm_null &lt;- function(x){
 df_clean &lt;- df %&gt;% mutate_all(funs(rm_null))
 # replace with NA
 df_clean[df_clean == &quot;&quot;] &lt;- NA</code></pre>
+</div>
+<div id="cross-dataframe-multiplication-based-on-column-names" class="section level1">
+<h1>Cross dataframe multiplication based on column names</h1>
+<p>This is a niche case.</p>
+<pre class="r"><code>dfa &lt;- tibble(g1_var = sample(1:6000,5,replace=T), 
+              g2_var = letters[1:5],
+              g3_var = seq(10,50,10))
+
+dfb &lt;- tibble(g1_var = 2, g3_var = 100)
+
+df_matched &lt;-  mapply(&quot;/&quot;, dfa[intersect(names(dfa), names(dfb))],
+               dfb[intersect(names(dfa), names(dfb))])
+df_matched</code></pre>
+<pre><code>##      g1_var g3_var
+## [1,] 1268.5    0.1
+## [2,]  250.5    0.2
+## [3,] 1471.0    0.3
+## [4,] 2258.5    0.4
+## [5,] 2138.0    0.5</code></pre>
 </div>
