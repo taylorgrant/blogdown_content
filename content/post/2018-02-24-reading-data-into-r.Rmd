@@ -152,7 +152,7 @@ gg +
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 # read in the csv, filter and tally
-players <- read_csv(here("static/data/mlb/unzipped/baseballdatabank-2017.1/core/Master.csv")) %>%
+players <- read_csv(here("static/data/mlb/unzipped/baseballdatabank-2017_1/core/Master.csv")) %>%
   filter(birthYear > 1950 & birthCountry == "USA") %>%
   distinct(playerID, .keep_all = TRUE) %>%
   group_by(birthState) %>% 
