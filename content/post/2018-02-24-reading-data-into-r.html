@@ -1,3 +1,20 @@
+---
+title: "Reading data into R"
+date: '2018-02-24'
+slug: reading-data-into-r
+categories:
+  - R
+  - lesson
+tags: 
+  - data ingest
+  - rvest
+  - broom
+summary: "5 different ways to get data into R"
+output:
+  blogdown::html_page:
+    toc: true
+---
+
 
 <div id="TOC">
 <ul>
@@ -26,7 +43,7 @@ ggplot(airquality, aes(x = Ozone, y = Temp)) +
   facet_grid(~Month) + 
   geom_smooth(method = &#39;lm&#39;) + 
   theme_minimal()</code></pre>
-<p><img src="2018-02-24-reading-data-into-r_files/figure-html/airquality-1.png" width="672" /></p>
+<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/airquality-1.png" width="672" /></p>
 </div>
 <div id="reading-in-data-from-a-url" class="section level1">
 <h1>Reading in data from a URL</h1>
@@ -55,7 +72,7 @@ fan %&gt;% gather(&quot;Site&quot;, &quot;Stars&quot;, c(7,14,16,18)) %&gt;%
     theme(legend.position = &quot;bottom&quot;) + 
   labs(x = &quot;Stars&quot;, y = &quot;&quot;, 
        title = &quot;Fandango LOVES Movies&quot;)</code></pre>
-<p><img src="2018-02-24-reading-data-into-r_files/figure-html/fandango-1.png" width="672" /></p>
+<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/fandango-1.png" width="672" /></p>
 </div>
 <div id="reading-in-a-zip-file" class="section level1">
 <h1>Reading in a zip file</h1>
@@ -122,7 +139,7 @@ gg +
   theme(legend.position=&quot;right&quot;, 
         legend.title = element_blank(),
         legend.key.width=unit(1, &quot;lines&quot;))</code></pre>
-<p><img src="2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
 <div id="reading-in-from-google-sheets" class="section level1">
 <h1>Reading in from Google Sheets</h1>
@@ -218,9 +235,9 @@ df %&gt;%
   labs(x = &quot;WAR&quot;, y = &quot;Statistic Value&quot;) + 
   theme(
     strip.background = element_rect(fill=&quot;gray&quot;, colour = &quot;transparent&quot;))</code></pre>
-<p><img src="2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>Compare this with the 6 statistics that explain the lowest amount of the variance.</p>
-<p><img src="2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 </div>
 <div id="reading-in-multiple-files-from-folder" class="section level1">
 <h1>Reading in multiple files from folder</h1>
