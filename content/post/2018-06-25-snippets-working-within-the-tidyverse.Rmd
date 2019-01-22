@@ -144,3 +144,42 @@ mtcars %>%
   mutate(quantiles = map(data, ~ quantile(.$mpg))) %>%
   unnest(map(quantiles, broom::tidy))
 ```
+
+# Selection of multiple variables
+
+When using either `select` or wanting to `mutate_at` there are lots of helpers -- `starts_with`, `ends_with`, `contains`, and `matches` and probably some that I'm missing. 
+
+`contains` only works on a single, specific request, whereas `matches` allows for an OR. 
+
+```{r}
+tmp <- tibble(g1_letters = sample(letters, 5), 
+              g1_num = sample(1:600000, 5),
+              g2_letters = sample(letters, 5),
+              g2_num = sample(1:60000, 5),
+              h1_letters = sample(letters, 5),
+              h1_num = sample(1:60000, 5))
+
+# or statement
+tmp <- tmp %>% select(matches("g1|h1"))
+tmp
+```
+
+But we can also use the `intersect` function to create an AND statement
+
+```{r}
+tmp <- tibble(g1_letters = sample(letters, 5), 
+              g1_num = sample(1:600000, 5),
+              g1_weighted = g1_num*.4,
+              g2_letters = sample(letters, 5),
+              g2_num = sample(1:60000, 5),
+              g2_weighted = g2_num*.4,
+              h1_letters = sample(letters, 5),
+              h1_num = sample(1:60000, 5),
+              h1_weighted = h1_num*.4)
+
+tmp <- tmp %>% 
+  summarise_at(vars(matches("num|weighted")), sum) %>%
+  mutate_at(vars(intersect(starts_with("g1"), contains("weighted"))), 
+            funs(paste0(., "sel")))
+tmp
+```

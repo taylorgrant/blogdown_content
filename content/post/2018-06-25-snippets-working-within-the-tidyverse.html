@@ -26,6 +26,7 @@ thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dot
 <li><a href="#mutating-multiple-date-formats-within-the-same-column">Mutating multiple date formats within the same column</a></li>
 <li><a href="#multiple-left_joins-using-dplyr">Multiple left_joins using dplyr</a></li>
 <li><a href="#calculating-quantiles-the-tidy-way">Calculating quantiles the tidy way</a></li>
+<li><a href="#selection-of-multiple-variables">Selection of multiple variables</a></li>
 </ul>
 </div>
 
@@ -46,10 +47,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 e        39    57 l    
-## 2 u        13    16 k    
-## 3 a        76    87 b    
-## 4 r        73    40 c</code></pre>
+## 1 n        36    48 r    
+## 2 e        85    18 p    
+## 3 g         2    58 u    
+## 4 v        97    30 f</code></pre>
 </div>
 <div id="using-rename_at-to-rename-specific-columns" class="section level1">
 <h1>Using rename_at to rename specific columns</h1>
@@ -67,10 +68,10 @@ df</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   a     pastedName_b     c pastedName_d
 ##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;chr&gt;       
-## 1 a               28    10 c           
-## 2 x                3    64 k           
-## 3 t               98    96 m           
-## 4 q               48    32 r</code></pre>
+## 1 n               45    21 z           
+## 2 v               16     5 t           
+## 3 a               89    44 w           
+## 4 d               92    60 h</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -147,6 +148,14 @@ mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, df2, by = &qu
   nest(-cyl) %&gt;% 
   mutate(quantiles = map(data, ~ quantile(.$mpg))) %&gt;%
   unnest(map(quantiles, broom::tidy))</code></pre>
+<pre><code>## Warning: &#39;tidy.numeric&#39; is deprecated.
+## See help(&quot;Deprecated&quot;)
+
+## Warning: &#39;tidy.numeric&#39; is deprecated.
+## See help(&quot;Deprecated&quot;)
+
+## Warning: &#39;tidy.numeric&#39; is deprecated.
+## See help(&quot;Deprecated&quot;)</code></pre>
 <pre><code>##    cyl names     x
 ## 1    6    0% 17.80
 ## 2    6   25% 18.65
@@ -163,4 +172,47 @@ mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, df2, by = &qu
 ## 13   8   50% 15.20
 ## 14   8   75% 16.25
 ## 15   8  100% 19.20</code></pre>
+</div>
+<div id="selection-of-multiple-variables" class="section level1">
+<h1>Selection of multiple variables</h1>
+<p>When using either <code>select</code> or wanting to <code>mutate_at</code> there are lots of helpers – <code>starts_with</code>, <code>ends_with</code>, <code>contains</code>, and <code>matches</code> and probably some that I’m missing.</p>
+<p><code>contains</code> only works on a single, specific request, whereas <code>matches</code> allows for an OR.</p>
+<pre class="r"><code>tmp &lt;- tibble(g1_letters = sample(letters, 5), 
+              g1_num = sample(1:600000, 5),
+              g2_letters = sample(letters, 5),
+              g2_num = sample(1:60000, 5),
+              h1_letters = sample(letters, 5),
+              h1_num = sample(1:60000, 5))
+
+# or statement
+tmp &lt;- tmp %&gt;% select(matches(&quot;g1|h1&quot;))
+tmp</code></pre>
+<pre><code>## # A tibble: 5 x 4
+##   g1_letters g1_num h1_letters h1_num
+##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;       &lt;int&gt;
+## 1 o          113847 k           58271
+## 2 u          580999 s            6179
+## 3 k           21671 w           39297
+## 4 l           85847 p           48199
+## 5 a          353553 u            2948</code></pre>
+<p>But we can also use the <code>intersect</code> function to create an AND statement</p>
+<pre class="r"><code>tmp &lt;- tibble(g1_letters = sample(letters, 5), 
+              g1_num = sample(1:600000, 5),
+              g1_weighted = g1_num*.4,
+              g2_letters = sample(letters, 5),
+              g2_num = sample(1:60000, 5),
+              g2_weighted = g2_num*.4,
+              h1_letters = sample(letters, 5),
+              h1_num = sample(1:60000, 5),
+              h1_weighted = h1_num*.4)
+
+tmp &lt;- tmp %&gt;% 
+  summarise_at(vars(matches(&quot;num|weighted&quot;)), sum) %&gt;%
+  mutate_at(vars(intersect(starts_with(&quot;g1&quot;), contains(&quot;weighted&quot;))), 
+            funs(paste0(., &quot;sel&quot;)))
+tmp</code></pre>
+<pre><code>## # A tibble: 1 x 6
+##   g1_num g1_weighted g2_num g2_weighted h1_num h1_weighted
+##    &lt;int&gt; &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;  &lt;int&gt;       &lt;dbl&gt;
+## 1 932204 372881.6sel 189943      75977. 212117      84847.</code></pre>
 </div>
