@@ -14,7 +14,7 @@ output:
   blogdown::html_page:
     toc: true
 thumbnailImagePosition: left
-thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dots.jpg
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dots.jpg
 ---
 
 Snippet files are periodically updated with tips and tricks as I learn them. These commands are relevant for packages within the `tidyverse`.

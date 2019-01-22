@@ -13,7 +13,7 @@ output:
   blogdown::html_page:
     toc: true
 thumbnailImagePosition: left
-thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dots.jpg
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dots.jpg
 ---
 
 ```{r setup, include=FALSE}

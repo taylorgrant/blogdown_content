@@ -13,7 +13,7 @@ tags:
   - tidy data
   - functionals
 thumbnailImagePosition: left
-thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1528601498/augusta13th.jpg
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1528601498/augusta13th.jpg
 summary: "Programmatically finding links, scraping the data, and returning tidy data. All thanks to the `map()` function..."
 output:
   blogdown::html_page:
