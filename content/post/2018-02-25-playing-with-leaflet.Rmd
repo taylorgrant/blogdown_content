@@ -8,6 +8,8 @@ categories:
 tags:
   - leaflet
   - mapping
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548283020/map.png
 summary: "Tinkering with the `mapsapi` package and putting data into `Leaflet`"
 output:
   blogdown::html_page:
@@ -20,7 +22,7 @@ library(leaflet)
 library(mapsapi)
 library(xml2)
 library(bitops)
-key <- "AIzaSyC-oYVm8_cDmBCS1bYWGZeKuftsUKXGoAc"
+key <- "AIzaSyCyYl0BLP5UzqKWUdmLdms1Mf7VOSnj3ec"
 ```
 
 I ran across a package called ```mapsapi``` a while back, and it has some nice functionality for pulling Google Maps information. In poking around, I didn't see any ability to get directions either to or from multiple locations. So I took a portion of the code from that package and rewrote it to do so. Is there much reason to do this? No, probably not, but it's fun.  
