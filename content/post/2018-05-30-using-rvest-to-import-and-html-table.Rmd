@@ -9,6 +9,8 @@ categories:
 tags:
   - rvest
   - scraping
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548282612/scrape.jpg
 summary: "A simple way of extracting tables from HTML using `rvest` and Developer Tools"
 output:
   blogdown::html_page:
