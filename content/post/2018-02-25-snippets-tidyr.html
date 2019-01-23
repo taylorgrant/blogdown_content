@@ -12,7 +12,7 @@ output:
   blogdown::html_page:
     toc: true
 thumbnailImagePosition: left
-thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dots.jpg
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/snippets.jpg
 ---
 
 
@@ -127,38 +127,38 @@ event &lt;- sample(letters, 15)
 data &lt;- data.frame(date, hour, min, second, event)
 data</code></pre>
 <pre><code>##          date hour min second event
-## 1  2018-01-01   24  25      3     g
-## 2  2018-01-02   15  42     22     e
-## 3  2018-01-03    2  32     54     a
-## 4  2018-01-04   19  53     34     k
-## 5  2018-01-05   18  52     57     b
-## 6  2018-01-06    4  50      7     l
-## 7  2018-01-07   11  19     18     d
-## 8  2018-01-08   20  13     14     h
-## 9  2018-01-09   10  47     59     c
-## 10 2018-01-10   13  58      2     x
-## 11 2018-01-11    6  24     31     z
-## 12 2018-01-12   14  38     44     t
-## 13 2018-01-13    3  17     20     q
-## 14 2018-01-14   16  28     33     r
-## 15 2018-01-15   23  26     55     m</code></pre>
+## 1  2018-01-01    1  52      2     s
+## 2  2018-01-02   12  32     35     k
+## 3  2018-01-03   16  53      3     n
+## 4  2018-01-04   15  14      5     y
+## 5  2018-01-05    2  31     55     b
+## 6  2018-01-06    3  49     49     a
+## 7  2018-01-07   17  48     22     e
+## 8  2018-01-08    7   6     10     w
+## 9  2018-01-09   23  33     36     g
+## 10 2018-01-10   18   4     50     l
+## 11 2018-01-11   22  16      8     d
+## 12 2018-01-12   21  56     48     f
+## 13 2018-01-13   14   7     40     u
+## 14 2018-01-14   11  23     60     i
+## 15 2018-01-15    9  51      9     p</code></pre>
 <pre class="r"><code>data %&gt;% unite(datetime, hour, min, second, sep = &quot;:&quot;)</code></pre>
 <pre><code>##          date datetime event
-## 1  2018-01-01  24:25:3     g
-## 2  2018-01-02 15:42:22     e
-## 3  2018-01-03  2:32:54     a
-## 4  2018-01-04 19:53:34     k
-## 5  2018-01-05 18:52:57     b
-## 6  2018-01-06   4:50:7     l
-## 7  2018-01-07 11:19:18     d
-## 8  2018-01-08 20:13:14     h
-## 9  2018-01-09 10:47:59     c
-## 10 2018-01-10  13:58:2     x
-## 11 2018-01-11  6:24:31     z
-## 12 2018-01-12 14:38:44     t
-## 13 2018-01-13  3:17:20     q
-## 14 2018-01-14 16:28:33     r
-## 15 2018-01-15 23:26:55     m</code></pre>
+## 1  2018-01-01   1:52:2     s
+## 2  2018-01-02 12:32:35     k
+## 3  2018-01-03  16:53:3     n
+## 4  2018-01-04  15:14:5     y
+## 5  2018-01-05  2:31:55     b
+## 6  2018-01-06  3:49:49     a
+## 7  2018-01-07 17:48:22     e
+## 8  2018-01-08   7:6:10     w
+## 9  2018-01-09 23:33:36     g
+## 10 2018-01-10  18:4:50     l
+## 11 2018-01-11  22:16:8     d
+## 12 2018-01-12 21:56:48     f
+## 13 2018-01-13  14:7:40     u
+## 14 2018-01-14 11:23:60     i
+## 15 2018-01-15   9:51:9     p</code></pre>
 <pre class="r"><code># the default separator is &quot;_&quot;, so if that doesn&#39;t work, change it as necessary</code></pre>
 <p>The <code>unite</code> function is also helpful when you need to spread multiple columns in a dataframe.</p>
 <pre class="r"><code>df &lt;- data.frame(quarter=rep(1:4,2),
