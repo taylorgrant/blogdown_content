@@ -8,6 +8,8 @@ categories:
   - lesson
 tags: 
   - blogdown
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548284056/blog.jpg
 summary: "Tips and tricks I've learned about blogdown and Hugo"
 output:
   blogdown::html_page:
