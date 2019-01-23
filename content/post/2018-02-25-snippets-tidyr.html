@@ -12,7 +12,7 @@ output:
   blogdown::html_page:
     toc: true
 thumbnailImagePosition: left
-thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dots.jpg
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dots.jpg
 ---
 
 
@@ -35,7 +35,7 @@ dat &lt;- read_csv(&quot;https://raw.githubusercontent.com/garrettgman/DSR/maste
 dat</code></pre>
 <pre><code>## # A tibble: 12 x 4
 ##    country      year key             value
-##    &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;           &lt;int&gt;
+##    &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt;
 ##  1 Afghanistan  1999 cases             745
 ##  2 Afghanistan  1999 population   19987071
 ##  3 Afghanistan  2000 cases            2666
@@ -51,7 +51,7 @@ dat</code></pre>
 <pre class="r"><code>dat %&gt;% spread(key, value)</code></pre>
 <pre><code>## # A tibble: 6 x 4
 ##   country      year  cases population
-##   &lt;chr&gt;       &lt;int&gt;  &lt;int&gt;      &lt;int&gt;
+##   &lt;chr&gt;       &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;
 ## 1 Afghanistan  1999    745   19987071
 ## 2 Afghanistan  2000   2666   20595360
 ## 3 Brazil       1999  37737  172006362
@@ -68,14 +68,14 @@ dat &lt;- read_csv(&quot;https://raw.githubusercontent.com/garrettgman/DSR/maste
 dat</code></pre>
 <pre><code>## # A tibble: 3 x 3
 ##   country     `1999` `2000`
-##   &lt;chr&gt;        &lt;int&gt;  &lt;int&gt;
+##   &lt;chr&gt;        &lt;dbl&gt;  &lt;dbl&gt;
 ## 1 Afghanistan    745   2666
 ## 2 Brazil       37737  80488
 ## 3 China       212258 213766</code></pre>
 <pre class="r"><code>dat %&gt;% gather(&quot;year&quot;, &quot;cases&quot;, 2:3)</code></pre>
 <pre><code>## # A tibble: 6 x 3
 ##   country     year   cases
-##   &lt;chr&gt;       &lt;chr&gt;  &lt;int&gt;
+##   &lt;chr&gt;       &lt;chr&gt;  &lt;dbl&gt;
 ## 1 Afghanistan 1999     745
 ## 2 Brazil      1999   37737
 ## 3 China       1999  212258
@@ -89,7 +89,7 @@ dat &lt;- read_csv(&quot;https://raw.githubusercontent.com/garrettgman/DSR/maste
 dat %&gt;% gather(year, cases, -country)</code></pre>
 <pre><code>## # A tibble: 6 x 3
 ##   country     year   cases
-##   &lt;chr&gt;       &lt;chr&gt;  &lt;int&gt;
+##   &lt;chr&gt;       &lt;chr&gt;  &lt;dbl&gt;
 ## 1 Afghanistan 1999     745
 ## 2 Brazil      1999   37737
 ## 3 China       1999  212258
@@ -127,38 +127,38 @@ event &lt;- sample(letters, 15)
 data &lt;- data.frame(date, hour, min, second, event)
 data</code></pre>
 <pre><code>##          date hour min second event
-## 1  2018-01-01   12  28     58     e
-## 2  2018-01-02    6  16     13     x
-## 3  2018-01-03    4  54     45     t
-## 4  2018-01-04   11   5     28     o
-## 5  2018-01-05   17   7     47     m
-## 6  2018-01-06   14  22     27     d
-## 7  2018-01-07   21  34     32     k
-## 8  2018-01-08    5  50     18     l
-## 9  2018-01-09   19  48      7     p
-## 10 2018-01-10    3  49     42     i
-## 11 2018-01-11   24  37     29     n
-## 12 2018-01-12   15  40      1     s
-## 13 2018-01-13    2  42     12     g
-## 14 2018-01-14    8  11     26     z
-## 15 2018-01-15   13  47     51     r</code></pre>
+## 1  2018-01-01   24  25      3     g
+## 2  2018-01-02   15  42     22     e
+## 3  2018-01-03    2  32     54     a
+## 4  2018-01-04   19  53     34     k
+## 5  2018-01-05   18  52     57     b
+## 6  2018-01-06    4  50      7     l
+## 7  2018-01-07   11  19     18     d
+## 8  2018-01-08   20  13     14     h
+## 9  2018-01-09   10  47     59     c
+## 10 2018-01-10   13  58      2     x
+## 11 2018-01-11    6  24     31     z
+## 12 2018-01-12   14  38     44     t
+## 13 2018-01-13    3  17     20     q
+## 14 2018-01-14   16  28     33     r
+## 15 2018-01-15   23  26     55     m</code></pre>
 <pre class="r"><code>data %&gt;% unite(datetime, hour, min, second, sep = &quot;:&quot;)</code></pre>
 <pre><code>##          date datetime event
-## 1  2018-01-01 12:28:58     e
-## 2  2018-01-02  6:16:13     x
-## 3  2018-01-03  4:54:45     t
-## 4  2018-01-04  11:5:28     o
-## 5  2018-01-05  17:7:47     m
-## 6  2018-01-06 14:22:27     d
-## 7  2018-01-07 21:34:32     k
-## 8  2018-01-08  5:50:18     l
-## 9  2018-01-09  19:48:7     p
-## 10 2018-01-10  3:49:42     i
-## 11 2018-01-11 24:37:29     n
-## 12 2018-01-12  15:40:1     s
-## 13 2018-01-13  2:42:12     g
-## 14 2018-01-14  8:11:26     z
-## 15 2018-01-15 13:47:51     r</code></pre>
+## 1  2018-01-01  24:25:3     g
+## 2  2018-01-02 15:42:22     e
+## 3  2018-01-03  2:32:54     a
+## 4  2018-01-04 19:53:34     k
+## 5  2018-01-05 18:52:57     b
+## 6  2018-01-06   4:50:7     l
+## 7  2018-01-07 11:19:18     d
+## 8  2018-01-08 20:13:14     h
+## 9  2018-01-09 10:47:59     c
+## 10 2018-01-10  13:58:2     x
+## 11 2018-01-11  6:24:31     z
+## 12 2018-01-12 14:38:44     t
+## 13 2018-01-13  3:17:20     q
+## 14 2018-01-14 16:28:33     r
+## 15 2018-01-15 23:26:55     m</code></pre>
 <pre class="r"><code># the default separator is &quot;_&quot;, so if that doesn&#39;t work, change it as necessary</code></pre>
 <p>The <code>unite</code> function is also helpful when you need to spread multiple columns in a dataframe.</p>
 <pre class="r"><code>df &lt;- data.frame(quarter=rep(1:4,2),
