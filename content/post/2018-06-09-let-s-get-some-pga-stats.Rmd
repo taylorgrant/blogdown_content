@@ -20,10 +20,10 @@ output:
     toc: true
 ---
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(tidyverse, rvest)
 
-load("~/static/data/pga/pga_data.RData")
+pacman::p_load(tidyverse, rvest, here)
+
+load(here("static", "data", "pga", "pga_data.RData"))
 ```
 
 Building off of the [last post](https://taylorgrant.netlify.com/2018/05/using-rvest-to-import-and-html-table/){target="_blank"} about using `rvest` to easily scrape html tables, I wanted to extend the process so that I could programmatically scrape multiple tables from multiple pages while still returning tidy data.

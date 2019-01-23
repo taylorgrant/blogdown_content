@@ -13,7 +13,7 @@ tags:
   - tidy data
   - functionals
 thumbnailImagePosition: left
-thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1528601498/augusta13th.jpg
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1528601498/augusta13th.jpg
 summary: "Programmatically finding links, scraping the data, and returning tidy data. All thanks to the `map()` function..."
 output:
   blogdown::html_page:
@@ -45,7 +45,7 @@ output:
   bot = &quot;*&quot;
 )</code></pre>
 <pre><code>## 
- pgatour.com</code></pre>
+ pgatour.com                      No encoding supplied: defaulting to UTF-8.</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <p>Ok, so it looks like we’re ok to move forward. Let’s start by figuring out where the statistics are within the site as well as the structure of the urls of each.</p>
 <p>If we navigate to the <a href="https://www.pgatour.com/stats.html" target="_blank">stats</a> page for the PGA Tour we can see that there is a main navigation bar below the hero image that contains 9 tabs linked to different stat categories. We’ll ignore the Overview tab, which only contains current Top-5 type stats, and focus on the other 8 categories.</p>
@@ -67,23 +67,25 @@ ott &lt;- url_1 %&gt;% read_html() %&gt;%
     html_nodes(&quot;.clearfix a&quot;) %&gt;% # we know the css by using Chrome&#39;s dev tools
     html_attr(&#39;href&#39;) %&gt;% 
   as_tibble() %&gt;% 
-  mutate(url_loc = row_number())
-ott[c(1:4, 35:38, 80:83),1:2]</code></pre>
+  mutate(url_loc = row_number())</code></pre>
+<pre><code>## Warning: Calling `as_tibble()` on a vector is discouraged, because the behavior is likely to change in the future. Use `enframe(name = NULL)` instead.
+## This warning is displayed once per session.</code></pre>
+<pre class="r"><code>ott[c(1:4, 35:38, 80:83),1:2]</code></pre>
 <pre><code>## # A tibble: 12 x 2
-##    value                                                          url_loc
-##    &lt;chr&gt;                                                            &lt;int&gt;
-##  1 #                                                                    1
-##  2 /content/pgatour/stats.html                                          2
-##  3 /content/pgatour/stats/categories.ROTT_INQ.html                      3
-##  4 /content/pgatour/stats/categories.RAPP_INQ.html                      4
-##  5 /content/pgatour/stats/stat.496.html                                35
-##  6 /content/pgatour/stats/stat.495.html                                36
-##  7 /content/pgatour/stats/stat.454.html                                37
-##  8 /content/pgatour/stats/stat.455.html                                38
-##  9 https://play.google.com/store/apps/details?id=com.tour.pgatour      80
-## 10 https://www.instagram.com/pgatour                                   81
-## 11 https://www.youtube.com/pgatour                                     82
-## 12 /content/pgatour/mobile.html                                        83</code></pre>
+##    value                             url_loc
+##    &lt;chr&gt;                               &lt;int&gt;
+##  1 #                                       1
+##  2 /stats.html                             2
+##  3 /stats/categories.ROTT_INQ.html         3
+##  4 /stats/categories.RAPP_INQ.html         4
+##  5 /stats/stat.496.html                   35
+##  6 /stats/stat.495.html                   36
+##  7 /stats/stat.454.html                   37
+##  8 /stats/stat.455.html                   38
+##  9 https://www.instagram.com/pgatour      80
+## 10 https://www.youtube.com/pgatour        81
+## 11 /mobile.html                           82
+## 12 &lt;NA&gt;                                   NA</code></pre>
 <p>It’s clear that <code>rvest</code> is working from top to bottom as it collects all of the links. Links 3 and 4 are links to two of the category pages, and links 80 through 83 are tied to social icons found in the footer of the page. Our interest is in the links in the middle that include <code>/stats/stat/</code>. These are our statistics.</p>
 <p><img src = "/img/pga_stat_year.png"></img></p>
 <p>If we visit one of the stats pages and toggle the year we can see the overall url structure: <code>[domain]/[path].[stat_id].[year].html</code>. So as a first step, we need to write a function that visits each category page, grabs the appropriate links, and then mutates them into this basic form.</p>
@@ -96,7 +98,7 @@ ott[c(1:4, 35:38, 80:83),1:2]</code></pre>
     filter(str_detect(value, &quot;stats/stat&quot;)) %&gt;%
     mutate(value = gsub(&quot;/.*/(.*)/&quot;, &quot;&quot;, value)) %&gt;%
     mutate(cat = cat, 
-           link = paste0(&quot;https://www.pgatour.com/stats/&quot;, value),
+           link = paste0(&quot;https://www.pgatour.com&quot;, value),
            partial = str_replace_all(link, &quot;html&quot;, &quot;&quot;)) %&gt;% 
     select(-value)
   return(link)
@@ -106,131 +108,131 @@ ott[c(1:4, 35:38, 80:83),1:2]</code></pre>
 <p>Running this function returns a list of 8 elements, one for each category, and within each list we can find the category name, the link to the overall stat, and the partial url that we’re going to eventually use to gather data for all years.</p>
 <pre><code>## [[1]]
 ## # A tibble: 60 x 3
-##    cat         link                                          partial      
-##    &lt;chr&gt;       &lt;chr&gt;                                         &lt;chr&gt;        
-##  1 off_the_tee https://www.pgatour.com/stats/stat.02674.html https://www.…
-##  2 off_the_tee https://www.pgatour.com/stats/stat.02567.html https://www.…
-##  3 off_the_tee https://www.pgatour.com/stats/stat.159.html   https://www.…
-##  4 off_the_tee https://www.pgatour.com/stats/stat.101.html   https://www.…
-##  5 off_the_tee https://www.pgatour.com/stats/stat.496.html   https://www.…
-##  6 off_the_tee https://www.pgatour.com/stats/stat.495.html   https://www.…
-##  7 off_the_tee https://www.pgatour.com/stats/stat.454.html   https://www.…
-##  8 off_the_tee https://www.pgatour.com/stats/stat.455.html   https://www.…
-##  9 off_the_tee https://www.pgatour.com/stats/stat.456.html   https://www.…
-## 10 off_the_tee https://www.pgatour.com/stats/stat.457.html   https://www.…
-## # ... with 50 more rows
+##    cat       link                             partial                      
+##    &lt;chr&gt;     &lt;chr&gt;                            &lt;chr&gt;                        
+##  1 off_the_… https://www.pgatour.com/stats/s… https://www.pgatour.com/stat…
+##  2 off_the_… https://www.pgatour.com/stats/s… https://www.pgatour.com/stat…
+##  3 off_the_… https://www.pgatour.com/stats/s… https://www.pgatour.com/stat…
+##  4 off_the_… https://www.pgatour.com/stats/s… https://www.pgatour.com/stat…
+##  5 off_the_… https://www.pgatour.com/stats/s… https://www.pgatour.com/stat…
+##  6 off_the_… https://www.pgatour.com/stats/s… https://www.pgatour.com/stat…
+##  7 off_the_… https://www.pgatour.com/stats/s… https://www.pgatour.com/stat…
+##  8 off_the_… https://www.pgatour.com/stats/s… https://www.pgatour.com/stat…
+##  9 off_the_… https://www.pgatour.com/stats/s… https://www.pgatour.com/stat…
+## 10 off_the_… https://www.pgatour.com/stats/s… https://www.pgatour.com/stat…
+## # … with 50 more rows
 ## 
 ## [[2]]
 ## # A tibble: 100 x 3
-##    cat                link                        partial                 
-##    &lt;chr&gt;              &lt;chr&gt;                       &lt;chr&gt;                   
-##  1 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
-##  2 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
-##  3 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
-##  4 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
-##  5 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
-##  6 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
-##  7 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
-##  8 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
-##  9 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
-## 10 approach_the_green https://www.pgatour.com/st… https://www.pgatour.com…
-## # ... with 90 more rows
+##    cat           link                           partial                    
+##    &lt;chr&gt;         &lt;chr&gt;                          &lt;chr&gt;                      
+##  1 approach_the… https://www.pgatour.com/stats… https://www.pgatour.com/st…
+##  2 approach_the… https://www.pgatour.com/stats… https://www.pgatour.com/st…
+##  3 approach_the… https://www.pgatour.com/stats… https://www.pgatour.com/st…
+##  4 approach_the… https://www.pgatour.com/stats… https://www.pgatour.com/st…
+##  5 approach_the… https://www.pgatour.com/stats… https://www.pgatour.com/st…
+##  6 approach_the… https://www.pgatour.com/stats… https://www.pgatour.com/st…
+##  7 approach_the… https://www.pgatour.com/stats… https://www.pgatour.com/st…
+##  8 approach_the… https://www.pgatour.com/stats… https://www.pgatour.com/st…
+##  9 approach_the… https://www.pgatour.com/stats… https://www.pgatour.com/st…
+## 10 approach_the… https://www.pgatour.com/stats… https://www.pgatour.com/st…
+## # … with 90 more rows
 ## 
 ## [[3]]
 ## # A tibble: 30 x 3
-##    cat              link                                          partial 
-##    &lt;chr&gt;            &lt;chr&gt;                                         &lt;chr&gt;   
-##  1 around_the_green https://www.pgatour.com/stats/stat.02569.html https:/…
-##  2 around_the_green https://www.pgatour.com/stats/stat.111.html   https:/…
-##  3 around_the_green https://www.pgatour.com/stats/stat.370.html   https:/…
-##  4 around_the_green https://www.pgatour.com/stats/stat.371.html   https:/…
-##  5 around_the_green https://www.pgatour.com/stats/stat.372.html   https:/…
-##  6 around_the_green https://www.pgatour.com/stats/stat.373.html   https:/…
-##  7 around_the_green https://www.pgatour.com/stats/stat.130.html   https:/…
-##  8 around_the_green https://www.pgatour.com/stats/stat.362.html   https:/…
-##  9 around_the_green https://www.pgatour.com/stats/stat.363.html   https:/…
-## 10 around_the_green https://www.pgatour.com/stats/stat.364.html   https:/…
-## # ... with 20 more rows
+##    cat          link                           partial                     
+##    &lt;chr&gt;        &lt;chr&gt;                          &lt;chr&gt;                       
+##  1 around_the_… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  2 around_the_… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  3 around_the_… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  4 around_the_… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  5 around_the_… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  6 around_the_… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  7 around_the_… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  8 around_the_… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  9 around_the_… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+## 10 around_the_… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+## # … with 20 more rows
 ## 
 ## [[4]]
 ## # A tibble: 95 x 3
-##    cat     link                                          partial          
-##    &lt;chr&gt;   &lt;chr&gt;                                         &lt;chr&gt;            
-##  1 putting https://www.pgatour.com/stats/stat.02564.html https://www.pgat…
-##  2 putting https://www.pgatour.com/stats/stat.413.html   https://www.pgat…
-##  3 putting https://www.pgatour.com/stats/stat.414.html   https://www.pgat…
-##  4 putting https://www.pgatour.com/stats/stat.415.html   https://www.pgat…
-##  5 putting https://www.pgatour.com/stats/stat.416.html   https://www.pgat…
-##  6 putting https://www.pgatour.com/stats/stat.417.html   https://www.pgat…
-##  7 putting https://www.pgatour.com/stats/stat.418.html   https://www.pgat…
-##  8 putting https://www.pgatour.com/stats/stat.420.html   https://www.pgat…
-##  9 putting https://www.pgatour.com/stats/stat.421.html   https://www.pgat…
-## 10 putting https://www.pgatour.com/stats/stat.422.html   https://www.pgat…
-## # ... with 85 more rows
+##    cat     link                              partial                       
+##    &lt;chr&gt;   &lt;chr&gt;                             &lt;chr&gt;                         
+##  1 putting https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  2 putting https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  3 putting https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  4 putting https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  5 putting https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  6 putting https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  7 putting https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  8 putting https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  9 putting https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+## 10 putting https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+## # … with 85 more rows
 ## 
 ## [[5]]
 ## # A tibble: 209 x 3
-##    cat     link                                          partial          
-##    &lt;chr&gt;   &lt;chr&gt;                                         &lt;chr&gt;            
-##  1 scoring https://www.pgatour.com/stats/stat.02675.html https://www.pgat…
-##  2 scoring https://www.pgatour.com/stats/stat.120.html   https://www.pgat…
-##  3 scoring https://www.pgatour.com/stats/stat.108.html   https://www.pgat…
-##  4 scoring https://www.pgatour.com/stats/stat.116.html   https://www.pgat…
-##  5 scoring https://www.pgatour.com/stats/stat.02417.html https://www.pgat…
-##  6 scoring https://www.pgatour.com/stats/stat.299.html   https://www.pgat…
-##  7 scoring https://www.pgatour.com/stats/stat.152.html   https://www.pgat…
-##  8 scoring https://www.pgatour.com/stats/stat.153.html   https://www.pgat…
-##  9 scoring https://www.pgatour.com/stats/stat.112.html   https://www.pgat…
-## 10 scoring https://www.pgatour.com/stats/stat.113.html   https://www.pgat…
-## # ... with 199 more rows
+##    cat     link                              partial                       
+##    &lt;chr&gt;   &lt;chr&gt;                             &lt;chr&gt;                         
+##  1 scoring https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  2 scoring https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  3 scoring https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  4 scoring https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  5 scoring https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  6 scoring https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  7 scoring https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  8 scoring https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  9 scoring https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+## 10 scoring https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+## # … with 199 more rows
 ## 
 ## [[6]]
 ## # A tibble: 21 x 3
-##    cat     link                                        partial            
-##    &lt;chr&gt;   &lt;chr&gt;                                       &lt;chr&gt;              
-##  1 streaks https://www.pgatour.com/stats/stat.297.html https://www.pgatou…
-##  2 streaks https://www.pgatour.com/stats/stat.298.html https://www.pgatou…
-##  3 streaks https://www.pgatour.com/stats/stat.296.html https://www.pgatou…
-##  4 streaks https://www.pgatour.com/stats/stat.295.html https://www.pgatou…
-##  5 streaks https://www.pgatour.com/stats/stat.483.html https://www.pgatou…
-##  6 streaks https://www.pgatour.com/stats/stat.294.html https://www.pgatou…
-##  7 streaks https://www.pgatour.com/stats/stat.474.html https://www.pgatou…
-##  8 streaks https://www.pgatour.com/stats/stat.475.html https://www.pgatou…
-##  9 streaks https://www.pgatour.com/stats/stat.476.html https://www.pgatou…
-## 10 streaks https://www.pgatour.com/stats/stat.477.html https://www.pgatou…
-## # ... with 11 more rows
+##    cat     link                              partial                       
+##    &lt;chr&gt;   &lt;chr&gt;                             &lt;chr&gt;                         
+##  1 streaks https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  2 streaks https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  3 streaks https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  4 streaks https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  5 streaks https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  6 streaks https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  7 streaks https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  8 streaks https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+##  9 streaks https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+## 10 streaks https://www.pgatour.com/stats/st… https://www.pgatour.com/stats…
+## # … with 11 more rows
 ## 
 ## [[7]]
 ## # A tibble: 11 x 3
-##    cat            link                                          partial   
-##    &lt;chr&gt;          &lt;chr&gt;                                         &lt;chr&gt;     
-##  1 money_finishes https://www.pgatour.com/stats/stat.109.html   https://w…
-##  2 money_finishes https://www.pgatour.com/stats/stat.110.html   https://w…
-##  3 money_finishes https://www.pgatour.com/stats/stat.014.html   https://w…
-##  4 money_finishes https://www.pgatour.com/stats/stat.139.html   https://w…
-##  5 money_finishes https://www.pgatour.com/stats/stat.02444.html https://w…
-##  6 money_finishes https://www.pgatour.com/stats/stat.154.html   https://w…
-##  7 money_finishes https://www.pgatour.com/stats/stat.194.html   https://w…
-##  8 money_finishes https://www.pgatour.com/stats/stat.02337.html https://w…
-##  9 money_finishes https://www.pgatour.com/stats/stat.02447.html https://w…
-## 10 money_finishes https://www.pgatour.com/stats/stat.138.html   https://w…
-## 11 money_finishes https://www.pgatour.com/stats/stat.300.html   https://w…
+##    cat         link                            partial                     
+##    &lt;chr&gt;       &lt;chr&gt;                           &lt;chr&gt;                       
+##  1 money_fini… https://www.pgatour.com/stats/… https://www.pgatour.com/sta…
+##  2 money_fini… https://www.pgatour.com/stats/… https://www.pgatour.com/sta…
+##  3 money_fini… https://www.pgatour.com/stats/… https://www.pgatour.com/sta…
+##  4 money_fini… https://www.pgatour.com/stats/… https://www.pgatour.com/sta…
+##  5 money_fini… https://www.pgatour.com/stats/… https://www.pgatour.com/sta…
+##  6 money_fini… https://www.pgatour.com/stats/… https://www.pgatour.com/sta…
+##  7 money_fini… https://www.pgatour.com/stats/… https://www.pgatour.com/sta…
+##  8 money_fini… https://www.pgatour.com/stats/… https://www.pgatour.com/sta…
+##  9 money_fini… https://www.pgatour.com/stats/… https://www.pgatour.com/sta…
+## 10 money_fini… https://www.pgatour.com/stats/… https://www.pgatour.com/sta…
+## 11 money_fini… https://www.pgatour.com/stats/… https://www.pgatour.com/sta…
 ## 
 ## [[8]]
-## # A tibble: 34 x 3
-##    cat             link                                          partial  
-##    &lt;chr&gt;           &lt;chr&gt;                                         &lt;chr&gt;    
-##  1 points_rankings https://www.pgatour.com/stats/stat.02394.html https://…
-##  2 points_rankings https://www.pgatour.com/stats/stat.02395.html https://…
-##  3 points_rankings https://www.pgatour.com/stats/stat.02562.html https://…
-##  4 points_rankings https://www.pgatour.com/stats/stat.131.html   https://…
-##  5 points_rankings https://www.pgatour.com/stats/stat.132.html   https://…
-##  6 points_rankings https://www.pgatour.com/stats/stat.140.html   https://…
-##  7 points_rankings https://www.pgatour.com/stats/stat.187.html   https://…
-##  8 points_rankings https://www.pgatour.com/stats/stat.439.html   https://…
-##  9 points_rankings https://www.pgatour.com/stats/stat.499.html   https://…
-## 10 points_rankings https://www.pgatour.com/stats/stat.02396.html https://…
-## # ... with 24 more rows</code></pre>
+## # A tibble: 35 x 3
+##    cat          link                           partial                     
+##    &lt;chr&gt;        &lt;chr&gt;                          &lt;chr&gt;                       
+##  1 points_rank… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  2 points_rank… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  3 points_rank… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  4 points_rank… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  5 points_rank… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  6 points_rank… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  7 points_rank… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  8 points_rank… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+##  9 points_rank… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+## 10 points_rank… https://www.pgatour.com/stats… https://www.pgatour.com/sta…
+## # … with 25 more rows</code></pre>
 <p>We can now bind the rows together to move this from a list to a dataframe.</p>
 <pre class="r"><code>stat_links &lt;- stat_links_list %&gt;% reduce(bind_rows) %&gt;%
   distinct(link, .keep_all = TRUE)</code></pre>
@@ -303,14 +305,14 @@ head(dir_links)</code></pre>
 <pre class="r"><code>dir_links %&gt;% filter(title == &quot;Driving Distance&quot;) %&gt;%
   unnest(year_links) %&gt;% head()</code></pre>
 <pre><code>## # A tibble: 6 x 4
-##   cat         title            value                                  year
-##   &lt;chr&gt;       &lt;chr&gt;            &lt;chr&gt;                                 &lt;dbl&gt;
-## 1 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1980
-## 2 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1981
-## 3 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1982
-## 4 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1983
-## 5 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1984
-## 6 off_the_tee Driving Distance https://www.pgatour.com/stats/stat.1…  1985</code></pre>
+##   cat        title           value                                     year
+##   &lt;chr&gt;      &lt;chr&gt;           &lt;chr&gt;                                    &lt;dbl&gt;
+## 1 off_the_t… Driving Distan… https://www.pgatour.com/stats/stat.101.…  1980
+## 2 off_the_t… Driving Distan… https://www.pgatour.com/stats/stat.101.…  1981
+## 3 off_the_t… Driving Distan… https://www.pgatour.com/stats/stat.101.…  1982
+## 4 off_the_t… Driving Distan… https://www.pgatour.com/stats/stat.101.…  1983
+## 5 off_the_t… Driving Distan… https://www.pgatour.com/stats/stat.101.…  1984
+## 6 off_the_t… Driving Distan… https://www.pgatour.com/stats/stat.101.…  1985</code></pre>
 </div>
 <div id="using-the-directory" class="section level1">
 <h1>Using the directory</h1>
@@ -339,7 +341,7 @@ head(dir_links)</code></pre>
 ##   &lt;chr&gt;            &lt;list&gt;           
 ## 1 Driving Distance &lt;tibble [39 × 3]&gt;</code></pre>
 <p>When we unnest this tibble, we’ll find more nested data. This is actually useful if you want to only keep a select number of years, or if you want to see how much data is available within each year.</p>
-<pre class="r"><code>dd %&gt;% unnest() %&gt;% head()</code></pre>
+<pre class="r"><code>dd %&gt;% unnest() %&gt;% head</code></pre>
 <pre><code>## # A tibble: 6 x 4
 ##   title            cat          year data              
 ##   &lt;chr&gt;            &lt;chr&gt;       &lt;dbl&gt; &lt;list&gt;            
@@ -350,9 +352,10 @@ head(dir_links)</code></pre>
 ## 5 Driving Distance off_the_tee  1984 &lt;tibble [182 × 7]&gt;
 ## 6 Driving Distance off_the_tee  1985 &lt;tibble [179 × 7]&gt;</code></pre>
 <p>Or you can simply unnest twice and retrieve all data.</p>
-<pre class="r"><code>dd %&gt;% unnest() %&gt;% 
+<pre class="r"><code>dd %&gt;% 
   unnest() %&gt;% 
-  tail(10) %&gt;%
+  unnest() %&gt;% 
+  tail(10) %&gt;% 
   knitr::kable()</code></pre>
 <table>
 <thead>
@@ -374,121 +377,121 @@ head(dir_links)</code></pre>
 <td align="left">Driving Distance</td>
 <td align="left">off_the_tee</td>
 <td align="right">2018</td>
-<td align="left">197</td>
-<td align="left">197</td>
-<td align="left">Camilo Villegas</td>
-<td align="right">45</td>
-<td align="right">281.5</td>
-<td align="left">20,828</td>
-<td align="right">74</td>
-</tr>
-<tr class="even">
-<td align="left">Driving Distance</td>
-<td align="left">off_the_tee</td>
-<td align="right">2018</td>
-<td align="left">198</td>
-<td align="left">198</td>
+<td align="left">184</td>
+<td align="left">184</td>
 <td align="left">Billy Hurley III</td>
-<td align="right">42</td>
-<td align="right">281.1</td>
-<td align="left">22,486</td>
-<td align="right">80</td>
+<td align="right">70</td>
+<td align="right">284.0</td>
+<td align="left">36,354</td>
+<td align="right">128</td>
+</tr>
+<tr class="even">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">185</td>
+<td align="left">185</td>
+<td align="left">Ryan Armour</td>
+<td align="right">109</td>
+<td align="right">283.5</td>
+<td align="left">60,663</td>
+<td align="right">214</td>
 </tr>
 <tr class="odd">
 <td align="left">Driving Distance</td>
 <td align="left">off_the_tee</td>
 <td align="right">2018</td>
-<td align="left">199</td>
-<td align="left">200</td>
+<td align="left">186</td>
+<td align="left">186</td>
+<td align="left">Brian Gay</td>
+<td align="right">103</td>
+<td align="right">282.9</td>
+<td align="left">57,155</td>
+<td align="right">202</td>
+</tr>
+<tr class="even">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">187</td>
+<td align="left">187</td>
+<td align="left">Greg Chalmers</td>
+<td align="right">56</td>
+<td align="right">282.8</td>
+<td align="left">29,413</td>
+<td align="right">104</td>
+</tr>
+<tr class="odd">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">188</td>
+<td align="left">188</td>
 <td align="left">Ben Crane</td>
-<td align="right">49</td>
-<td align="right">279.8</td>
-<td align="left">22,940</td>
-<td align="right">82</td>
+<td align="right">65</td>
+<td align="right">281.1</td>
+<td align="left">30,921</td>
+<td align="right">110</td>
 </tr>
 <tr class="even">
 <td align="left">Driving Distance</td>
 <td align="left">off_the_tee</td>
 <td align="right">2018</td>
-<td align="left">200</td>
-<td align="left">199</td>
-<td align="left">K.J. Choi</td>
-<td align="right">40</td>
-<td align="right">279.6</td>
-<td align="left">19,015</td>
-<td align="right">68</td>
-</tr>
-<tr class="odd">
-<td align="left">Driving Distance</td>
-<td align="left">off_the_tee</td>
-<td align="right">2018</td>
-<td align="left">201</td>
-<td align="left">201</td>
-<td align="left">Wesley Bryan</td>
-<td align="right">50</td>
-<td align="right">279.2</td>
-<td align="left">20,102</td>
-<td align="right">72</td>
-</tr>
-<tr class="even">
-<td align="left">Driving Distance</td>
-<td align="left">off_the_tee</td>
-<td align="right">2018</td>
-<td align="left">202</td>
-<td align="left">T202</td>
+<td align="left">189</td>
+<td align="left">189</td>
 <td align="left">D.A. Points</td>
-<td align="right">45</td>
-<td align="right">278.7</td>
-<td align="left">21,742</td>
-<td align="right">78</td>
+<td align="right">63</td>
+<td align="right">280.8</td>
+<td align="left">32,015</td>
+<td align="right">114</td>
 </tr>
 <tr class="odd">
 <td align="left">Driving Distance</td>
 <td align="left">off_the_tee</td>
 <td align="right">2018</td>
-<td align="left">203</td>
-<td align="left">T202</td>
-<td align="left">Brian Stuard</td>
-<td align="right">72</td>
-<td align="right">278.0</td>
-<td align="left">37,811</td>
-<td align="right">136</td>
-</tr>
-<tr class="even">
-<td align="left">Driving Distance</td>
-<td align="left">off_the_tee</td>
-<td align="right">2018</td>
-<td align="left">204</td>
-<td align="left">204</td>
-<td align="left">Zac Blair</td>
-<td align="right">36</td>
-<td align="right">276.3</td>
-<td align="left">18,785</td>
-<td align="right">68</td>
-</tr>
-<tr class="odd">
-<td align="left">Driving Distance</td>
-<td align="left">off_the_tee</td>
-<td align="right">2018</td>
-<td align="left">205</td>
-<td align="left">205</td>
+<td align="left">190</td>
+<td align="left">190</td>
 <td align="left">Jim Furyk</td>
-<td align="right">28</td>
-<td align="right">273.7</td>
-<td align="left">14,234</td>
-<td align="right">52</td>
+<td align="right">50</td>
+<td align="right">280.5</td>
+<td align="left">26,930</td>
+<td align="right">96</td>
 </tr>
 <tr class="even">
 <td align="left">Driving Distance</td>
 <td align="left">off_the_tee</td>
 <td align="right">2018</td>
-<td align="left">206</td>
-<td align="left">206</td>
-<td align="left">Colt Knost</td>
-<td align="right">28</td>
-<td align="right">271.9</td>
-<td align="left">11,962</td>
-<td align="right">44</td>
+<td align="left">191</td>
+<td align="left">191</td>
+<td align="left">Wesley Bryan</td>
+<td align="right">69</td>
+<td align="right">280.4</td>
+<td align="left">30,844</td>
+<td align="right">110</td>
+</tr>
+<tr class="odd">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">192</td>
+<td align="left">192</td>
+<td align="left">Zac Blair</td>
+<td align="right">64</td>
+<td align="right">279.5</td>
+<td align="left">32,427</td>
+<td align="right">116</td>
+</tr>
+<tr class="even">
+<td align="left">Driving Distance</td>
+<td align="left">off_the_tee</td>
+<td align="right">2018</td>
+<td align="left">193</td>
+<td align="left">193</td>
+<td align="left">Brian Stuard</td>
+<td align="right">103</td>
+<td align="right">278.9</td>
+<td align="left">54,106</td>
+<td align="right">194</td>
 </tr>
 </tbody>
 </table>
@@ -499,11 +502,15 @@ head(dir_links)</code></pre>
   mutate(data = map(value, try_pull_data)) %&gt;%
   group_by(title) %&gt;% 
   nest(-c(value))</code></pre>
-<pre><code>## # A tibble: 2 x 2
-##   title            data             
-##   &lt;chr&gt;            &lt;list&gt;           
-## 1 SG: Tee-to-Green &lt;tibble [39 × 3]&gt;
-## 2 SG: Off-the-Tee  &lt;tibble [39 × 3]&gt;</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   title                  data             
+##   &lt;chr&gt;                  &lt;list&gt;           
+## 1 SG: Tee-to-Green       &lt;tibble [39 × 3]&gt;
+## 2 SG: Off-the-Tee        &lt;tibble [39 × 3]&gt;
+## 3 SG: Approach-the-Green &lt;tibble [39 × 3]&gt;
+## 4 SG: Around-the-Green   &lt;tibble [39 × 3]&gt;
+## 5 SG: Putting            &lt;tibble [39 × 3]&gt;
+## 6 SG: Total              &lt;tibble [39 × 3]&gt;</code></pre>
 <p>Strokes Gained is a relatively new statistic that was only first calculated and collected in 2004. But we are trying to pull data since 1980. What is returned for early years for which no data is actually available?</p>
 <pre class="r"><code>sg2 %&gt;% filter(title == &quot;SG: Tee-to-Green&quot;) %&gt;% unnest()</code></pre>
 <pre><code>## # A tibble: 39 x 4
@@ -519,10 +526,10 @@ head(dir_links)</code></pre>
 ##  8 SG: Tee-to-Green off_the_tee  1987 &lt;tibble [0 × 3]&gt;
 ##  9 SG: Tee-to-Green off_the_tee  1988 &lt;tibble [0 × 3]&gt;
 ## 10 SG: Tee-to-Green off_the_tee  1989 &lt;tibble [0 × 3]&gt;
-## # ... with 29 more rows</code></pre>
+## # … with 29 more rows</code></pre>
 <p>Very cool! The function simply returns empty tibbles, and when we unnest for a second time, these are simply ignored. So, who led the PGA Tour in Strokes Gained in 2017, both off the tee and from tee to green?</p>
 <pre class="r"><code>sg2 %&gt;% unnest() %&gt;%
-  unnest() %&gt;% %&gt;%
+  unnest() %&gt;% 
   group_by(title) %&gt;%
   filter(year == 2017 &amp; rank_this_week == 1) %&gt;% 
   select(title, year, rank = rank_this_week, player_name) %&gt;%
@@ -548,6 +555,30 @@ head(dir_links)</code></pre>
 <td align="right">2017</td>
 <td align="left">1</td>
 <td align="left">Dustin Johnson</td>
+</tr>
+<tr class="odd">
+<td align="left">SG: Approach-the-Green</td>
+<td align="right">2017</td>
+<td align="left">1</td>
+<td align="left">Jordan Spieth</td>
+</tr>
+<tr class="even">
+<td align="left">SG: Around-the-Green</td>
+<td align="right">2017</td>
+<td align="left">1</td>
+<td align="left">Tim Wilkinson</td>
+</tr>
+<tr class="odd">
+<td align="left">SG: Putting</td>
+<td align="right">2017</td>
+<td align="left">1</td>
+<td align="left">Michael Thompson</td>
+</tr>
+<tr class="even">
+<td align="left">SG: Total</td>
+<td align="right">2017</td>
+<td align="left">1</td>
+<td align="left">Jordan Spieth</td>
 </tr>
 </tbody>
 </table>

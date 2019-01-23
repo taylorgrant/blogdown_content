@@ -14,7 +14,7 @@ output:
   blogdown::html_page:
     toc: true
 thumbnailImagePosition: left
-thumbnailImage: http://res.cloudinary.com/dn83gtg0l/image/upload/v1529964813/dots.jpg
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/snippets.jpg
 ---
 
 
@@ -47,10 +47,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 n        36    48 r    
-## 2 e        85    18 p    
-## 3 g         2    58 u    
-## 4 v        97    30 f</code></pre>
+## 1 l        65    26 w    
+## 2 u        54    13 d    
+## 3 f        43    66 l    
+## 4 a        93    29 e</code></pre>
 </div>
 <div id="using-rename_at-to-rename-specific-columns" class="section level1">
 <h1>Using rename_at to rename specific columns</h1>
@@ -68,10 +68,10 @@ df</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   a     pastedName_b     c pastedName_d
 ##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;chr&gt;       
-## 1 n               45    21 z           
-## 2 v               16     5 t           
-## 3 a               89    44 w           
-## 4 d               92    60 h</code></pre>
+## 1 h               23    83 s           
+## 2 j               55    28 x           
+## 3 w               98    43 c           
+## 4 z               40    40 k</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -190,11 +190,11 @@ tmp</code></pre>
 <pre><code>## # A tibble: 5 x 4
 ##   g1_letters g1_num h1_letters h1_num
 ##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;       &lt;int&gt;
-## 1 o          113847 k           58271
-## 2 u          580999 s            6179
-## 3 k           21671 w           39297
-## 4 l           85847 p           48199
-## 5 a          353553 u            2948</code></pre>
+## 1 y          395137 o           59291
+## 2 q          426237 i           46810
+## 3 o           22368 u           53841
+## 4 w          114550 k            1626
+## 5 b          213850 d           47121</code></pre>
 <p>But we can also use the <code>intersect</code> function to create an AND statement</p>
 <pre class="r"><code>tmp &lt;- tibble(g1_letters = sample(letters, 5), 
               g1_num = sample(1:600000, 5),
@@ -212,7 +212,7 @@ tmp &lt;- tmp %&gt;%
             funs(paste0(., &quot;sel&quot;)))
 tmp</code></pre>
 <pre><code>## # A tibble: 1 x 6
-##   g1_num g1_weighted g2_num g2_weighted h1_num h1_weighted
-##    &lt;int&gt; &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;  &lt;int&gt;       &lt;dbl&gt;
-## 1 932204 372881.6sel 189943      75977. 212117      84847.</code></pre>
+##    g1_num g1_weighted g2_num g2_weighted h1_num h1_weighted
+##     &lt;int&gt; &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;  &lt;int&gt;       &lt;dbl&gt;
+## 1 1197668 479067.2sel  77411      30964.  85390       34156</code></pre>
 </div>
