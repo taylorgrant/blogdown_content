@@ -1,0 +1,30 @@
+---
+title: Running
+author: ''
+date: '2019-02-02'
+slug: running
+categories:
+  - R
+  - analysis
+tags:
+  - highcharter
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1549156087/running.jpg
+summary: "Using rStrava to track my running over time"
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#about">About</a></li>
+</ul>
+</div>
+
+<div id="about" class="section level1">
+<h1>About</h1>
+<p>I’ve been wearing a Garmin tracker for over two years now and finally decided to something with the data. I’ve ported over all of my historic activity data to Strava and using the relatively new <code>rStrava</code> package ([Github])(<a href="https://github.com/fawda123/rStrava" class="uri">https://github.com/fawda123/rStrava</a>){target=“_blank“} I can easily download all of the data and play with it.</p>
+<p>For this, I’m going to convert each year of data into an interactive heatmap that tracks my activity. This will be done with the excellent <code>highcharter</code> package from <a href="http://jkunst.com/highcharter/" target="_blank">jkunst</a>. The only issue with highcharter is that it doesn’t have faceting capaibilities.</p>
+</div>
