@@ -10,17 +10,44 @@ tags:
   - highcharter
 thumbnailImagePosition: left
 thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1549156087/running.jpg
-summary: "Using rStrava to track my running over time"
+summary: "Using `rStrava` and `highcharter` to track my running over time"
 output:
   blogdown::html_page:
     toc: true
 ---
 
-# Running data from Strava 
+```{r setup, include=FALSE}
+pacman::p_load(tidyverse, janitor, highcharter, here)
 
-I've been wearing a Garmin tracker for over two years now and finally decided to something with the data. I've ported over all of my historic activity data to Strava and using the relatively new `rStrava` package [Github](https://github.com/fawda123/rStrava){target="_blank"} I can easily download all of the data. All the information for setting up the application for the Strava API is on the github page for `rStrava`.
+strava <- readRDS(here("static", "data", "running", "strava.RDS"))
 
-For this, I'm going to convert each year of data into an interactive heatmap that tracks my activity. This will be done with the excellent `highcharter` package from [jkunst](http://jkunst.com/highcharter/){target="_blank"}. The only issue with highcharter is that it doesn't have faceting capaibilities. 
+strava_19 <- strava %>%
+  filter(year == 2019)
+strava_18 <- strava %>%
+  filter(year == 2018)
+strava_17 <- strava %>%
+  filter(year == 2017)
+```
 
+# 2019 `r sum(strava_19$distance)` Miles
 
+```{r}
+
+hchart(strava_19, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
+  hc_colorAxis(minColor = "#d9d9d9", maxColor = "#238b45") %>% 
+  hc_xAxis(title = list(text = "")) %>%
+  hc_yAxis(title = list(text = "Week of Month"),
+           reversed = TRUE,
+           plotLines = list(
+             list(color = "#003366",
+                  width = 4,
+                  value = 100))) %>%
+  hc_legend(layout = "vertical", verticalAlign = "top",
+            align = "right", valueDecimals = 0) %>%
+  hc_tooltip(useHTML = TRUE, headerFormat = "",
+             pointFormat = "Week of: {point.week} <br>
+             Miles: {point.distance:.1f} <br>",
+             shared = FALSE, style = list(pointerEvents = 'auto'))
+
+```
 
