@@ -16,13 +16,13 @@ output:
     toc: true
 ---
 
-```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
+```{r setup, include = FALSE}
 library(tidyverse)
 library(leaflet)
 library(mapsapi)
 library(xml2)
 library(bitops)
-key <- "KEY GOES HERE"
+key <- Sys.getenv("DIRECTIONS_API_KEY")
 ```
 
 I ran across a package called ```mapsapi``` a while back, and it has some nice functionality for pulling Google Maps information. In poking around, I didn't see any ability to get directions either to or from multiple locations. So I took a portion of the code from that package and rewrote it to do so. Is there much reason to do this? No, probably not, but it's fun.  
