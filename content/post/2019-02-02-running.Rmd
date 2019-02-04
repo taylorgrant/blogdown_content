@@ -29,7 +29,8 @@ strava_17 <- strava %>%
   filter(year == 2017)
 ```
 
-# 2019 `r sum(strava_19$distance)` Miles
+# 2019 
+## `r round(sum(strava_19$distance), 1)` Miles
 
 ```{r}
 
