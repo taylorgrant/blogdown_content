@@ -13,7 +13,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1549156087/ru
 summary: "Using `rStrava` and `highcharter` to track my running over time"
 output:
   blogdown::html_page:
-    toc: true
+    toc: false
 ---
 
 ```{r setup, include=FALSE}
@@ -34,7 +34,7 @@ strava_17 <- strava %>%
 
 ```{r, echo = FALSE}
 
-hchart(strava_19, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
+chart19 <- hchart(strava_19, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
   hc_colorAxis(minColor = "#d9d9d9", maxColor = "#238b45") %>% 
   hc_xAxis(title = list(text = "")) %>%
   hc_yAxis(title = list(text = "Week of Month"),
@@ -50,6 +50,7 @@ hchart(strava_19, "heatmap", hcaes(x = month, y = week_ct, value = round(distanc
              Miles: {point.distance:.1f} <br>",
              shared = FALSE, style = list(pointerEvents = 'auto'))
 
+chart19
 ```
 
 # 2018 
@@ -57,7 +58,7 @@ hchart(strava_19, "heatmap", hcaes(x = month, y = week_ct, value = round(distanc
 
 ```{r, echo = FALSE}
 
-hchart(strava_18, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
+chart18 <- hchart(strava_18, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
   hc_colorAxis(minColor = "#d9d9d9", maxColor = "#238b45") %>% 
   hc_xAxis(title = list(text = "")) %>%
   hc_yAxis(title = list(text = "Week of Month"),
@@ -73,6 +74,7 @@ hchart(strava_18, "heatmap", hcaes(x = month, y = week_ct, value = round(distanc
              Miles: {point.distance:.1f} <br>",
              shared = FALSE, style = list(pointerEvents = 'auto'))
 
+chart18
 ```
 
 # 2017 
@@ -80,7 +82,7 @@ hchart(strava_18, "heatmap", hcaes(x = month, y = week_ct, value = round(distanc
 
 ```{r, echo = FALSE}
 
-hchart(strava_17, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
+chart17 <- hchart(strava_17, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
   hc_colorAxis(minColor = "#d9d9d9", maxColor = "#238b45") %>% 
   hc_xAxis(title = list(text = "")) %>%
   hc_yAxis(title = list(text = "Week of Month"),
@@ -96,4 +98,5 @@ hchart(strava_17, "heatmap", hcaes(x = month, y = week_ct, value = round(distanc
              Miles: {point.distance:.1f} <br>",
              shared = FALSE, style = list(pointerEvents = 'auto'))
 
+chart17
 ```
