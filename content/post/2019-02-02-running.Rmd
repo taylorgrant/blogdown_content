@@ -27,6 +27,9 @@ strava_18 <- strava %>%
   filter(year == 2018)
 strava_17 <- strava %>%
   filter(year == 2017)
+
+# to update running states
+# source(here('static', 'data', 'running', "strava_pull.R"))
 ```
 
 # 2019 
