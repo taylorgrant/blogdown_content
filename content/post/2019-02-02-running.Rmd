@@ -17,7 +17,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-pacman::p_load(tidyverse, janitor, highcharter, here)
+pacman::p_load(tidyverse, janitor, highcharter, here, widgetframe)
 
 strava <- readRDS(here("static", "data", "running", "strava.RDS"))
 
@@ -33,8 +33,8 @@ strava_17 <- strava %>%
 ## `r round(sum(strava_19$distance), 1)` Miles
 
 ```{r, echo = FALSE}
-library(highcharter)
-chart19 <- hchart(strava_19, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
+
+frameWidget(hchart(strava_19, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
   hc_colorAxis(minColor = "#d9d9d9", maxColor = "#238b45") %>% 
   hc_xAxis(title = list(text = "")) %>%
   hc_yAxis(title = list(text = "Week of Month"),
@@ -48,9 +48,10 @@ chart19 <- hchart(strava_19, "heatmap", hcaes(x = month, y = week_ct, value = ro
   hc_tooltip(useHTML = TRUE, headerFormat = "",
              pointFormat = "Week of: {point.week} <br>
              Miles: {point.distance:.1f} <br>",
-             shared = FALSE, style = list(pointerEvents = 'auto'))
+             shared = FALSE, style = list(pointerEvents = 'auto')) %>%
+    hc_size(height = 400)) 
 
-chart19
+
 ```
 
 # 2018 
@@ -58,7 +59,7 @@ chart19
 
 ```{r, echo = FALSE}
 
-chart18 <- hchart(strava_18, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
+frameWidget(hchart(strava_18, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
   hc_colorAxis(minColor = "#d9d9d9", maxColor = "#238b45") %>% 
   hc_xAxis(title = list(text = "")) %>%
   hc_yAxis(title = list(text = "Week of Month"),
@@ -72,9 +73,8 @@ chart18 <- hchart(strava_18, "heatmap", hcaes(x = month, y = week_ct, value = ro
   hc_tooltip(useHTML = TRUE, headerFormat = "",
              pointFormat = "Week of: {point.week} <br>
              Miles: {point.distance:.1f} <br>",
-             shared = FALSE, style = list(pointerEvents = 'auto'))
+             shared = FALSE, style = list(pointerEvents = 'auto')))
 
-chart18
 ```
 
 # 2017 
@@ -82,7 +82,7 @@ chart18
 
 ```{r, echo = FALSE}
 
-chart17 <- hchart(strava_17, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
+frameWidget(hchart(strava_17, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
   hc_colorAxis(minColor = "#d9d9d9", maxColor = "#238b45") %>% 
   hc_xAxis(title = list(text = "")) %>%
   hc_yAxis(title = list(text = "Week of Month"),
@@ -96,7 +96,6 @@ chart17 <- hchart(strava_17, "heatmap", hcaes(x = month, y = week_ct, value = ro
   hc_tooltip(useHTML = TRUE, headerFormat = "",
              pointFormat = "Week of: {point.week} <br>
              Miles: {point.distance:.1f} <br>",
-             shared = FALSE, style = list(pointerEvents = 'auto'))
+             shared = FALSE, style = list(pointerEvents = 'auto')))
 
-chart17
 ```
