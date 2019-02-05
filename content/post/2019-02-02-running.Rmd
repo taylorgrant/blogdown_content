@@ -49,7 +49,7 @@ frameWidget(hchart(strava_19, "heatmap", hcaes(x = month, y = week_ct, value = r
              pointFormat = "Week of: {point.week} <br>
              Miles: {point.distance:.1f} <br>",
              shared = FALSE, style = list(pointerEvents = 'auto')) %>%
-    hc_size(height = 400)) 
+    hc_size(height = 250)) 
 
 
 ```
@@ -73,7 +73,8 @@ frameWidget(hchart(strava_18, "heatmap", hcaes(x = month, y = week_ct, value = r
   hc_tooltip(useHTML = TRUE, headerFormat = "",
              pointFormat = "Week of: {point.week} <br>
              Miles: {point.distance:.1f} <br>",
-             shared = FALSE, style = list(pointerEvents = 'auto')))
+             shared = FALSE, style = list(pointerEvents = 'auto')) %>%
+    hc_size(height = 250)) 
 
 ```
 
@@ -96,6 +97,7 @@ frameWidget(hchart(strava_17, "heatmap", hcaes(x = month, y = week_ct, value = r
   hc_tooltip(useHTML = TRUE, headerFormat = "",
              pointFormat = "Week of: {point.week} <br>
              Miles: {point.distance:.1f} <br>",
-             shared = FALSE, style = list(pointerEvents = 'auto')))
+             shared = FALSE, style = list(pointerEvents = 'auto')) %>%
+    hc_size(height = 250)) 
 
 ```
