@@ -39,7 +39,7 @@ df <- dateseq %>%
          week_ct = ifelse(week == "2017-03-26", 4, week_ct),
          distance_fixed = ifelse(distance == 0, .001, distance)) # if using logarithmic
 
-saveRDS(here("static", "data", 'running', "strava.RDS"))
+saveRDS(df, here("static", "data", 'running', "strava.RDS"))
 
 
 

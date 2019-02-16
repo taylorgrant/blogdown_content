@@ -1,19 +1,19 @@
 ---
 title: Running
 author: ''
-date: '2019-02-04'
-slug: running
+date: '2019-02-16'
 categories:
-  - R
   - analysis
+  - R
 tags:
   - highcharter
+slug: running
 thumbnailImagePosition: left
 thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1549156087/running.jpg
-summary: "Using `rStrava` and `highcharter` to track my running over time"
+summary: Using `rStrava` and `highcharter` to track my running over time
 output:
   blogdown::html_page:
-    toc: false
+    toc: no
 ---
 
 ```{r setup, include=FALSE}
