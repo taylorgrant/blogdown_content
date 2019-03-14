@@ -70,3 +70,23 @@ str_sub(st, 1, 4)
 # In between
 str_sub(st, 5, 10)
 ```
+
+# Programmatically inserting a line break in strings
+
+Found this useful when working with lots of data and using a function to parse the data and plot using ggplot. 
+```{r, warning=FALSE}
+pacman::p_load(tidyverse)
+dat <- tibble(a = c("Suburban (just outside of urban/metro area)", "Small town (separate from suburban area, but within proximity)", 
+"Rural (far from large urban area)", "Urban (close to large metro area)", 
+"Other"),
+   val = 1:5)
+
+dat %>% 
+  mutate(a = ifelse(str_count(a, "\\S+") > 6, 
+                      str_replace_all(a, word(a, str_count(a, "\\S+")/2 + 1), 
+                                      paste0("\n", word(a, str_count(a, "\\S+")/2  +1))), a)) %>%
+  ggplot(aes(x = val, y = a)) + 
+  geom_point(col = "blue")
+
+```
+

@@ -24,6 +24,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <li><a href="#remove-commas-and-convert-string-to-numeric">Remove commas and convert string to numeric</a></li>
 <li><a href="#add-commas-and-convert-numeric-to-string">Add commas and convert numeric to string</a></li>
 <li><a href="#pull-out-the-last-n-and-first-n-characters-in-string">Pull out the last N and first N characters in string</a></li>
+<li><a href="#programmatically-inserting-a-line-break-in-strings">Programmatically inserting a line break in strings</a></li>
 </ul>
 </div>
 
@@ -42,8 +43,9 @@ gsub(&quot;\\T.*&quot;, &quot;&quot;, stamp) </code></pre>
 <div id="splitting-and-pulling-data-after-symbols." class="section level1">
 <h1>Splitting and pulling data after symbols.</h1>
 <p>There are also pure regex ways of achieving the same ends, but stringr is so easy. The <code>str_split</code> function returns a list, and we then pull out the specific list element that we want. This command works nicely when working with dataframes and <code>dplyr</code> - simply mutate with this command to create a new variable.</p>
-<pre class="r"><code>library(stringr)
-# assume a url with the following path, and we want to pull out the 
+<pre class="r"><code>library(stringr)</code></pre>
+<pre><code>## Warning: package &#39;stringr&#39; was built under R version 3.5.2</code></pre>
+<pre class="r"><code># assume a url with the following path, and we want to pull out the 
 # info after the 2nd slash
 urlPath &lt;- &quot;/t5/Announcements-and-Info/Bixby-Button-Short-Press-The-choice-is-yours/m-p/168685/highlight/true#M210&quot;
 
@@ -78,4 +80,21 @@ str_sub(st, 1, 4)</code></pre>
 <pre class="r"><code># In between
 str_sub(st, 5, 10)</code></pre>
 <pre><code>## [1] &quot;string&quot;</code></pre>
+</div>
+<div id="programmatically-inserting-a-line-break-in-strings" class="section level1">
+<h1>Programmatically inserting a line break in strings</h1>
+<p>Found this useful when working with lots of data and using a function to parse the data and plot using ggplot.</p>
+<pre class="r"><code>pacman::p_load(tidyverse)
+dat &lt;- tibble(a = c(&quot;Suburban (just outside of urban/metro area)&quot;, &quot;Small town (separate from suburban area, but within proximity)&quot;, 
+&quot;Rural (far from large urban area)&quot;, &quot;Urban (close to large metro area)&quot;, 
+&quot;Other&quot;),
+   val = 1:5)
+
+dat %&gt;% 
+  mutate(a = ifelse(str_count(a, &quot;\\S+&quot;) &gt; 6, 
+                      str_replace_all(a, word(a, str_count(a, &quot;\\S+&quot;)/2 + 1), 
+                                      paste0(&quot;\n&quot;, word(a, str_count(a, &quot;\\S+&quot;)/2  +1))), a)) %&gt;%
+  ggplot(aes(x = val, y = a)) + 
+  geom_point(col = &quot;blue&quot;)</code></pre>
+<p><img src="/post/2018-02-25-snippets-regular-expressions-regex_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
