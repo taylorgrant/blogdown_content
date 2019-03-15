@@ -86,7 +86,7 @@ dat %>%
                       str_replace_all(a, word(a, str_count(a, "\\S+")/2 + 1), 
                                       paste0("\n", word(a, str_count(a, "\\S+")/2  +1))), a)) %>%
   ggplot(aes(x = val, y = a)) + 
-  geom_point(col = "blue")
+  geom_point(col = "blue") 
 
 ```
 
