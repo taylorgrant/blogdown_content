@@ -27,6 +27,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <li><a href="#multiple-left_joins-using-dplyr">Multiple left_joins using dplyr</a></li>
 <li><a href="#calculating-quantiles-the-tidy-way">Calculating quantiles the tidy way</a></li>
 <li><a href="#selection-of-multiple-variables">Selection of multiple variables</a></li>
+<li><a href="#dplyr---group_split-function">dplyr - group_split function</a></li>
 </ul>
 </div>
 
@@ -47,10 +48,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 l        65    26 w    
-## 2 u        54    13 d    
-## 3 f        43    66 l    
-## 4 a        93    29 e</code></pre>
+## 1 i        44    79 a    
+## 2 g        60     5 p    
+## 3 c        16    35 n    
+## 4 h        50     8 m</code></pre>
 </div>
 <div id="using-rename_at-to-rename-specific-columns" class="section level1">
 <h1>Using rename_at to rename specific columns</h1>
@@ -68,10 +69,10 @@ df</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   a     pastedName_b     c pastedName_d
 ##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;chr&gt;       
-## 1 h               23    83 s           
-## 2 j               55    28 x           
-## 3 w               98    43 c           
-## 4 z               40    40 k</code></pre>
+## 1 b               75    38 j           
+## 2 w                9    31 y           
+## 3 k               28    84 f           
+## 4 v               73    75 n</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -79,6 +80,15 @@ df</code></pre>
 <pre class="r"><code>mtcars %&gt;% 
   group_by(cyl) %&gt;%
   summarise_at(vars(disp, drat, mpg), funs(median, mean))</code></pre>
+<pre><code>## Warning: funs() is soft deprecated as of dplyr 0.8.0
+## please use list() instead
+## 
+## # Before:
+## funs(name = f(.)
+## 
+## # After: 
+## list(name = ~f(.))
+## This warning is displayed once per session.</code></pre>
 <pre><code>## # A tibble: 3 x 7
 ##     cyl disp_median drat_median mpg_median disp_mean drat_mean mpg_mean
 ##   &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
@@ -93,7 +103,7 @@ df</code></pre>
 <p>But this won’t</p>
 <pre class="r"><code>mtcars %&gt;%
   summarise_at(vars(contains(&quot;ar|mp&quot;)), funs(mean))</code></pre>
-<pre><code>## data frame with 0 columns and 0 rows</code></pre>
+<pre><code>## data frame with 0 columns and 1 row</code></pre>
 <p>If you want to match across multiple strings, the <code>matches()</code> function will do the trick.</p>
 <pre class="r"><code>mtcars %&gt;%
   summarise_at(vars(matches(&quot;ar|mp&quot;)), funs(mean))</code></pre>
@@ -190,11 +200,11 @@ tmp</code></pre>
 <pre><code>## # A tibble: 5 x 4
 ##   g1_letters g1_num h1_letters h1_num
 ##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;       &lt;int&gt;
-## 1 y          395137 o           59291
-## 2 q          426237 i           46810
-## 3 o           22368 u           53841
-## 4 w          114550 k            1626
-## 5 b          213850 d           47121</code></pre>
+## 1 n          210432 a           48825
+## 2 o          347699 e           51454
+## 3 p          352933 d           24623
+## 4 y          282326 r           53935
+## 5 h          151352 i            5606</code></pre>
 <p>But we can also use the <code>intersect</code> function to create an AND statement</p>
 <pre class="r"><code>tmp &lt;- tibble(g1_letters = sample(letters, 5), 
               g1_num = sample(1:600000, 5),
@@ -214,5 +224,86 @@ tmp</code></pre>
 <pre><code>## # A tibble: 1 x 6
 ##    g1_num g1_weighted g2_num g2_weighted h1_num h1_weighted
 ##     &lt;int&gt; &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;  &lt;int&gt;       &lt;dbl&gt;
-## 1 1197668 479067.2sel  77411      30964.  85390       34156</code></pre>
+## 1 1967316 786926.4sel 212728      85091. 182912      73165.</code></pre>
+</div>
+<div id="dplyr---group_split-function" class="section level1">
+<h1>dplyr - group_split function</h1>
+<p>An interesting addition to dplyr is the new <code>group_split</code> function which groups by a specific variable and then splits the data into separate lists.</p>
+<p>Not sure when I’m going to use this, but wanted to put it here.</p>
+<pre class="r"><code>pacman::p_load(tidyverse)
+data(starwars)
+
+split_by &lt;- starwars %&gt;%
+  group_by(gender)
+
+group_split(split_by)</code></pre>
+<pre><code>## [[1]]
+## # A tibble: 3 x 13
+##   name  height  mass hair_color skin_color eye_color birth_year gender
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
+## 1 C-3PO    167    75 &lt;NA&gt;       gold       yellow           112 &lt;NA&gt;  
+## 2 R2-D2     96    32 &lt;NA&gt;       white, bl… red               33 &lt;NA&gt;  
+## 3 R5-D4     97    32 &lt;NA&gt;       white, red red               NA &lt;NA&gt;  
+## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+## #   vehicles &lt;list&gt;, starships &lt;list&gt;
+## 
+## [[2]]
+## # A tibble: 19 x 13
+##    name  height  mass hair_color skin_color eye_color birth_year gender
+##    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
+##  1 Leia…    150  49   brown      light      brown             19 female
+##  2 Beru…    165  75   brown      light      blue              47 female
+##  3 Mon …    150  NA   auburn     fair       blue              48 female
+##  4 Shmi…    163  NA   black      fair       brown             72 female
+##  5 Ayla…    178  55   none       blue       hazel             48 female
+##  6 Adi …    184  50   none       dark       blue              NA female
+##  7 Cordé    157  NA   brown      light      brown             NA female
+##  8 Lumi…    170  56.2 black      yellow     blue              58 female
+##  9 Barr…    166  50   black      yellow     blue              40 female
+## 10 Dormé    165  NA   brown      light      brown             NA female
+## 11 Zam …    168  55   blonde     fair, gre… yellow            NA female
+## 12 Taun…    213  NA   none       grey       black             NA female
+## 13 Joca…    167  NA   white      fair       blue              NA female
+## 14 R4-P…     96  NA   none       silver, r… red, blue         NA female
+## 15 Shaa…    178  57   none       red, blue… black             NA female
+## 16 Sly …    178  48   none       pale       white             NA female
+## 17 Rey       NA  NA   brown      light      hazel             NA female
+## 18 Capt…     NA  NA   unknown    unknown    unknown           NA female
+## 19 Padm…    165  45   brown      light      brown             46 female
+## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+## #   vehicles &lt;list&gt;, starships &lt;list&gt;
+## 
+## [[3]]
+## # A tibble: 1 x 13
+##   name  height  mass hair_color skin_color eye_color birth_year gender
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
+## 1 Jabb…    175  1358 &lt;NA&gt;       green-tan… orange           600 herma…
+## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+## #   vehicles &lt;list&gt;, starships &lt;list&gt;
+## 
+## [[4]]
+## # A tibble: 62 x 13
+##    name  height  mass hair_color skin_color eye_color birth_year gender
+##    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
+##  1 Luke…    172    77 blond      fair       blue            19   male  
+##  2 Dart…    202   136 none       white      yellow          41.9 male  
+##  3 Owen…    178   120 brown, gr… light      blue            52   male  
+##  4 Bigg…    183    84 black      light      brown           24   male  
+##  5 Obi-…    182    77 auburn, w… fair       blue-gray       57   male  
+##  6 Anak…    188    84 blond      fair       blue            41.9 male  
+##  7 Wilh…    180    NA auburn, g… fair       blue            64   male  
+##  8 Chew…    228   112 brown      unknown    blue           200   male  
+##  9 Han …    180    80 brown      fair       brown           29   male  
+## 10 Gree…    173    74 &lt;NA&gt;       green      black           44   male  
+## # … with 52 more rows, and 5 more variables: homeworld &lt;chr&gt;,
+## #   species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;, starships &lt;list&gt;
+## 
+## [[5]]
+## # A tibble: 2 x 13
+##   name  height  mass hair_color skin_color eye_color birth_year gender
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
+## 1 IG-88    200   140 none       metal      red               15 none  
+## 2 BB8       NA    NA none       none       black             NA none  
+## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+## #   vehicles &lt;list&gt;, starships &lt;list&gt;</code></pre>
 </div>

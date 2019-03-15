@@ -183,3 +183,20 @@ tmp <- tmp %>%
             funs(paste0(., "sel")))
 tmp
 ```
+
+# dplyr - group_split function
+
+An interesting addition to dplyr is the new `group_split` function which groups by a specific variable and then splits the data into separate lists. 
+
+Not sure when I'm going to use this, but wanted to put it here. 
+
+```{r}
+pacman::p_load(tidyverse)
+data(starwars)
+
+split_by <- starwars %>%
+  group_by(gender)
+
+group_split(split_by)
+
+```
