@@ -131,3 +131,28 @@ tibble(x = 1:l,
 
 
 ```
+
+# France 
+
+```{r, echo = FALSE,  fig.height = 3, fig.width = 5}
+l <- 140
+h_lim <- l*(1/1.9)
+line_seq <- seq(1, l, length.out = 4)
+
+tibble(x = 1:l, 
+       y = 1:l) %>%
+  ggplot(aes(x = x, y = y)) + 
+  geom_point(col = "white") + 
+  coord_cartesian(ylim = c(0, h_lim)) +
+  geom_segment(x = line_seq[2], xend = line_seq[2], y = 1, yend = h_lim, col = 'white') +
+  geom_segment(x = line_seq[3], xend = line_seq[3], y = 1, yend = h_lim, col = 'white') +
+  theme(panel.background = element_rect(fill = "white")) +
+  geom_rect(aes(xmin = 1, xmax = line_seq[2], ymin = 1, ymax = h_lim), fill = "#183883") +
+  geom_rect(aes(xmin = line_seq[2], xmax = line_seq[2], ymin = 1, ymax = h_lim), fill = "#FFFFFF") +
+  geom_rect(aes(xmin = line_seq[3], xmax = line_seq[4], ymin = 1, ymax = h_lim), fill = "#DA251E") +
+  theme(legend.position = "none",
+        axis.text = element_blank(),
+        axis.ticks = element_blank()) +
+  labs(x = "", y = "")
+
+```
