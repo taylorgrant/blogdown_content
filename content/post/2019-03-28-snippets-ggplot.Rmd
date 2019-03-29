@@ -60,7 +60,7 @@ tibble(type = rep(c('a','b'), each = 4),
 
 Of course no one likes pie charts, but occasionally someone wants one. A single pie chart is simple to make in ggplot (see [here](http://www.sthda.com/english/wiki/ggplot2-pie-chart-quick-start-guide-r-software-and-data-visualization){target="_blank"}), but what if you want to facet your pie charts? 
 
-This was the old way of having to make pie charts with ggplot and it still works really well. Since we essentially applied `element_blank()` to everything, we have to go back in and recolor the facet labels within the theme.
+This was the old way of having to make pie charts with ggplot and it still works really well. Since we applied `theme_minimal()` (not sure it's necessary in this case) to everything, we have to go back in and recolor the facet labels within the theme.
 
 ```{r}
 tibble(type = rep(c('a','b', 'c'), each = 4),
@@ -90,7 +90,7 @@ tibble(type = rep(c('a','b', 'c'), each = 4),
        title = "Title over a row of faceted pie charts")
 ```
 
-Note that you can turn these pie charts into donut plots with the `xlim(4,8)` line within the code. The first number decides the thickness of the donut (larger = thicker); the second number dictates the size of the donut (smaller equals larger). 
+Note that you can turn these pie charts into donut plots by adding `xlim(4,8)` within the code. The first number decides the thickness of the donut (larger = thicker); the second number dictates the size of the donut (smaller equals larger). 
 
 ```{r, echo = FALSE}
 tibble(type = rep(c('a','b', 'c'), each = 4),
@@ -181,7 +181,7 @@ tibble(date = seq.Date(as.Date("2019-01-01"), as.Date("2019-12-01"), by = "week"
 
 Heatmaps are simple to make. In this case, we have data at the monthly level with some missing data. Options are used within the fill command to ensure the lower and upper extremes aren't too dark or light;  `na.value` allows us to change the values of our NA months. Additionally, the plot margins are altered to give more room around the plot while leaving the left margin untouched to give it sense of width. 
 
-```{r}
+```{r, message=FALSE}
 library(viridis)
 tibble(date = seq.Date(as.Date("2014-01-01"), as.Date("2019-12-01"), "month"),
        value = c(sample(10000:100000, 63), rep(NA_integer_, 9))) %>% 

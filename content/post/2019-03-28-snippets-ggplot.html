@@ -60,7 +60,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
 <div id="faceting-pie-charts-and-donut-plots" class="section level1">
 <h1>Faceting pie charts and donut plots</h1>
 <p>Of course no one likes pie charts, but occasionally someone wants one. A single pie chart is simple to make in ggplot (see <a href="http://www.sthda.com/english/wiki/ggplot2-pie-chart-quick-start-guide-r-software-and-data-visualization" target="_blank">here</a>), but what if you want to facet your pie charts?</p>
-<p>This was the old way of having to make pie charts with ggplot and it still works really well. Since we essentially applied <code>element_blank()</code> to everything, we have to go back in and recolor the facet labels within the theme.</p>
+<p>This was the old way of having to make pie charts with ggplot and it still works really well. Since we applied <code>theme_minimal()</code> (not sure it’s necessary in this case) to everything, we have to go back in and recolor the facet labels within the theme.</p>
 <pre class="r"><code>tibble(type = rep(c(&#39;a&#39;,&#39;b&#39;, &#39;c&#39;), each = 4),
          cat = rep(c(&#39;cat&#39;, &#39;dog&#39;, &#39;bird&#39;, &#39;snake&#39;),3),
          n = sample(1:500, 12)) %&gt;%
@@ -87,7 +87,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
   labs(x = &quot;x-axis label&quot;, y = &quot;y-axis label&quot;,
        title = &quot;Title over a row of faceted pie charts&quot;)</code></pre>
 <p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<p>Note that you can turn these pie charts into donut plots with the <code>xlim(4,8)</code> line within the code. The first number decides the thickness of the donut (larger = thicker); the second number dictates the size of the donut (smaller equals larger).</p>
+<p>Note that you can turn these pie charts into donut plots by adding <code>xlim(4,8)</code> within the code. The first number decides the thickness of the donut (larger = thicker); the second number dictates the size of the donut (smaller equals larger).</p>
 <p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
 <div id="using-facet_grid-to-graph-multiple-groups-in-the-same-plot" class="section level1">
@@ -133,9 +133,8 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
 <div id="heatmaps" class="section level1">
 <h1>Heatmaps</h1>
 <p>Heatmaps are simple to make. In this case, we have data at the monthly level with some missing data. Options are used within the fill command to ensure the lower and upper extremes aren’t too dark or light; <code>na.value</code> allows us to change the values of our NA months. Additionally, the plot margins are altered to give more room around the plot while leaving the left margin untouched to give it sense of width.</p>
-<pre class="r"><code>library(viridis)</code></pre>
-<pre><code>## Loading required package: viridisLite</code></pre>
-<pre class="r"><code>tibble(date = seq.Date(as.Date(&quot;2014-01-01&quot;), as.Date(&quot;2019-12-01&quot;), &quot;month&quot;),
+<pre class="r"><code>library(viridis)
+tibble(date = seq.Date(as.Date(&quot;2014-01-01&quot;), as.Date(&quot;2019-12-01&quot;), &quot;month&quot;),
        value = c(sample(10000:100000, 63), rep(NA_integer_, 9))) %&gt;% 
   mutate(month = lubridate::month(date, label = TRUE),
          year = factor(lubridate::year(date))) %&gt;%
