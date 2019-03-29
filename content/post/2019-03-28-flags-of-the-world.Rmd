@@ -1,0 +1,133 @@
+---
+title: Flags of the World
+author: ''
+date: '2019-03-28'
+slug: flags-of-the-world
+categories:
+  - R
+tags:
+  - dataviz
+  - ggplot
+summary: "Using ggplot to make flags of the world"
+output:
+  blogdown::html_page:
+    toc: true
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553842477/national-flags.jpg
+---
+
+```{r , setup, include = FALSE}
+library(tidyverse)
+```
+
+Graphing flags of the world in ggplot, because why not?  
+
+# United States 
+
+```{r, echo = FALSE}
+l <- 140
+h_lim <- l*(1/1.9)
+union_l <- l*(.76/1.9)
+union_h <- (h_lim - (l*(1/1.9) - (l*(1/1.9))*.5385)) - .54
+
+star6_l <- union_l*(.063/.76)
+star6_h <- union_h*(.054/.5385) 
+
+line_seq <- seq(1, l*(1/1.9), length.out = 14)
+
+tibble(x = 1:l, 
+       y = 1:l) %>%
+  ggplot(aes(x = x, y = y)) + 
+  geom_point(col = "white") + 
+  coord_cartesian(ylim = c(0, h_lim)) + 
+  # theme_void() + 
+  geom_segment(x = 1, xend = l, y = line_seq[1], yend = line_seq[1], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[2], yend = line_seq[2], col = 'white') + 
+  geom_segment(x = 1, xend = l, y = line_seq[3], yend = line_seq[3], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[4], yend = line_seq[4], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[5], yend = line_seq[5], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[6], yend = line_seq[6], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[7], yend = line_seq[7], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[8], yend = line_seq[8], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[9], yend = line_seq[9], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[10], yend = line_seq[10], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[11], yend = line_seq[11], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[12], yend = line_seq[12], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[13], yend = line_seq[13], col = 'white') +
+  geom_segment(x = 1, xend = l, y = line_seq[14], yend = line_seq[14], col = 'white') +
+  geom_ribbon(aes(ymin = line_seq[1], ymax = line_seq[2], fill = "#BF0A30")) +
+  geom_ribbon(aes(ymin = line_seq[3], ymax = line_seq[4], fill = "#BF0A30")) +
+  geom_ribbon(aes(ymin = line_seq[5], ymax = line_seq[6], fill = "#BF0A30")) +
+  geom_ribbon(aes(ymin = line_seq[7], ymax = line_seq[8], fill = "#BF0A30")) +
+  geom_ribbon(aes(ymin = line_seq[9], ymax = line_seq[10], fill = "#BF0A30")) +
+  geom_ribbon(aes(ymin = line_seq[11], ymax = line_seq[12], fill = "#BF0A30")) +
+  geom_ribbon(aes(ymin = line_seq[13], ymax = line_seq[14], fill = "#BF0A30")) +
+  theme(panel.background = element_rect(fill = "white")) +
+  geom_rect(aes(xmin = 1, xmax = union_l, ymin = h_lim - union_h, ymax = h_lim), fill = "#002868") +
+  # top row
+  geom_point(aes(x = star6_l,  y = h_lim - star6_h), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*3,  y = h_lim - star6_h), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*5,  y = h_lim - star6_h), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*7,  y = h_lim - star6_h), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*9,  y = h_lim - star6_h), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*11,  y = h_lim - star6_h), col = "white", size = 3) +
+  # second row
+  geom_point(aes(x = star6_l*2,  y = h_lim - star6_h*2), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*4,  y = h_lim - star6_h*2), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*6,  y = h_lim - star6_h*2), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*8,  y = h_lim - star6_h*2), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*10,  y = h_lim - star6_h*2), col = "white", size = 3) +
+  # third row
+  geom_point(aes(x = star6_l,  y = h_lim - star6_h*3), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*3,  y = h_lim - star6_h*3), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*5,  y = h_lim - star6_h*3), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*7,  y = h_lim - star6_h*3), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*9,  y = h_lim - star6_h*3), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*11,  y = h_lim - star6_h*3), col = "white", size = 3) +
+  # fourth row
+  geom_point(aes(x = star6_l*2,  y = h_lim - star6_h*4), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*4,  y = h_lim - star6_h*4), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*6,  y = h_lim - star6_h*4), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*8,  y = h_lim - star6_h*4), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*10,  y = h_lim - star6_h*4), col = "white", size = 3) +
+  # fifth row
+  geom_point(aes(x = star6_l,  y = h_lim - star6_h*5), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*3,  y = h_lim - star6_h*5), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*5,  y = h_lim - star6_h*5), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*7,  y = h_lim - star6_h*5), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*9,  y = h_lim - star6_h*5), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*11,  y = h_lim - star6_h*5), col = "white", size = 3) +
+  # sixth row
+  geom_point(aes(x = star6_l*2,  y = h_lim - star6_h*6), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*4,  y = h_lim - star6_h*6), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*6,  y = h_lim - star6_h*6), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*8,  y = h_lim - star6_h*6), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*10,  y = h_lim - star6_h*6), col = "white", size = 3) +
+  # seventh row
+  geom_point(aes(x = star6_l,  y = h_lim - star6_h*7), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*3,  y = h_lim - star6_h*7), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*5,  y = h_lim - star6_h*7), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*7,  y = h_lim - star6_h*7), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*9,  y = h_lim - star6_h*7), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*11,  y = h_lim - star6_h*7), col = "white", size = 3) +
+  # eighth row
+  geom_point(aes(x = star6_l*2,  y = h_lim - star6_h*8), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*4,  y = h_lim - star6_h*8), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*6,  y = h_lim - star6_h*8), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*8,  y = h_lim - star6_h*8), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*10,  y = h_lim - star6_h*8), col = "white", size = 3) +
+  # ninth row
+  geom_point(aes(x = star6_l,  y = h_lim - star6_h*9), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*3,  y = h_lim - star6_h*9), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*5,  y = h_lim - star6_h*9), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*7,  y = h_lim - star6_h*9), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*9,  y = h_lim - star6_h*9), col = "white", size = 3) +
+  geom_point(aes(x = star6_l*11,  y = h_lim - star6_h*9), col = "white", size = 3) +
+  scale_fill_manual(values = c("#BF0A30", "white")) +
+  theme(legend.position = "none",
+        axis.text = element_blank(),
+        axis.ticks = element_blank()) +
+  labs(x = "", y = "")
+
+
+```
