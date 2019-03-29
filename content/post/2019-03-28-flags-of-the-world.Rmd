@@ -28,7 +28,7 @@ Graphing flags of the world in ggplot, because why not?
 ## United States 
 
 There are no stars in ggplot... 
-```{r, echo = FALSE, , warning = FALSE, fig.height = 3, fig.width = 5}
+```{r, echo = FALSE, warning = FALSE, fig.height = 3, fig.width = 5}
 # flag dimensions 
 l <- 140
 h_lim <- l*(1/1.9)
@@ -127,7 +127,7 @@ tibble(x = 1:l,
 ## Germany 
 Straightforward 
 
-```{r echo = FALSE,  fig.height = 2, fig.width = 3.333}
+```{r echo = FALSE,  warning = FALSE, fig.height = 3, fig.width = 5}
 l <- 140
 h_lim <- l*(1/1.9)
 bar_seq <- seq(1, h_lim, length.out = 4)
