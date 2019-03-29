@@ -103,30 +103,31 @@ tibble(x = 1:l,
 ```{r, echo = FALSE,  fig.height = 3, fig.width = 5}
 l <- 140
 h_lim <- l*(1/1.9)
-line_seq <- seq(1, l, length.out = 4)
+bar_seq <- seq(1, l, length.out = 4)
+bars <- c(bar_seq, rep(0, 140-length(bar_seq)))
 
 tibble(x = 1:l, 
        y = 1:l) %>%
   ggplot(aes(x = x, y = y)) + 
   geom_point(col = "white") + 
   coord_cartesian(ylim = c(0, h_lim)) +
-  geom_segment(x = line_seq[2], xend = line_seq[2], y = 1, yend = h_lim, col = 'white') +
-  geom_segment(x = line_seq[3], xend = line_seq[3], y = 1, yend = h_lim, col = 'white') +
+  geom_segment(x = bars, xend = bars, y = 1, yend = h_lim, col = 'white') +
   theme(panel.background = element_rect(fill = "white")) +
-  geom_rect(aes(xmin = 1, xmax = line_seq[2], ymin = 1, ymax = h_lim), fill = "#183883") +
-  geom_rect(aes(xmin = line_seq[2], xmax = line_seq[2], ymin = 1, ymax = h_lim), fill = "#FFFFFF") +
-  geom_rect(aes(xmin = line_seq[3], xmax = line_seq[4], ymin = 1, ymax = h_lim), fill = "#DA251E") +
+  geom_rect(aes(xmin = 1, xmax = bars[2], ymin = 1, ymax = h_lim), fill = "#183883") + 
+  geom_rect(aes(xmin = bars[2], xmax = bars[3], ymin = 1, ymax = h_lim), fill = "#FFFFFF") +
+  geom_rect(aes(xmin = bars[3], xmax = bars[4], ymin = 1, ymax = h_lim), fill = "#DA251E") +
   theme(legend.position = "none",
         axis.text = element_blank(),
         axis.ticks = element_blank()) +
   labs(x = "", y = "")
+
 
 ```
 
 ## Germany 
 Straightforward 
 
-```{r echo = FALSE,  fig.height = 3, fig.width = 5}
+```{r echo = FALSE,  fig.height = 2, fig.width = 3.333}
 l <- 140
 h_lim <- l*(1/1.9)
 bar_seq <- seq(1, h_lim, length.out = 4)
@@ -139,10 +140,9 @@ tibble(x = 1:l,
   coord_cartesian(ylim = c(0, h_lim)) +
   geom_segment(x = rep(1, 140), xend = rep(l,140), y = bars, yend = bars, col = NA) +
   theme(panel.background = element_rect(fill = "white")) +
-  geom_ribbon(aes(ymin = bars[1], ymax = bars[2], fill = "bottom")) +
-  geom_ribbon(aes(ymin = bars[2], ymax = bars[3], fill = "mid")) +
-  geom_ribbon(aes(ymin = bars[3], ymax = bars[4], fill = "top")) + 
-  scale_fill_manual(values = c("#FFCE00", "#DD0000", "#000000")) +
+  geom_rect(aes(xmin = 1, xmax = l, ymin = bars[1], ymax = bars[2]), fill = "#FFCE00") + 
+  geom_rect(aes(xmin = 1, xmax = l, ymin = bars[2], ymax = bars[3]), fill = "#DD0000") + 
+  geom_rect(aes(xmin = 1, xmax = l, ymin = bars[3], ymax = bars[4]), fill = "#000000") +
   theme_void() + 
   theme(legend.position = "none",
         axis.text = element_blank(),
@@ -154,21 +154,22 @@ tibble(x = 1:l,
 ## Italy 
 
 ```{r, echo = FALSE,  fig.height = 3, fig.width = 5}
+
 l <- 140
 h_lim <- l*(1/1.9)
-line_seq <- seq(1, l, length.out = 4)
+bar_seq <- seq(1, l, length.out = 4)
+bars <- c(bar_seq, rep(0, 140-length(bar_seq)))
 
 tibble(x = 1:l, 
        y = 1:l) %>%
   ggplot(aes(x = x, y = y)) + 
   geom_point(col = "white") + 
   coord_cartesian(ylim = c(0, h_lim)) +
-  geom_segment(x = line_seq[2], xend = line_seq[2], y = 1, yend = h_lim, col = 'white') +
-  geom_segment(x = line_seq[3], xend = line_seq[3], y = 1, yend = h_lim, col = 'white') +
+  geom_segment(x = bars, xend = bars, y = 1, yend = h_lim, col = 'white') +
   theme(panel.background = element_rect(fill = "white")) +
-  geom_rect(aes(xmin = 1, xmax = line_seq[2], ymin = 1, ymax = h_lim), fill = "#009246") +
-  geom_rect(aes(xmin = line_seq[2], xmax = line_seq[2], ymin = 1, ymax = h_lim), fill = "#FFFFFF") +
-  geom_rect(aes(xmin = line_seq[3], xmax = line_seq[4], ymin = 1, ymax = h_lim), fill = "#CE2B37") +
+  geom_rect(aes(xmin = 1, xmax = bars[2], ymin = 1, ymax = h_lim), fill = "#009246") + 
+  geom_rect(aes(xmin = bars[2], xmax = bars[3], ymin = 1, ymax = h_lim), fill = "#FFFFFF") +
+  geom_rect(aes(xmin = bars[3], xmax = bars[4], ymin = 1, ymax = h_lim), fill = "#CE2B37") +
   theme(legend.position = "none",
         axis.text = element_blank(),
         axis.ticks = element_blank()) +
