@@ -24,7 +24,7 @@ Graphing flags of the world in ggplot, because why not?
 
 # United States 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.height = 3, fig.width = 5}
 l <- 140
 h_lim <- l*(1/1.9)
 union_l <- l*(.76/1.9)
