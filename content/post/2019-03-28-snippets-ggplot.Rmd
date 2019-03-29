@@ -147,3 +147,32 @@ tibble(group = c('Group A', 'Group A',
         strip.background =element_rect(fill="lightgray", color = NA)) +
   labs(x = "", y = 'Percent')
 ```
+
+# Rotating axis text 
+
+This graph looks terrible.
+
+```{r, echo = FALSE}
+tibble(date = seq.Date(as.Date("2019-01-01"), as.Date("2019-12-01"), by = "week"),
+       value = sample(1:100, 48)/100) %>%
+  ggplot(aes(x = date, y = value)) + 
+  geom_line(col = "dodgerblue") + 
+  scale_x_date(date_breaks = "week") + 
+  theme_minimal() +
+  hrbrthemes::scale_y_percent() +
+  labs(x = "", y= "")
+```
+
+But we can do two things to make the graph work. Scale the dates being used in the axis with `scale_x_date` and rotate the label in the them. 
+
+```{r}
+tibble(date = seq.Date(as.Date("2019-01-01"), as.Date("2019-12-01"), by = "week"),
+       value = sample(1:100, 48)/100) %>%
+  ggplot(aes(x = date, y = value)) + 
+  geom_line(col = "dodgerblue") + 
+  scale_x_date(date_breaks = "2 weeks") + 
+  theme_minimal() + 
+  hrbrthemes::scale_y_percent() +
+  labs(x = "", y= "") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```

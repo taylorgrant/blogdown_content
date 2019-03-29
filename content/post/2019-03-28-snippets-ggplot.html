@@ -22,6 +22,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
 <li><a href="#adding-text-to-barplots-with-position-dodge">Adding text to barplots with position = “dodge”</a></li>
 <li><a href="#faceting-pie-charts-and-donut-plots">Faceting pie charts and donut plots</a></li>
 <li><a href="#using-facet_grid-to-graph-multiple-groups-in-the-same-plot">Using facet_grid to graph multiple groups in the same plot</a></li>
+<li><a href="#rotating-axis-text">Rotating axis text</a></li>
 </ul>
 </div>
 
@@ -111,4 +112,20 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
         strip.background =element_rect(fill=&quot;lightgray&quot;, color = NA)) +
   labs(x = &quot;&quot;, y = &#39;Percent&#39;)</code></pre>
 <p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="rotating-axis-text" class="section level1">
+<h1>Rotating axis text</h1>
+<p>This graph looks terrible.</p>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>But we can do two things to make the graph work. Scale the dates being used in the axis with <code>scale_x_date</code> and rotate the label in the them.</p>
+<pre class="r"><code>tibble(date = seq.Date(as.Date(&quot;2019-01-01&quot;), as.Date(&quot;2019-12-01&quot;), by = &quot;week&quot;),
+       value = sample(1:100, 48)/100) %&gt;%
+  ggplot(aes(x = date, y = value)) + 
+  geom_line(col = &quot;dodgerblue&quot;) + 
+  scale_x_date(date_breaks = &quot;2 weeks&quot;) + 
+  theme_minimal() + 
+  hrbrthemes::scale_y_percent() +
+  labs(x = &quot;&quot;, y= &quot;&quot;) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
