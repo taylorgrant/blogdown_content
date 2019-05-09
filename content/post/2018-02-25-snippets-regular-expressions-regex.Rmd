@@ -28,6 +28,12 @@ gsub(".*\\T", "", stamp)
 gsub("\\T.*", "", stamp) 
 ```
 
+# Pulling text after first occurrence in string with multiple occurrences
+```{r}
+# simple example 
+sub(".*?_",'', "this_is_a_concatenated_string")
+```
+
 # Splitting and pulling data after symbols. 
 
 There are also pure regex ways of achieving the same ends, but stringr is so easy. The `str_split` function returns a list, and we then pull out the specific list element that we want. This command works nicely when working with dataframes and `dplyr` - simply mutate with this command to create a new variable. 
