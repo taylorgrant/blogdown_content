@@ -21,6 +21,8 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <ul>
 <li><a href="#pulling-out-text-before-or-after-symbolspaceother">Pulling out text before or after symbol/space/other</a></li>
 <li><a href="#pulling-text-after-first-occurrence-in-string-with-multiple-occurrences">Pulling text after first occurrence in string with multiple occurrences</a></li>
+<li><a href="#keeping-only-the-last-occurrence-in-string-with-multiple-occurrences">Keeping only the last occurrence in string with multiple occurrences</a></li>
+<li><a href="#dropping-everything-after-the-last-occurrence-in-string-with-multiple-occurrences">Dropping everything after the last occurrence in string with multiple occurrences</a></li>
 <li><a href="#splitting-and-pulling-data-after-symbols.">Splitting and pulling data after symbols.</a></li>
 <li><a href="#remove-commas-and-convert-string-to-numeric">Remove commas and convert string to numeric</a></li>
 <li><a href="#add-commas-and-convert-numeric-to-string">Add commas and convert numeric to string</a></li>
@@ -47,6 +49,16 @@ gsub(&quot;\\T.*&quot;, &quot;&quot;, stamp) </code></pre>
 <pre class="r"><code># simple example 
 sub(&quot;.*?_&quot;,&#39;&#39;, &quot;this_is_a_concatenated_string&quot;)</code></pre>
 <pre><code>## [1] &quot;is_a_concatenated_string&quot;</code></pre>
+</div>
+<div id="keeping-only-the-last-occurrence-in-string-with-multiple-occurrences" class="section level1">
+<h1>Keeping only the last occurrence in string with multiple occurrences</h1>
+<pre class="r"><code>sub(&quot;.*[_]&quot;, &quot;&quot;, &quot;abc_def_ghi_jkl&quot;)</code></pre>
+<pre><code>## [1] &quot;jkl&quot;</code></pre>
+</div>
+<div id="dropping-everything-after-the-last-occurrence-in-string-with-multiple-occurrences" class="section level1">
+<h1>Dropping everything after the last occurrence in string with multiple occurrences</h1>
+<pre class="r"><code>sub(&quot;_[^_]+$&quot;, &quot;&quot;, &quot;abc_def_ghi_jkl&quot;)</code></pre>
+<pre><code>## [1] &quot;abc_def_ghi&quot;</code></pre>
 </div>
 <div id="splitting-and-pulling-data-after-symbols." class="section level1">
 <h1>Splitting and pulling data after symbols.</h1>
@@ -103,7 +115,7 @@ dat %&gt;%
                                       paste0(&quot;\n&quot;, word(a, str_count(a, &quot;\\S+&quot;)/2  +1))), a)) %&gt;%
   ggplot(aes(x = val, y = a)) + 
   geom_point(col = &quot;blue&quot;) </code></pre>
-<p><img src="/post/2018-02-25-snippets-regular-expressions-regex_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="/post/2018-02-25-snippets-regular-expressions-regex_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>
 <div id="counting-words-in-a-string" class="section level1">
 <h1>Counting words in a string</h1>
