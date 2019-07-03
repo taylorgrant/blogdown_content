@@ -35,7 +35,7 @@ strava_17 <- strava %>%
 # 2019 
 ## `r round(sum(strava_19$distance), 1)` Miles
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning=FALSE}
 
 frameWidget(hchart(strava_19, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
   hc_colorAxis(minColor = "#d9d9d9", maxColor = "#238b45") %>% 
@@ -60,7 +60,7 @@ frameWidget(hchart(strava_19, "heatmap", hcaes(x = month, y = week_ct, value = r
 # 2018 
 ## `r round(sum(strava_18$distance), 1)` Miles
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE}
 
 frameWidget(hchart(strava_18, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
   hc_colorAxis(minColor = "#d9d9d9", maxColor = "#238b45") %>% 
@@ -84,7 +84,7 @@ frameWidget(hchart(strava_18, "heatmap", hcaes(x = month, y = week_ct, value = r
 # 2017 
 ## `r round(sum(strava_17$distance), 1)` Miles
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE}
 
 frameWidget(hchart(strava_17, "heatmap", hcaes(x = month, y = week_ct, value = round(distance, 2))) %>% 
   hc_colorAxis(minColor = "#d9d9d9", maxColor = "#238b45") %>% 
