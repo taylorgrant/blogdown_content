@@ -24,6 +24,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
 <li><a href="#using-facet_grid-to-graph-multiple-groups-in-the-same-plot">Using facet_grid to graph multiple groups in the same plot</a></li>
 <li><a href="#rotating-axis-text">Rotating axis text</a></li>
 <li><a href="#heatmaps">Heatmaps</a></li>
+<li><a href="#adding-a-benchmark-to-a-bar-graph">Adding a benchmark to a bar graph</a></li>
 </ul>
 </div>
 
@@ -151,4 +152,54 @@ tibble(date = seq.Date(as.Date(&quot;2014-01-01&quot;), as.Date(&quot;2019-12-01
        title = &quot;This is a heatmap&quot;,
        caption = &quot;Using viridis color scales&quot;)</code></pre>
 <p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div id="adding-a-benchmark-to-a-bar-graph" class="section level1">
+<h1>Adding a benchmark to a bar graph</h1>
+<p>We’ll assume that each bar is a category with a separate benchmark and we’ll have different groups so we’ll also add in facets.</p>
+<pre class="r"><code># build a dataset 
+data &lt;- tibble(component = c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, 
+                             &quot;D&quot;, &quot;E&quot;, &quot;F&quot;, &quot;G&quot;),
+               g1 = c(666, 652, 630, 588, 630, 575, 593),
+               g2 = c(699, 674, 631, 521, 615, 544, 561), 
+               g3 = c(486, 477,506, 509, 496, 447, 453),
+               benchmark = c(622, 608,596,581,593,558,559))
+
+# now graph 
+data %&gt;% 
+  gather(group, score, 2:4) %&gt;% 
+  mutate(group = case_when(group == &quot;g1&quot; ~ &quot;Group 1&quot;,
+                        group == &quot;g2&quot; ~ &quot;Group 2&quot;,
+                        group == &quot;g3&quot; ~ &quot;Group 3&quot;),
+         score2 = paste0(score, &quot; (&quot;, benchmark, &quot;)&quot;)) %&gt;%
+  ggplot(aes(x = component, y = score, label = score2, fill = group)) + 
+  geom_bar(stat = &quot;identity&quot;,alpha = .9) +
+  facet_grid(group ~ .) + 
+  coord_flip() + 
+  ylim(c(0, 760)) +
+  geom_text(aes(x = component, y = 739),
+            size = 2.5) +
+  scale_fill_manual(values = c(&quot;#3b5998&quot;, &quot;#8b9dc3&quot;,&quot;#dfe3ee&quot;),
+                    # labels = c(&quot;All is Bright&quot;,
+                    #            &#39;Jenni Mistletoe&#39;,
+                    #            &quot;Most Wonderful\nSale of the Year&quot;),
+                    name = &quot;&quot;) +
+  geom_segment(aes(xend = component, yend = benchmark-2, y = benchmark+2), size = 5, lineend = &quot;butt&quot;,
+               color = &quot;black&quot;) + 
+  theme_minimal() + 
+  theme(strip.background = element_rect(fill=&quot;lightgray&quot;, color = NA),
+        legend.position = &quot;none&quot;,
+        panel.grid.minor.x=element_blank(),
+        panel.grid.major.x=element_blank(),
+        plot.caption = element_text(hjust = 1,
+                                    face = &quot;italic&quot;),
+        plot.title = element_text(hjust = 0, size = 12, 
+                                  # margin = margin(b = 10), 
+                                  face = &quot;bold&quot;),
+        axis.title = element_text( 
+                                  size = 12,
+                                  face = &#39;italic&#39;)) +
+  labs(x = &quot;&quot;, y = &quot;Score&quot;,
+       title = &quot;Component Scores for Each Group&quot;,
+       caption = &quot;Note: Black lines are Benchmarks&quot;)</code></pre>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 </div>

@@ -200,3 +200,59 @@ tibble(date = seq.Date(as.Date("2014-01-01"), as.Date("2019-12-01"), "month"),
        title = "This is a heatmap",
        caption = "Using viridis color scales")
 ```
+
+# Adding a benchmark to a bar graph 
+
+We'll assume that each bar is a category with a separate benchmark and we'll have different groups so we'll also add in facets. 
+
+```{r, message = FALSE}
+# build a dataset 
+data <- tibble(component = c("A", "B", "C", 
+                             "D", "E", "F", "G"),
+               g1 = c(666, 652, 630, 588, 630, 575, 593),
+               g2 = c(699, 674, 631, 521, 615, 544, 561), 
+               g3 = c(486, 477,506, 509, 496, 447, 453),
+               benchmark = c(622, 608,596,581,593,558,559))
+
+# now graph 
+data %>% 
+  gather(group, score, 2:4) %>% 
+  mutate(group = case_when(group == "g1" ~ "Group 1",
+                        group == "g2" ~ "Group 2",
+                        group == "g3" ~ "Group 3"),
+         score2 = paste0(score, " (", benchmark, ")")) %>%
+  ggplot(aes(x = component, y = score, label = score2, fill = group)) + 
+  geom_bar(stat = "identity",alpha = .9) +
+  facet_grid(group ~ .) + 
+  coord_flip() + 
+  ylim(c(0, 760)) +
+  geom_text(aes(x = component, y = 739),
+            size = 2.5) +
+  scale_fill_manual(values = c("#3b5998", "#8b9dc3","#dfe3ee"),
+                    # labels = c("All is Bright",
+                    #            'Jenni Mistletoe',
+                    #            "Most Wonderful\nSale of the Year"),
+                    name = "") +
+  geom_segment(aes(xend = component, yend = benchmark-2, y = benchmark+2), size = 5, lineend = "butt",
+               color = "black") + 
+  theme_minimal() + 
+  theme(strip.background = element_rect(fill="lightgray", color = NA),
+        legend.position = "none",
+        panel.grid.minor.x=element_blank(),
+        panel.grid.major.x=element_blank(),
+        plot.caption = element_text(hjust = 1,
+                                    face = "italic"),
+        plot.title = element_text(hjust = 0, size = 12, 
+                                  # margin = margin(b = 10), 
+                                  face = "bold"),
+        axis.title = element_text( 
+                                  size = 12,
+                                  face = 'italic')) +
+  labs(x = "", y = "Score",
+       title = "Component Scores for Each Group",
+       caption = "Note: Black lines are Benchmarks")
+
+```
+
+
+
