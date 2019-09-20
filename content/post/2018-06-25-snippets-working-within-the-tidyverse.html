@@ -28,6 +28,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <li><a href="#calculating-quantiles-the-tidy-way">Calculating quantiles the tidy way</a></li>
 <li><a href="#selection-of-multiple-variables">Selection of multiple variables</a></li>
 <li><a href="#dplyr---group_split-function">dplyr - group_split function</a></li>
+<li><a href="#piping-into-a-t.test">Piping into a t.test</a></li>
 </ul>
 </div>
 
@@ -48,10 +49,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 i        44    79 a    
-## 2 g        60     5 p    
-## 3 c        16    35 n    
-## 4 h        50     8 m</code></pre>
+## 1 i        52     7 i    
+## 2 p        99    89 a    
+## 3 b        75    27 v    
+## 4 v         8    98 k</code></pre>
 </div>
 <div id="using-rename_at-to-rename-specific-columns" class="section level1">
 <h1>Using rename_at to rename specific columns</h1>
@@ -69,10 +70,10 @@ df</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   a     pastedName_b     c pastedName_d
 ##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;chr&gt;       
-## 1 b               75    38 j           
-## 2 w                9    31 y           
-## 3 k               28    84 f           
-## 4 v               73    75 n</code></pre>
+## 1 j               41    38 k           
+## 2 k               40    39 u           
+## 3 f               95    79 s           
+## 4 w               81    90 x</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -81,13 +82,16 @@ df</code></pre>
   group_by(cyl) %&gt;%
   summarise_at(vars(disp, drat, mpg), funs(median, mean))</code></pre>
 <pre><code>## Warning: funs() is soft deprecated as of dplyr 0.8.0
-## please use list() instead
+## Please use a list of either functions or lambdas: 
 ## 
-## # Before:
-## funs(name = f(.)
+##   # Simple named list: 
+##   list(mean = mean, median = median)
 ## 
-## # After: 
-## list(name = ~f(.))
+##   # Auto named with `tibble::lst()`: 
+##   tibble::lst(mean, median)
+## 
+##   # Using lambdas
+##   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
 ## This warning is displayed once per session.</code></pre>
 <pre><code>## # A tibble: 3 x 7
 ##     cyl disp_median drat_median mpg_median disp_mean drat_mean mpg_mean
@@ -166,22 +170,24 @@ mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, df2, by = &qu
 
 ## Warning: &#39;tidy.numeric&#39; is deprecated.
 ## See help(&quot;Deprecated&quot;)</code></pre>
-<pre><code>##    cyl names     x
-## 1    6    0% 17.80
-## 2    6   25% 18.65
-## 3    6   50% 19.70
-## 4    6   75% 21.00
-## 5    6  100% 21.40
-## 6    4    0% 21.40
-## 7    4   25% 22.80
-## 8    4   50% 26.00
-## 9    4   75% 30.40
-## 10   4  100% 33.90
-## 11   8    0% 10.40
-## 12   8   25% 14.40
-## 13   8   50% 15.20
-## 14   8   75% 16.25
-## 15   8  100% 19.20</code></pre>
+<pre><code>## # A tibble: 15 x 3
+##      cyl names     x
+##    &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;
+##  1     6 0%     17.8
+##  2     6 25%    18.6
+##  3     6 50%    19.7
+##  4     6 75%    21  
+##  5     6 100%   21.4
+##  6     4 0%     21.4
+##  7     4 25%    22.8
+##  8     4 50%    26  
+##  9     4 75%    30.4
+## 10     4 100%   33.9
+## 11     8 0%     10.4
+## 12     8 25%    14.4
+## 13     8 50%    15.2
+## 14     8 75%    16.2
+## 15     8 100%   19.2</code></pre>
 </div>
 <div id="selection-of-multiple-variables" class="section level1">
 <h1>Selection of multiple variables</h1>
@@ -200,11 +206,11 @@ tmp</code></pre>
 <pre><code>## # A tibble: 5 x 4
 ##   g1_letters g1_num h1_letters h1_num
 ##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;       &lt;int&gt;
-## 1 n          210432 a           48825
-## 2 o          347699 e           51454
-## 3 p          352933 d           24623
-## 4 y          282326 r           53935
-## 5 h          151352 i            5606</code></pre>
+## 1 y          167975 u           43194
+## 2 q          334145 g           31918
+## 3 b          367733 m           42716
+## 4 w          427365 p            7115
+## 5 f          402952 j           50917</code></pre>
 <p>But we can also use the <code>intersect</code> function to create an AND statement</p>
 <pre class="r"><code>tmp &lt;- tibble(g1_letters = sample(letters, 5), 
               g1_num = sample(1:600000, 5),
@@ -224,7 +230,7 @@ tmp</code></pre>
 <pre><code>## # A tibble: 1 x 6
 ##    g1_num g1_weighted g2_num g2_weighted h1_num h1_weighted
 ##     &lt;int&gt; &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;  &lt;int&gt;       &lt;dbl&gt;
-## 1 1967316 786926.4sel 212728      85091. 182912      73165.</code></pre>
+## 1 1909455 763782sel   193768      77507. 179067      71627.</code></pre>
 </div>
 <div id="dplyr---group_split-function" class="section level1">
 <h1>dplyr - group_split function</h1>
@@ -238,16 +244,6 @@ split_by &lt;- starwars %&gt;%
 
 group_split(split_by)</code></pre>
 <pre><code>## [[1]]
-## # A tibble: 3 x 13
-##   name  height  mass hair_color skin_color eye_color birth_year gender
-##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
-## 1 C-3PO    167    75 &lt;NA&gt;       gold       yellow           112 &lt;NA&gt;  
-## 2 R2-D2     96    32 &lt;NA&gt;       white, bl… red               33 &lt;NA&gt;  
-## 3 R5-D4     97    32 &lt;NA&gt;       white, red red               NA &lt;NA&gt;  
-## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
-## #   vehicles &lt;list&gt;, starships &lt;list&gt;
-## 
-## [[2]]
 ## # A tibble: 19 x 13
 ##    name  height  mass hair_color skin_color eye_color birth_year gender
 ##    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
@@ -273,7 +269,7 @@ group_split(split_by)</code></pre>
 ## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
 ## #   vehicles &lt;list&gt;, starships &lt;list&gt;
 ## 
-## [[3]]
+## [[2]]
 ## # A tibble: 1 x 13
 ##   name  height  mass hair_color skin_color eye_color birth_year gender
 ##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
@@ -281,7 +277,7 @@ group_split(split_by)</code></pre>
 ## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
 ## #   vehicles &lt;list&gt;, starships &lt;list&gt;
 ## 
-## [[4]]
+## [[3]]
 ## # A tibble: 62 x 13
 ##    name  height  mass hair_color skin_color eye_color birth_year gender
 ##    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
@@ -298,12 +294,46 @@ group_split(split_by)</code></pre>
 ## # … with 52 more rows, and 5 more variables: homeworld &lt;chr&gt;,
 ## #   species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;, starships &lt;list&gt;
 ## 
-## [[5]]
+## [[4]]
 ## # A tibble: 2 x 13
 ##   name  height  mass hair_color skin_color eye_color birth_year gender
 ##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
 ## 1 IG-88    200   140 none       metal      red               15 none  
 ## 2 BB8       NA    NA none       none       black             NA none  
 ## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+## #   vehicles &lt;list&gt;, starships &lt;list&gt;
+## 
+## [[5]]
+## # A tibble: 3 x 13
+##   name  height  mass hair_color skin_color eye_color birth_year gender
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
+## 1 C-3PO    167    75 &lt;NA&gt;       gold       yellow           112 &lt;NA&gt;  
+## 2 R2-D2     96    32 &lt;NA&gt;       white, bl… red               33 &lt;NA&gt;  
+## 3 R5-D4     97    32 &lt;NA&gt;       white, red red               NA &lt;NA&gt;  
+## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+## #   vehicles &lt;list&gt;, starships &lt;list&gt;
+## 
+## attr(,&quot;ptype&quot;)
+## # A tibble: 0 x 13
+## # … with 13 variables: name &lt;chr&gt;, height &lt;int&gt;, mass &lt;dbl&gt;,
+## #   hair_color &lt;chr&gt;, skin_color &lt;chr&gt;, eye_color &lt;chr&gt;, birth_year &lt;dbl&gt;,
+## #   gender &lt;chr&gt;, homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
 ## #   vehicles &lt;list&gt;, starships &lt;list&gt;</code></pre>
+</div>
+<div id="piping-into-a-t.test" class="section level1">
+<h1>Piping into a t.test</h1>
+<pre class="r"><code>tibble(a = c(rnorm(100, mean = 50, sd = 5),rnorm(100, mean = 80, sd = 5)),
+       group = c(rep(&quot;green&quot;, 100), rep(&quot;blue&quot;, 100))) %&gt;%
+  t.test(a ~ group, data = ., var.equal = TRUE)</code></pre>
+<pre><code>## 
+##  Two Sample t-test
+## 
+## data:  a by group
+## t = 42.568, df = 198, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  27.19077 29.83247
+## sample estimates:
+##  mean in group blue mean in group green 
+##            79.37203            50.86041</code></pre>
 </div>

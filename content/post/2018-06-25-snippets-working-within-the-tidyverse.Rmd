@@ -200,3 +200,12 @@ split_by <- starwars %>%
 group_split(split_by)
 
 ```
+
+# Piping into a t.test
+
+```{r}
+tibble(a = c(rnorm(100, mean = 50, sd = 5),rnorm(100, mean = 80, sd = 5)),
+       group = c(rep("green", 100), rep("blue", 100))) %>%
+  t.test(a ~ group, data = ., var.equal = TRUE)
+  
+```
