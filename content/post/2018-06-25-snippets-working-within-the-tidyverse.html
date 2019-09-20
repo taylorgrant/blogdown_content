@@ -1,18 +1,19 @@
 ---
 title: 'Snippets: Working within the tidyverse'
 author: ''
-date: '2018-06-25'
-slug: snippets-working-within-the-tidyverse
+date: '2018-09-20'
 categories:
   - R
 tags:
+  - dplyr
   - tidy data
   - tidyverse
-  - dplyr
-summary: "Commands, tips, and tricks that are useful within the tidyverse of packages, especially when using piped operations."
+slug: snippets-working-within-the-tidyverse
+summary: Commands, tips, and tricks that are useful within the tidyverse of packages,
+  especially when using piped operations.
 output:
   blogdown::html_page:
-    toc: true
+    toc: yes
 thumbnailImagePosition: left
 thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/snippets.jpg
 ---
@@ -49,10 +50,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 i        52     7 i    
-## 2 p        99    89 a    
-## 3 b        75    27 v    
-## 4 v         8    98 k</code></pre>
+## 1 g         3    71 o    
+## 2 e        32    83 x    
+## 3 a        88    91 j    
+## 4 n        54   100 a</code></pre>
 </div>
 <div id="using-rename_at-to-rename-specific-columns" class="section level1">
 <h1>Using rename_at to rename specific columns</h1>
@@ -70,10 +71,10 @@ df</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   a     pastedName_b     c pastedName_d
 ##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;chr&gt;       
-## 1 j               41    38 k           
-## 2 k               40    39 u           
-## 3 f               95    79 s           
-## 4 w               81    90 x</code></pre>
+## 1 w               45    83 h           
+## 2 i                9    86 t           
+## 3 v               53    59 b           
+## 4 t                6    80 g</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -206,11 +207,11 @@ tmp</code></pre>
 <pre><code>## # A tibble: 5 x 4
 ##   g1_letters g1_num h1_letters h1_num
 ##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;       &lt;int&gt;
-## 1 y          167975 u           43194
-## 2 q          334145 g           31918
-## 3 b          367733 m           42716
-## 4 w          427365 p            7115
-## 5 f          402952 j           50917</code></pre>
+## 1 q          576796 r           22099
+## 2 a          438972 e           20488
+## 3 l          531799 k            7244
+## 4 n           69769 s            3784
+## 5 h           28552 f           32789</code></pre>
 <p>But we can also use the <code>intersect</code> function to create an AND statement</p>
 <pre class="r"><code>tmp &lt;- tibble(g1_letters = sample(letters, 5), 
               g1_num = sample(1:600000, 5),
@@ -230,7 +231,7 @@ tmp</code></pre>
 <pre><code>## # A tibble: 1 x 6
 ##    g1_num g1_weighted g2_num g2_weighted h1_num h1_weighted
 ##     &lt;int&gt; &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;  &lt;int&gt;       &lt;dbl&gt;
-## 1 1909455 763782sel   193768      77507. 179067      71627.</code></pre>
+## 1 2070540 828216sel   118104      47242. 188444      75378.</code></pre>
 </div>
 <div id="dplyr---group_split-function" class="section level1">
 <h1>dplyr - group_split function</h1>
@@ -329,11 +330,11 @@ group_split(split_by)</code></pre>
 ##  Two Sample t-test
 ## 
 ## data:  a by group
-## t = 42.568, df = 198, p-value &lt; 2.2e-16
+## t = 41.466, df = 198, p-value &lt; 2.2e-16
 ## alternative hypothesis: true difference in means is not equal to 0
 ## 95 percent confidence interval:
-##  27.19077 29.83247
+##  28.71944 31.58750
 ## sample estimates:
 ##  mean in group blue mean in group green 
-##            79.37203            50.86041</code></pre>
+##            80.37007            50.21660</code></pre>
 </div>

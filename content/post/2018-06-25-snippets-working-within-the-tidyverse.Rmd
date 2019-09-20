@@ -1,18 +1,19 @@
 ---
 title: 'Snippets: Working within the tidyverse'
 author: ''
-date: '2018-06-25'
-slug: snippets-working-within-the-tidyverse
+date: '2018-09-20'
 categories:
   - R
 tags:
+  - dplyr
   - tidy data
   - tidyverse
-  - dplyr
-summary: "Commands, tips, and tricks that are useful within the tidyverse of packages, especially when using piped operations."
+slug: snippets-working-within-the-tidyverse
+summary: Commands, tips, and tricks that are useful within the tidyverse of packages,
+  especially when using piped operations.
 output:
   blogdown::html_page:
-    toc: true
+    toc: yes
 thumbnailImagePosition: left
 thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/snippets.jpg
 ---
