@@ -1,0 +1,132 @@
+---
+title: 'Snippets: Working with time'
+author: ''
+date: '2019-10-22'
+slug: snippets-working-with-time
+categories:
+  - R
+tags:
+  - lubridate
+  - time
+  - date
+summary: "Commands and tips for working with dates and times"
+output:
+  blogdown::html_page:
+    toc: true
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/snippets.jpg
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#what-are-the-time-formats">What are the time formats</a></li>
+<li><a href="#current-date-and-time">Current date and time</a></li>
+<li><a href="#converting-string-to-date">Converting string to date</a></li>
+<li><a href="#sequencing-dates">Sequencing dates</a></li>
+<li><a href="#rounding-dates">Rounding dates</a></li>
+<li><a href="#rounding-to-quarters-without-standard-date-format">Rounding to quarters, without standard date format</a></li>
+</ul>
+</div>
+
+<p>Snippet files are periodically updated with how-to’s for working with time/date formats, which are notoriously terrible in R.</p>
+<div id="what-are-the-time-formats" class="section level1">
+<h1>What are the time formats</h1>
+<p>These are the different formats that can be used when referencing pieces of time.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">code</th>
+<th align="left">value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">%d</td>
+<td align="left">Day of month (numeric)</td>
+</tr>
+<tr class="even">
+<td align="left">%m</td>
+<td align="left">Month (numeric)</td>
+</tr>
+<tr class="odd">
+<td align="left">%b</td>
+<td align="left">Month (abbreviated)</td>
+</tr>
+<tr class="even">
+<td align="left">%B</td>
+<td align="left">Month (full name)</td>
+</tr>
+<tr class="odd">
+<td align="left">%y</td>
+<td align="left">Year (2 digit)</td>
+</tr>
+<tr class="even">
+<td align="left">%Y</td>
+<td align="left">Year (4 digit)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="current-date-and-time" class="section level1">
+<h1>Current date and time</h1>
+<pre class="r"><code>Sys.Date()</code></pre>
+<pre><code>## [1] &quot;2019-10-22&quot;</code></pre>
+<pre class="r"><code>Sys.time()</code></pre>
+<pre><code>## [1] &quot;2019-10-22 09:59:23 PDT&quot;</code></pre>
+</div>
+<div id="converting-string-to-date" class="section level1">
+<h1>Converting string to date</h1>
+<p>Assume you have a string and need to convert it to a date. Make sure the format matches that of the string.</p>
+<pre class="r"><code>string &lt;- &quot;2017/10/10&quot;
+as.Date(string, format = &quot;%Y/%m/%d&quot;)</code></pre>
+<pre><code>## [1] &quot;2017-10-10&quot;</code></pre>
+<p>Or, use lubridate</p>
+<pre class="r"><code>string &lt;- &quot;2017/10/10&quot;
+lubridate::ymd(string)</code></pre>
+<pre><code>## [1] &quot;2017-10-10&quot;</code></pre>
+</div>
+<div id="sequencing-dates" class="section level1">
+<h1>Sequencing dates</h1>
+<pre class="r"><code>seq.Date(from = as.Date(&quot;2019-10-01&quot;), to = as.Date(&quot;2019-10-07&quot;), by = &quot;days&quot;)</code></pre>
+<pre><code>## [1] &quot;2019-10-01&quot; &quot;2019-10-02&quot; &quot;2019-10-03&quot; &quot;2019-10-04&quot; &quot;2019-10-05&quot;
+## [6] &quot;2019-10-06&quot; &quot;2019-10-07&quot;</code></pre>
+</div>
+<div id="rounding-dates" class="section level1">
+<h1>Rounding dates</h1>
+<pre class="r"><code>x &lt;- tibble(date = seq.Date(from = as.Date(&quot;2019-09-29&quot;), to = as.Date(&quot;2019-10-07&quot;), by = &quot;days&quot;))
+
+x %&gt;% mutate(week_date = lubridate::floor_date(date, &quot;week&quot;),
+             month_date = lubridate::floor_date(date, &quot;month&quot;),
+             quarter_date = lubridate::floor_date(date, &quot;quarter&quot;))</code></pre>
+<pre><code>## # A tibble: 9 x 4
+##   date       week_date  month_date quarter_date
+##   &lt;date&gt;     &lt;date&gt;     &lt;date&gt;     &lt;date&gt;      
+## 1 2019-09-29 2019-09-29 2019-09-01 2019-07-01  
+## 2 2019-09-30 2019-09-29 2019-09-01 2019-07-01  
+## 3 2019-10-01 2019-09-29 2019-10-01 2019-10-01  
+## 4 2019-10-02 2019-09-29 2019-10-01 2019-10-01  
+## 5 2019-10-03 2019-09-29 2019-10-01 2019-10-01  
+## 6 2019-10-04 2019-09-29 2019-10-01 2019-10-01  
+## 7 2019-10-05 2019-09-29 2019-10-01 2019-10-01  
+## 8 2019-10-06 2019-10-06 2019-10-01 2019-10-01  
+## 9 2019-10-07 2019-10-06 2019-10-01 2019-10-01</code></pre>
+</div>
+<div id="rounding-to-quarters-without-standard-date-format" class="section level1">
+<h1>Rounding to quarters, without standard date format</h1>
+<p>Can use the <code>zoo</code> package to convert to workable form.</p>
+<pre class="r"><code>x &lt;- tibble(date = seq.Date(from = as.Date(&quot;2019-09-29&quot;), to = as.Date(&quot;2019-10-07&quot;), by = &quot;days&quot;))
+x %&gt;% mutate(Quarter = zoo::as.yearqtr(date, format = &quot;%Y-%m-%d&quot;))  </code></pre>
+<pre><code>## # A tibble: 9 x 2
+##   date       Quarter  
+##   &lt;date&gt;     &lt;yearqtr&gt;
+## 1 2019-09-29 2019 Q3  
+## 2 2019-09-30 2019 Q3  
+## 3 2019-10-01 2019 Q4  
+## 4 2019-10-02 2019 Q4  
+## 5 2019-10-03 2019 Q4  
+## 6 2019-10-04 2019 Q4  
+## 7 2019-10-05 2019 Q4  
+## 8 2019-10-06 2019 Q4  
+## 9 2019-10-07 2019 Q4</code></pre>
+</div>

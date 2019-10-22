@@ -1,0 +1,85 @@
+---
+title: 'Snippets: Working with time'
+author: ''
+date: '2019-10-22'
+slug: snippets-working-with-time
+categories:
+  - R
+tags:
+  - lubridate
+  - time
+  - date
+summary: "Commands and tips for working with dates and times"
+output:
+  blogdown::html_page:
+    toc: true
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/snippets.jpg
+---
+
+```{r , setup, include = FALSE}
+library(tidyverse)
+
+```
+Snippet files are periodically updated with how-to’s for working with time/date formats, which are notoriously terrible in R. 
+
+# What are the time formats 
+
+These are the different formats that can be used when referencing pieces of time. 
+```{r, echo=FALSE, message=FALSE}
+
+tibble(code = c("%d", "%m", "%b", "%B", "%y", "%Y"),
+       value = c("Day of month (numeric)", "Month (numeric)", "Month (abbreviated)",
+       "Month (full name)", "Year (2 digit)", "Year (4 digit)")) %>%
+         knitr::kable()
+```
+
+# Current date and time
+
+```{r}
+Sys.Date()
+Sys.time()
+```
+
+# Converting string to date
+
+Assume you have a string and need to convert it to a date. Make sure the format matches that of the string.   
+```{r}
+string <- "2017/10/10"
+as.Date(string, format = "%Y/%m/%d")
+```
+
+Or, use lubridate
+```{r}
+string <- "2017/10/10"
+lubridate::ymd(string)
+```
+
+# Sequencing dates 
+
+```{r}
+seq.Date(from = as.Date("2019-10-01"), to = as.Date("2019-10-07"), by = "days")
+```
+
+# Rounding dates
+
+```{r}
+x <- tibble(date = seq.Date(from = as.Date("2019-09-29"), to = as.Date("2019-10-07"), by = "days"))
+
+x %>% mutate(week_date = lubridate::floor_date(date, "week"),
+             month_date = lubridate::floor_date(date, "month"),
+             quarter_date = lubridate::floor_date(date, "quarter"))
+```
+
+# Rounding to quarters, without standard date format
+
+Can use the `zoo` package to convert to workable form. 
+
+```{r}
+x <- tibble(date = seq.Date(from = as.Date("2019-09-29"), to = as.Date("2019-10-07"), by = "days"))
+x %>% mutate(Quarter = zoo::as.yearqtr(date, format = "%Y-%m-%d"))  
+```
+
+
+
+
