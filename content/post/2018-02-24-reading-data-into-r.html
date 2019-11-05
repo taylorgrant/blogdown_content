@@ -29,8 +29,8 @@ output:
 <li><a href="#using-the-readr-package">Using the readr package</a></li>
 <li><a href="#using-data.table-package">Using data.table package</a></li>
 <li><a href="#reading-in-multiple-files-and-skipping-lines">Reading in multiple files and skipping lines</a></li>
-</ul></li>
 <li><a href="#reading-in-multiple-files-with-purrr">Reading in multiple files with <code>purrr</code></a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -265,17 +265,17 @@ DT = rbindlist(lapply(files, fread))</code></pre>
 <p>But with multiple files you write the following after identifying your files.</p>
 <pre class="r"><code>df &lt;- do.call(rbind, lapply(files, read_csv, skip = 10))</code></pre>
 </div>
-</div>
-<div id="reading-in-multiple-files-with-purrr" class="section level1">
-<h1>Reading in multiple files with <code>purrr</code></h1>
-<p>The above will work, but working within the tidyverse we can also pipe together most of the information necessary.</p>
+<div id="reading-in-multiple-files-with-purrr" class="section level2">
+<h2>Reading in multiple files with <code>purrr</code></h2>
+<p>The above will work, but working within the tidyverse we can also pipe together most of the information necessary. This is using .RDS files, but the read command can be changed to whatever.</p>
 <pre class="r"><code>data_path &lt;- &quot;folder_location&quot;   # path to the data
-files &lt;- dir(data_path, pattern = &quot;*.csv&quot;) # get file names
+files &lt;- dir(data_path, pattern = &quot;*.RDS&quot;) # get file names
 
 df &lt;- files %&gt;%
   # read in all the files, appending the path before the filename
-  map(~ read_csv(file.path(data_path, .))) %&gt;% 
+  map(~ readRDS(file.path(data_path, .))) %&gt;% 
   reduce(bind_rows)
 df</code></pre>
 <p><sub>fin</sub></p>
+</div>
 </div>
