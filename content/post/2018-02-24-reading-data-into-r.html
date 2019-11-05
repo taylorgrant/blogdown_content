@@ -1,6 +1,6 @@
 ---
 title: "Reading data into R"
-date: '2018-02-24'
+date: '2019-11-05'
 slug: reading-data-into-r
 categories:
   - R
@@ -30,6 +30,7 @@ output:
 <li><a href="#using-data.table-package">Using data.table package</a></li>
 <li><a href="#reading-in-multiple-files-and-skipping-lines">Reading in multiple files and skipping lines</a></li>
 </ul></li>
+<li><a href="#reading-in-multiple-files-with-purrr">Reading in multiple files with <code>purrr</code></a></li>
 </ul>
 </div>
 
@@ -151,7 +152,7 @@ gg +
 # this should ask for authentication of an account
 gs_ls()</code></pre>
 <p>After you’ve authenticated, a tibble is returned with the data on each sheet, including title, author, version, date last updated, and the sheet key.</p>
-<p>Next, register the sheet you want to read in - this can be done either through the Title or the Key. Let’s assume I have a sheet called “R&amp;I API Listing” and that’s what I want to read in, I“ll register it:</p>
+<p>Next, register the sheet you want to read in - this can be done either through the Title or the Key. Let’s assume I have a sheet called “R&amp;I API Listing” and that’s what I want to read in, I&quot;ll register it:</p>
 <pre class="r"><code>library(googlesheets)
 
 api &lt;- gs_title(&quot;R&amp;I API Listing&quot;)</code></pre>
@@ -187,7 +188,7 @@ for (i in 1:3){
 getData &lt;- function(url){
   fg &lt;- read_html(url) %&gt;%
     html_nodes(&quot;table&quot;) %&gt;%
-    .[[12]] %&gt;%
+    .[[13]] %&gt;%
     html_table(fill = FALSE)
   
   colnames(fg) &lt;- fg[2,]
@@ -220,12 +221,12 @@ df %&gt;%
 <pre><code>## # A tibble: 6 x 2
 ##   names r.squared
 ##   &lt;chr&gt;     &lt;dbl&gt;
-## 1 Off       0.803
+## 1 Off       0.800
 ## 2 wRC+      0.692
-## 3 wOBA      0.681
-## 4 OBP       0.611
-## 5 SLG       0.535
-## 6 R         0.477</code></pre>
+## 3 wOBA      0.678
+## 4 OBP       0.616
+## 5 SLG       0.527
+## 6 R         0.467</code></pre>
 <p>Now let’s graph the top 6 bivariate relationships in terms of variance explained by the model.</p>
 <pre class="r"><code>df %&gt;% select(WAR, Off, `wRC+`, wOBA, OBP, SLG, R) %&gt;%
   gather(&quot;stat&quot;, &quot;value&quot;, 2:7) %&gt;%
@@ -263,6 +264,18 @@ DT = rbindlist(lapply(files, fread))</code></pre>
 <pre class="r"><code>df &lt;- readr::read_csv(&quot;filename.csv&quot;, skip = 10)</code></pre>
 <p>But with multiple files you write the following after identifying your files.</p>
 <pre class="r"><code>df &lt;- do.call(rbind, lapply(files, read_csv, skip = 10))</code></pre>
-<p><sub>fin</sub></p>
 </div>
+</div>
+<div id="reading-in-multiple-files-with-purrr" class="section level1">
+<h1>Reading in multiple files with <code>purrr</code></h1>
+<p>The above will work, but working within the tidyverse we can also pipe together most of the information necessary.</p>
+<pre class="r"><code>data_path &lt;- &quot;folder_location&quot;   # path to the data
+files &lt;- dir(data_path, pattern = &quot;*.csv&quot;) # get file names
+
+df &lt;- files %&gt;%
+  # read in all the files, appending the path before the filename
+  map(~ read_csv(file.path(data_path, .))) %&gt;% 
+  reduce(bind_rows)
+df</code></pre>
+<p><sub>fin</sub></p>
 </div>
