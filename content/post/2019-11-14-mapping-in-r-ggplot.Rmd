@@ -71,12 +71,13 @@ devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/mast
 ```
 
 # Map at the state level 
+
 ```{r}
 # graph 
 ggplot(subset(dt2, GEO_Name != "DC"), 
        mapping = aes(long, lat, group = group, fill = log(real_hpi))) + 
   geom_polygon(color = "#ffffff", size = 0) + 
-  coord_map(projection = "albers", lat0 = 39, latl = 45) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
   viridis::scale_fill_viridis(option = "E",
                               breaks=c(log(50),log(100),log(200),log(400)),
                               labels=c("-50%","0%","+100%","+200%"),
@@ -90,5 +91,62 @@ ggplot(subset(dt2, GEO_Name != "DC"),
        title = "The coasts have gotten more expensive",
        caption = "Freddie Mac House Price Index by State,\ndeflated by US BLS, Consumer Price Index",
        fill = "Real House Price Growth\nSince Jan 1975")  
+
+```
+
+# Map at the County Level
+
+```{r}
+dt3 %>% 
+  mutate(county_fips = paste0(str_pad(FIPS_State_Code, 2, "left",0),
+                              str_pad(FIPS_County_Code, 3, "left",0))) %>% 
+  left_join(counties, by = c("county_fips")) %>%
+  ggplot(mapping = aes(long, lat, group = group, fill = log(real_hpi))) +
+  geom_polygon(data = states, aes(long, lat, group = group), fill = "#f0f0f5", color = "white",
+               size = 0) + 
+  geom_polygon(color = "#ffffff", size =0) +
+  coord_map(projection ="albers", lat0 = 39, lat1 =45) + 
+  viridis::scale_fill_viridis(option = "E",
+                              breaks=c(log(50),log(100),log(200),log(400)),
+                              labels=c("-50%","0%","+100%","+200%"),
+                              limits=c(log(50),log(400))) + 
+  theme_twg(grid = FALSE) + 
+  theme(legend.title = element_text(),
+        axis.text = element_blank(),
+        legend.key.width = unit(.2, 'in'),
+        legend.position = "right") +
+  labs(x = "", y = "",
+       title = "The coasts have gotten more expensive",
+       caption = "Freddie Mac House Price Index by State,\ndeflated by US BLS, Consumer Price Index",
+       fill = "Real House Price Growth\nSince Jan 1975") 
+```
+
+# Specific to a state
+
+```{r}
+dt3 %>% 
+  mutate(county_fips = paste0(str_pad(FIPS_State_Code, 2, "left",0),
+                              str_pad(FIPS_County_Code, 3, "left",0))) %>% 
+  left_join(counties, by = c("county_fips")) %>%
+  filter(state_name == "Washington") %>%
+  ggplot(mapping = aes(long, lat, group = group, fill = log(real_hpi))) +
+  geom_polygon(data = subset(states, state_name == "Washington"), 
+               aes(long, lat, group = group), fill = "#f0f0f5", color = "white",
+               size = 0) + 
+  geom_polygon(color = "#ffffff", size =0) +
+  coord_map(projection ="albers", lat0 = 39, lat1 =45) + 
+  viridis::scale_fill_viridis(option = "E",
+                              breaks=c(log(50),log(100),log(200),log(400)),
+                              labels=c("-50%","0%","+100%","+200%"),
+                              limits=c(log(50),log(400))) + 
+  theme_twg(grid = FALSE) + 
+  theme(legend.title = element_text(),
+        axis.text = element_blank(),
+        legend.key.width = unit(.2, 'in'),
+        legend.position = "right") +
+  labs(x = "", y = "",
+       title = "Looking at Washington",
+       caption = "Freddie Mac House Price Index for WA,\ndeflated by US BLS, Consumer Price Index",
+       fill = "Real House Price Growth\nSince Jan 1975") 
 
 ```

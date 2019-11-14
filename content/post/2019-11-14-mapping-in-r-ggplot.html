@@ -24,6 +24,8 @@ output:
 <li><a href="#packages-used">Packages used:</a></li>
 <li><a href="#get-the-data-necessary">Get the data necessary</a></li>
 <li><a href="#map-at-the-state-level">Map at the state level</a></li>
+<li><a href="#map-at-the-county-level">Map at the County Level</a></li>
+<li><a href="#specific-to-a-state">Specific to a state</a></li>
 </ul>
 </div>
 
@@ -72,7 +74,7 @@ devtools::source_url(&quot;https://raw.githubusercontent.com/taylorgrant/sandbox
 ggplot(subset(dt2, GEO_Name != &quot;DC&quot;), 
        mapping = aes(long, lat, group = group, fill = log(real_hpi))) + 
   geom_polygon(color = &quot;#ffffff&quot;, size = 0) + 
-  coord_map(projection = &quot;albers&quot;, lat0 = 39, latl = 45) +
+  coord_map(projection = &quot;albers&quot;, lat0 = 39, lat1 = 45) +
   viridis::scale_fill_viridis(option = &quot;E&quot;,
                               breaks=c(log(50),log(100),log(200),log(400)),
                               labels=c(&quot;-50%&quot;,&quot;0%&quot;,&quot;+100%&quot;,&quot;+200%&quot;),
@@ -87,4 +89,58 @@ ggplot(subset(dt2, GEO_Name != &quot;DC&quot;),
        caption = &quot;Freddie Mac House Price Index by State,\ndeflated by US BLS, Consumer Price Index&quot;,
        fill = &quot;Real House Price Growth\nSince Jan 1975&quot;)  </code></pre>
 <p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="map-at-the-county-level" class="section level1">
+<h1>Map at the County Level</h1>
+<pre class="r"><code>dt3 %&gt;% 
+  mutate(county_fips = paste0(str_pad(FIPS_State_Code, 2, &quot;left&quot;,0),
+                              str_pad(FIPS_County_Code, 3, &quot;left&quot;,0))) %&gt;% 
+  left_join(counties, by = c(&quot;county_fips&quot;)) %&gt;%
+  ggplot(mapping = aes(long, lat, group = group, fill = log(real_hpi))) +
+  geom_polygon(data = states, aes(long, lat, group = group), fill = &quot;#f0f0f5&quot;, color = &quot;white&quot;,
+               size = 0) + 
+  geom_polygon(color = &quot;#ffffff&quot;, size =0) +
+  coord_map(projection =&quot;albers&quot;, lat0 = 39, lat1 =45) + 
+  viridis::scale_fill_viridis(option = &quot;E&quot;,
+                              breaks=c(log(50),log(100),log(200),log(400)),
+                              labels=c(&quot;-50%&quot;,&quot;0%&quot;,&quot;+100%&quot;,&quot;+200%&quot;),
+                              limits=c(log(50),log(400))) + 
+  theme_twg(grid = FALSE) + 
+  theme(legend.title = element_text(),
+        axis.text = element_blank(),
+        legend.key.width = unit(.2, &#39;in&#39;),
+        legend.position = &quot;right&quot;) +
+  labs(x = &quot;&quot;, y = &quot;&quot;,
+       title = &quot;The coasts have gotten more expensive&quot;,
+       caption = &quot;Freddie Mac House Price Index by State,\ndeflated by US BLS, Consumer Price Index&quot;,
+       fill = &quot;Real House Price Growth\nSince Jan 1975&quot;) </code></pre>
+<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="specific-to-a-state" class="section level1">
+<h1>Specific to a state</h1>
+<pre class="r"><code>dt3 %&gt;% 
+  mutate(county_fips = paste0(str_pad(FIPS_State_Code, 2, &quot;left&quot;,0),
+                              str_pad(FIPS_County_Code, 3, &quot;left&quot;,0))) %&gt;% 
+  left_join(counties, by = c(&quot;county_fips&quot;)) %&gt;%
+  filter(state_name == &quot;Washington&quot;) %&gt;%
+  ggplot(mapping = aes(long, lat, group = group, fill = log(real_hpi))) +
+  geom_polygon(data = subset(states, state_name == &quot;Washington&quot;), 
+               aes(long, lat, group = group), fill = &quot;#f0f0f5&quot;, color = &quot;white&quot;,
+               size = 0) + 
+  geom_polygon(color = &quot;#ffffff&quot;, size =0) +
+  coord_map(projection =&quot;albers&quot;, lat0 = 39, lat1 =45) + 
+  viridis::scale_fill_viridis(option = &quot;E&quot;,
+                              breaks=c(log(50),log(100),log(200),log(400)),
+                              labels=c(&quot;-50%&quot;,&quot;0%&quot;,&quot;+100%&quot;,&quot;+200%&quot;),
+                              limits=c(log(50),log(400))) + 
+  theme_twg(grid = FALSE) + 
+  theme(legend.title = element_text(),
+        axis.text = element_blank(),
+        legend.key.width = unit(.2, &#39;in&#39;),
+        legend.position = &quot;right&quot;) +
+  labs(x = &quot;&quot;, y = &quot;&quot;,
+       title = &quot;Looking at Washington&quot;,
+       caption = &quot;Freddie Mac House Price Index for WA,\ndeflated by US BLS, Consumer Price Index&quot;,
+       fill = &quot;Real House Price Growth\nSince Jan 1975&quot;) </code></pre>
+<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
