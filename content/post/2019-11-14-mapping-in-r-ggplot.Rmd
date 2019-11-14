@@ -19,7 +19,6 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr)
 dt <- readRDS("~/R/blogdown_content/static/data/mapping/dt.RDS")
 dt2 <- readRDS("~/R/blogdown_content/static/data/mapping/dt2.RDS")
@@ -67,7 +66,7 @@ dt3 <- dt %>%
 ```
 
 # Map at the state level 
-```{r, message=FALSE}
+```{r, eval = TRUE, message=FALSE}
 # load theme 
 devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
 # graph 
