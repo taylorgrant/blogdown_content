@@ -26,6 +26,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <li><a href="#mutate-and-summarise-multiple-columns">Mutate and Summarise multiple columns</a></li>
 <li><a href="#mutating-multiple-date-formats-within-the-same-column">Mutating multiple date formats within the same column</a></li>
 <li><a href="#multiple-left_joins-using-dplyr">Multiple left_joins using dplyr</a></li>
+<li><a href="#calculating-quantiles-in-tidy-fashion">Calculating quantiles in tidy fashion</a></li>
 <li><a href="#selection-of-multiple-variables">Selection of multiple variables</a></li>
 <li><a href="#dplyr---group_split-function">dplyr - group_split function</a></li>
 <li><a href="#piping-into-a-t.test">Piping into a t.test</a></li>
@@ -50,10 +51,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 g        59    60 k    
-## 2 y        44    24 a    
-## 3 m        37    26 l    
-## 4 f        65    82 h</code></pre>
+## 1 p         7     4 q    
+## 2 w        70    38 p    
+## 3 n        41    73 a    
+## 4 g        51    78 l</code></pre>
 </div>
 <div id="using-rename_at-to-rename-specific-columns" class="section level1">
 <h1>Using rename_at to rename specific columns</h1>
@@ -71,10 +72,10 @@ df</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   a     pastedName_b     c pastedName_d
 ##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;chr&gt;       
-## 1 r               24    53 s           
-## 2 l               87    26 n           
-## 3 y               98    33 y           
-## 4 a               58    35 a</code></pre>
+## 1 r               25    31 l           
+## 2 b               97    25 y           
+## 3 p               50    98 e           
+## 4 m               95    34 q</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -156,6 +157,27 @@ mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, select(df2, m
 # specifying what the join is by
 mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, df2, by = &quot;index&quot;), .)</code></pre>
 </div>
+<div id="calculating-quantiles-in-tidy-fashion" class="section level1">
+<h1>Calculating quantiles in tidy fashion</h1>
+<pre class="r"><code>pacman::p_load(tidyverse)
+# set up quantiles we want 
+p &lt;- c(.2, .4, .6, .8)
+# create list of functions; one for each quantile; and give names to each
+p_names &lt;- map_chr(p, ~paste0(&#39;p_&#39;,.x*100))
+
+p_funs &lt;- map(p, ~partial(quantile, probs = .x, na.rm = TRUE)) %&gt;%
+  set_names(nm = p_names)
+
+mtcars %&gt;% group_by(cyl) %&gt;% 
+  summarise_at(vars(mpg), tibble::lst(!!!p_funs)) %&gt;% 
+  janitor::clean_names()</code></pre>
+<pre><code>## # A tibble: 3 x 5
+##     cyl  p_20  p_40  p_60  p_80
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1     4  22.8  24.4  27.3  30.4
+## 2     6  18.3  19.4  20.5  21  
+## 3     8  13.9  15.0  15.4  16.8</code></pre>
+</div>
 <div id="selection-of-multiple-variables" class="section level1">
 <h1>Selection of multiple variables</h1>
 <p>When using either <code>select</code> or wanting to <code>mutate_at</code> there are lots of helpers – <code>starts_with</code>, <code>ends_with</code>, <code>contains</code>, and <code>matches</code> and probably some that I’m missing.</p>
@@ -173,11 +195,11 @@ tmp</code></pre>
 <pre><code>## # A tibble: 5 x 4
 ##   g1_letters g1_num h1_letters h1_num
 ##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;       &lt;int&gt;
-## 1 i          474394 q           35267
-## 2 b          465524 z           25441
-## 3 x          309567 f           18390
-## 4 e          198061 w           44753
-## 5 h          241059 m            8781</code></pre>
+## 1 s          451798 d           48502
+## 2 p           15983 p           10506
+## 3 o          381366 w           27402
+## 4 z          408185 h           53463
+## 5 u          418008 b           45597</code></pre>
 <p>But we can also use the <code>intersect</code> function to create an AND statement</p>
 <pre class="r"><code>tmp &lt;- tibble(g1_letters = sample(letters, 5), 
               g1_num = sample(1:600000, 5),
@@ -197,7 +219,7 @@ tmp</code></pre>
 <pre><code>## # A tibble: 1 x 6
 ##    g1_num g1_weighted g2_num g2_weighted h1_num h1_weighted
 ##     &lt;int&gt; &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;  &lt;int&gt;       &lt;dbl&gt;
-## 1 1168782 467512.8sel  86198      34479. 188773      75509.</code></pre>
+## 1 1565490 626196sel   175828      70331. 103830       41532</code></pre>
 </div>
 <div id="dplyr---group_split-function" class="section level1">
 <h1>dplyr - group_split function</h1>
@@ -296,13 +318,13 @@ group_split(split_by)</code></pre>
 ##  Two Sample t-test
 ## 
 ## data:  a by group
-## t = 39.662, df = 198, p-value &lt; 2.2e-16
+## t = 42.303, df = 198, p-value &lt; 2.2e-16
 ## alternative hypothesis: true difference in means is not equal to 0
 ## 95 percent confidence interval:
-##  27.78215 30.68942
+##  27.77807 30.49452
 ## sample estimates:
 ##  mean in group blue mean in group green 
-##            79.14112            49.90534</code></pre>
+##            79.51194            50.37565</code></pre>
 </div>
 <div id="arranging-within-a-group" class="section level1">
 <h1>Arranging within a group</h1>

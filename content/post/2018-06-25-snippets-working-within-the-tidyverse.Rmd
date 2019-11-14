@@ -135,6 +135,24 @@ mass_df <- tmp %>% Reduce(function(df1, df2), left_join(df1, select(df2, matches
 mass_df <- tmp %>% Reduce(function(df1, df2), left_join(df1, df2, by = "index"), .)
 ```
 
+# Calculating quantiles in tidy fashion 
+
+```{r}
+pacman::p_load(tidyverse)
+# set up quantiles we want 
+p <- c(.2, .4, .6, .8)
+# create list of functions; one for each quantile; and give names to each
+p_names <- map_chr(p, ~paste0('p_',.x*100))
+
+p_funs <- map(p, ~partial(quantile, probs = .x, na.rm = TRUE)) %>%
+  set_names(nm = p_names)
+
+mtcars %>% group_by(cyl) %>% 
+  summarise_at(vars(mpg), tibble::lst(!!!p_funs)) %>% 
+  janitor::clean_names()
+
+```
+
 # Selection of multiple variables
 
 When using either `select` or wanting to `mutate_at` there are lots of helpers -- `starts_with`, `ends_with`, `contains`, and `matches` and probably some that I'm missing. 
