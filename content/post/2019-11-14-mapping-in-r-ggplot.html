@@ -1,0 +1,89 @@
+---
+title: Mapping in R (ggplot)
+author: ''
+date: '2019-11-14'
+slug: mapping-in-r-ggplot
+categories:
+  - R
+  - lesson
+  - mapping
+tags:
+  - ggplot
+  - mapping
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1573751968/old-map.png
+summary: "Various maps made in R"
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#packages-used">Packages used:</a></li>
+<li><a href="#get-the-data-necessary">Get the data necessary</a></li>
+<li><a href="#map-at-the-state-level">Map at the state level</a></li>
+</ul>
+</div>
+
+<p>Mapping based on the Housing Price Index from Freddie Mac</p>
+<div id="packages-used" class="section level2">
+<h2>Packages used:</h2>
+<p>This is using the <code>urbnmapr</code> <a href="https://medium.com/@urban_institute/how-to-create-state-and-county-maps-easily-in-r-577d29300bb2" target="_blank">package</a> for state and county choropleth maps.</p>
+<pre class="r"><code>devtools::install_github(“UrbanInstitute/urbnmapr”)
+pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr)</code></pre>
+</div>
+<div id="get-the-data-necessary" class="section level2">
+<h2>Get the data necessary</h2>
+<pre class="r"><code># download house price data (Freddie Mac)
+dt &lt;- data.table::fread(&quot;http://www.freddiemac.com/fmac-resources/research/docs/fmhpi_master_file.csv&quot;)
+# get CPI data (FRED)
+df_cpi &lt;- tidyquant::tq_get(&quot;CUUR0000SA0L2&quot;,get=&quot;economic.data&quot;,from=&quot;1975-01-01&quot;)
+# get delineation file (use April 2018 version)
+url1 &lt;- &quot;https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2018/delineation-files/list1.xls&quot;
+GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))
+df &lt;- read_excel(tf,skip=2) #read in data from third row
+# get rid of colname spaces
+colnames(df) &lt;- gsub(&#39;([[:punct:]])|\\s+&#39;,&#39;_&#39;,names(df))
+
+# Put it together ---------------------------------------------------------
+dt &lt;- dt %&gt;% data.frame() %&gt;%
+  mutate(date = as.Date(paste0(Year,&quot;-&quot;, Month,&quot;-&quot; ,&quot;1&quot;))) %&gt;% 
+  left_join(df_cpi) %&gt;% 
+  group_by(GEO_Name, GEO_Type) %&gt;%
+  mutate(real_hpi = 100*Index_SA/first(Index_SA) / (price/first(price))) %&gt;% # create real house price index
+  ungroup()
+
+dt2 &lt;- dt %&gt;%
+  filter(date == max(date) &amp; GEO_Type == &quot;State&quot;) %&gt;% 
+  left_join(states, by = c(&quot;GEO_Name&quot; = &quot;state_abbv&quot;))
+
+dt3 &lt;- dt %&gt;% 
+  filter(date == max(date) &amp; GEO_Type == &quot;CBSA&quot;) %&gt;%
+  left_join(df, by=c(&quot;GEO_Code&quot;=&quot;CBSA_Code&quot;))</code></pre>
+</div>
+<div id="map-at-the-state-level" class="section level1">
+<h1>Map at the state level</h1>
+<pre class="r"><code># load theme 
+devtools::source_url(&quot;https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R&quot;)
+# graph 
+ggplot(subset(dt2, GEO_Name != &quot;DC&quot;), 
+       mapping = aes(long, lat, group = group, fill = log(real_hpi))) + 
+  geom_polygon(color = &quot;#ffffff&quot;, size = 0) + 
+  coord_map(projection = &quot;albers&quot;, lat0 = 39, latl = 45) +
+  viridis::scale_fill_viridis(option = &quot;E&quot;,
+                              breaks=c(log(50),log(100),log(200),log(400)),
+                              labels=c(&quot;-50%&quot;,&quot;0%&quot;,&quot;+100%&quot;,&quot;+200%&quot;),
+                              limits=c(log(50),log(400))) + 
+  theme_twg(grid = FALSE) + 
+  theme(legend.title = element_text(),
+        axis.text = element_blank(),
+        legend.key.width = unit(.2, &#39;in&#39;),
+        legend.position = &quot;right&quot;) +
+  labs(x = &quot;&quot;, y = &quot;&quot;,
+       title = &quot;The coasts have gotten more expensive&quot;,
+       caption = &quot;Freddie Mac House Price Index by State,\ndeflated by US BLS, Consumer Price Index&quot;,
+       fill = &quot;Real House Price Growth\nSince Jan 1975&quot;)  </code></pre>
+<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>

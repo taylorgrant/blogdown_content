@@ -1,0 +1,91 @@
+---
+title: Mapping in R (ggplot)
+author: ''
+date: '2019-11-14'
+slug: mapping-in-r-ggplot
+categories:
+  - R
+  - lesson
+  - mapping
+tags:
+  - ggplot
+  - mapping
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1573751968/old-map.png
+summary: "Various maps made in R"
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr)
+dt <- readRDS("~/R/blogdown_content/static/data/mapping/dt.RDS")
+dt2 <- readRDS("~/R/blogdown_content/static/data/mapping/dt2.RDS")
+dt3 <- readRDS("~/R/blogdown_content/static/data/mapping/dt3.RDS")
+```
+
+Mapping based on the Housing Price Index from Freddie Mac
+
+## Packages used:
+This is using the `urbnmapr` [package](https://medium.com/@urban_institute/how-to-create-state-and-county-maps-easily-in-r-577d29300bb2){target="_blank"} for state and county choropleth maps. 
+
+```{r eval = FALSE}
+devtools::install_github(“UrbanInstitute/urbnmapr”)
+pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr)
+```
+
+## Get the data necessary
+```{r, eval = FALSE}
+# download house price data (Freddie Mac)
+dt <- data.table::fread("http://www.freddiemac.com/fmac-resources/research/docs/fmhpi_master_file.csv")
+# get CPI data (FRED)
+df_cpi <- tidyquant::tq_get("CUUR0000SA0L2",get="economic.data",from="1975-01-01")
+# get delineation file (use April 2018 version)
+url1 <- "https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2018/delineation-files/list1.xls"
+GET(url1, write_disk(tf <- tempfile(fileext = ".xls")))
+df <- read_excel(tf,skip=2) #read in data from third row
+# get rid of colname spaces
+colnames(df) <- gsub('([[:punct:]])|\\s+','_',names(df))
+
+# Put it together ---------------------------------------------------------
+dt <- dt %>% data.frame() %>%
+  mutate(date = as.Date(paste0(Year,"-", Month,"-" ,"1"))) %>% 
+  left_join(df_cpi) %>% 
+  group_by(GEO_Name, GEO_Type) %>%
+  mutate(real_hpi = 100*Index_SA/first(Index_SA) / (price/first(price))) %>% # create real house price index
+  ungroup()
+
+dt2 <- dt %>%
+  filter(date == max(date) & GEO_Type == "State") %>% 
+  left_join(states, by = c("GEO_Name" = "state_abbv"))
+
+dt3 <- dt %>% 
+  filter(date == max(date) & GEO_Type == "CBSA") %>%
+  left_join(df, by=c("GEO_Code"="CBSA_Code"))
+```
+
+# Map at the state level 
+```{r, message=FALSE}
+# load theme 
+devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
+# graph 
+ggplot(subset(dt2, GEO_Name != "DC"), 
+       mapping = aes(long, lat, group = group, fill = log(real_hpi))) + 
+  geom_polygon(color = "#ffffff", size = 0) + 
+  coord_map(projection = "albers", lat0 = 39, latl = 45) +
+  viridis::scale_fill_viridis(option = "E",
+                              breaks=c(log(50),log(100),log(200),log(400)),
+                              labels=c("-50%","0%","+100%","+200%"),
+                              limits=c(log(50),log(400))) + 
+  theme_twg(grid = FALSE) + 
+  theme(legend.title = element_text(),
+        axis.text = element_blank(),
+        legend.key.width = unit(.2, 'in'),
+        legend.position = "right") +
+  labs(x = "", y = "",
+       title = "The coasts have gotten more expensive",
+       caption = "Freddie Mac House Price Index by State,\ndeflated by US BLS, Consumer Price Index",
+       fill = "Real House Price Growth\nSince Jan 1975")  
+```
