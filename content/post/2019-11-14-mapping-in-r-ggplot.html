@@ -61,13 +61,14 @@ dt2 &lt;- dt %&gt;%
 
 dt3 &lt;- dt %&gt;% 
   filter(date == max(date) &amp; GEO_Type == &quot;CBSA&quot;) %&gt;%
-  left_join(df, by=c(&quot;GEO_Code&quot;=&quot;CBSA_Code&quot;))</code></pre>
+  left_join(df, by=c(&quot;GEO_Code&quot;=&quot;CBSA_Code&quot;))
+
+# load theme for ggplot 
+devtools::source_url(&quot;https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R&quot;)</code></pre>
 </div>
 <div id="map-at-the-state-level" class="section level1">
 <h1>Map at the state level</h1>
-<pre class="r"><code># load theme 
-devtools::source_url(&quot;https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R&quot;)
-# graph 
+<pre class="r"><code># graph 
 ggplot(subset(dt2, GEO_Name != &quot;DC&quot;), 
        mapping = aes(long, lat, group = group, fill = log(real_hpi))) + 
   geom_polygon(color = &quot;#ffffff&quot;, size = 0) + 

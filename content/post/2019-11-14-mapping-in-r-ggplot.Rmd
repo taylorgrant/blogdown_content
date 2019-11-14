@@ -23,6 +23,8 @@ pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr)
 dt <- readRDS("~/R/blogdown_content/static/data/mapping/dt.RDS")
 dt2 <- readRDS("~/R/blogdown_content/static/data/mapping/dt2.RDS")
 dt3 <- readRDS("~/R/blogdown_content/static/data/mapping/dt3.RDS")
+# load theme
+devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
 ```
 
 Mapping based on the Housing Price Index from Freddie Mac
@@ -63,12 +65,13 @@ dt2 <- dt %>%
 dt3 <- dt %>% 
   filter(date == max(date) & GEO_Type == "CBSA") %>%
   left_join(df, by=c("GEO_Code"="CBSA_Code"))
+
+# load theme for ggplot 
+devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
 ```
 
 # Map at the state level 
-```{r, eval = TRUE, message=FALSE}
-# load theme 
-devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
+```{r}
 # graph 
 ggplot(subset(dt2, GEO_Name != "DC"), 
        mapping = aes(long, lat, group = group, fill = log(real_hpi))) + 
