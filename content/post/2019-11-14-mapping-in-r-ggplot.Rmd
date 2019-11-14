@@ -90,4 +90,5 @@ ggplot(subset(dt2, GEO_Name != "DC"),
        title = "The coasts have gotten more expensive",
        caption = "Freddie Mac House Price Index by State,\ndeflated by US BLS, Consumer Price Index",
        fill = "Real House Price Growth\nSince Jan 1975")  
+
 ```
