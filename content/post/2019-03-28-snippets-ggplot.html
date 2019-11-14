@@ -19,6 +19,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
 
 <div id="TOC">
 <ul>
+<li><a href="#creating-my-own-theme">Creating my own theme</a></li>
 <li><a href="#adding-text-to-barplots-with-position-dodge">Adding text to barplots with position = “dodge”</a></li>
 <li><a href="#faceting-pie-charts-and-donut-plots">Faceting pie charts and donut plots</a></li>
 <li><a href="#using-facet_grid-to-graph-multiple-groups-in-the-same-plot">Using facet_grid to graph multiple groups in the same plot</a></li>
@@ -29,6 +30,11 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
 </div>
 
 <p>Snippet files are periodically updated with how-to’s for better plotting techniques.</p>
+<div id="creating-my-own-theme" class="section level1">
+<h1>Creating my own theme</h1>
+<p>I’ve borrowed heavily from the <code>hrbrthemes</code> and <code>myriad</code> packages to create a clean theme. Get it from github with the following…</p>
+<pre class="r"><code>devtools::source_url(&quot;https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R&quot;)</code></pre>
+</div>
 <div id="adding-text-to-barplots-with-position-dodge" class="section level1">
 <h1>Adding text to barplots with position = “dodge”</h1>
 <p>With grouped bar charts <code>position = &quot;dodge&quot;</code> is used and the <code>geom_text</code> function also needs to be put into the same position. Note some other aesthetic changes here – <code>coord_flip()</code> was used and within that the limits of the y-axis were extended (this is because <code>coord_cartesian()</code> doesn’t work with the coordinates flipped). Within the <code>theme</code> section the title was centered, the axis labels were pushed to the edges and italicized, the caption font was altered. We also borrowed the <code>hrbrthemes</code> package function <code>scale_y_percent</code> to easily convert the axis to a percentage.</p>
@@ -41,7 +47,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
              fill = type, label = scales::percent(frac))) + 
   geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;) + 
   coord_flip(ylim = c(0,.6)) + 
-  theme_minimal() + 
+  theme_twg() + 
   hrbrthemes::scale_y_percent() + 
   geom_text(aes(x = cat, y = frac+.04, 
                 label = scales::percent(frac)),
@@ -56,7 +62,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
   labs(x = &quot;Some Thing&quot;, y = &quot;Percent&quot;,
        title = &quot;Title of Graph&quot;,
        caption = &quot;Source: data source&quot;)</code></pre>
-<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 </div>
 <div id="faceting-pie-charts-and-donut-plots" class="section level1">
 <h1>Faceting pie charts and donut plots</h1>
@@ -81,15 +87,12 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
         axis.text=element_blank(),
         axis.ticks=element_blank(),
         plot.title = element_text(hjust = .5),
-        axis.title.x = element_text(hjust = 1, face = &quot;italic&quot;, size = 8),
-        axis.title.y = element_text(hjust = 1, face = &#39;italic&#39;, size = 8),
-        plot.caption = element_text(color = &quot;#BEBEBE&quot;, face = &quot;italic&quot;),
         strip.background =element_rect(fill=&quot;lightgray&quot;, color = NA)) + 
   labs(x = &quot;x-axis label&quot;, y = &quot;y-axis label&quot;,
        title = &quot;Title over a row of faceted pie charts&quot;)</code></pre>
-<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<p>Note that you can turn these pie charts into donut plots by adding <code>xlim(4,8)</code> within the code. The first number decides the thickness of the donut (larger = thicker); the second number dictates the size of the donut (smaller equals larger).</p>
 <p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>Note that you can turn these pie charts into donut plots by adding <code>xlim(4,8)</code> within the code. The first number decides the thickness of the donut (larger = thicker); the second number dictates the size of the donut (smaller equals larger).</p>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 </div>
 <div id="using-facet_grid-to-graph-multiple-groups-in-the-same-plot" class="section level1">
 <h1>Using facet_grid to graph multiple groups in the same plot</h1>
@@ -109,27 +112,27 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
   hrbrthemes::scale_y_percent() + 
   scale_fill_manual(values = c(&quot;#b6af06&quot;, &quot;#004d7c&quot;)) + 
   geom_text(nudge_y = .04) + 
-  theme_minimal() + 
+  theme_twg() + 
   theme(legend.position = &#39;none&#39;,
         strip.background =element_rect(fill=&quot;lightgray&quot;, color = NA)) +
   labs(x = &quot;&quot;, y = &#39;Percent&#39;)</code></pre>
-<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 <div id="rotating-axis-text" class="section level1">
 <h1>Rotating axis text</h1>
 <p>This graph looks terrible.</p>
-<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>But we can do two things to make the graph work. Scale the dates being used in the axis with <code>scale_x_date</code> and rotate the label in the them.</p>
 <pre class="r"><code>tibble(date = seq.Date(as.Date(&quot;2019-01-01&quot;), as.Date(&quot;2019-12-01&quot;), by = &quot;week&quot;),
        value = sample(1:100, 48)/100) %&gt;%
   ggplot(aes(x = date, y = value)) + 
   geom_line(col = &quot;dodgerblue&quot;) + 
   scale_x_date(date_breaks = &quot;2 weeks&quot;) + 
-  theme_minimal() + 
+  theme_twg() + 
   hrbrthemes::scale_y_percent() +
   labs(x = &quot;&quot;, y= &quot;&quot;) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))</code></pre>
-<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 </div>
 <div id="heatmaps" class="section level1">
 <h1>Heatmaps</h1>
@@ -145,13 +148,13 @@ tibble(date = seq.Date(as.Date(&quot;2014-01-01&quot;), as.Date(&quot;2019-12-01
                      na.value = &quot;gray&quot;,
                      breaks = seq(20000, 100000, 20000),
                      labels = c(&quot;20k&quot;, &quot;40k&quot;, &quot;60k&quot;, &quot;80k&quot;, &quot;100k&quot;)) + 
-  theme_minimal() + 
+  theme_twg() + 
   theme(legend.title = element_blank(),
         plot.margin=unit(c(1,1,1,0),&quot;cm&quot;)) +
   labs(x = &quot;&quot;, y = &quot;&quot;,
        title = &quot;This is a heatmap&quot;,
        caption = &quot;Using viridis color scales&quot;)</code></pre>
-<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 </div>
 <div id="adding-a-benchmark-to-a-bar-graph" class="section level1">
 <h1>Adding a benchmark to a bar graph</h1>
@@ -185,21 +188,11 @@ data %&gt;%
                     name = &quot;&quot;) +
   geom_segment(aes(xend = component, yend = benchmark-2, y = benchmark+2), size = 5, lineend = &quot;butt&quot;,
                color = &quot;black&quot;) + 
-  theme_minimal() + 
+  theme_twg() + 
   theme(strip.background = element_rect(fill=&quot;lightgray&quot;, color = NA),
-        legend.position = &quot;none&quot;,
-        panel.grid.minor.x=element_blank(),
-        panel.grid.major.x=element_blank(),
-        plot.caption = element_text(hjust = 1,
-                                    face = &quot;italic&quot;),
-        plot.title = element_text(hjust = 0, size = 12, 
-                                  # margin = margin(b = 10), 
-                                  face = &quot;bold&quot;),
-        axis.title = element_text( 
-                                  size = 12,
-                                  face = &#39;italic&#39;)) +
+        legend.position = &quot;none&quot;) +
   labs(x = &quot;&quot;, y = &quot;Score&quot;,
        title = &quot;Component Scores for Each Group&quot;,
        caption = &quot;Note: Black lines are Benchmarks&quot;)</code></pre>
-<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>

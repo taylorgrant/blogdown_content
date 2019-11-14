@@ -26,10 +26,10 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <li><a href="#mutate-and-summarise-multiple-columns">Mutate and Summarise multiple columns</a></li>
 <li><a href="#mutating-multiple-date-formats-within-the-same-column">Mutating multiple date formats within the same column</a></li>
 <li><a href="#multiple-left_joins-using-dplyr">Multiple left_joins using dplyr</a></li>
-<li><a href="#calculating-quantiles-the-tidy-way">Calculating quantiles the tidy way</a></li>
 <li><a href="#selection-of-multiple-variables">Selection of multiple variables</a></li>
 <li><a href="#dplyr---group_split-function">dplyr - group_split function</a></li>
 <li><a href="#piping-into-a-t.test">Piping into a t.test</a></li>
+<li><a href="#arranging-within-a-group">Arranging within a group</a></li>
 </ul>
 </div>
 
@@ -50,10 +50,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 m        70    84 q    
-## 2 g        84    87 c    
-## 3 k        89    34 k    
-## 4 l        24    81 n</code></pre>
+## 1 g        59    60 k    
+## 2 y        44    24 a    
+## 3 m        37    26 l    
+## 4 f        65    82 h</code></pre>
 </div>
 <div id="using-rename_at-to-rename-specific-columns" class="section level1">
 <h1>Using rename_at to rename specific columns</h1>
@@ -71,10 +71,10 @@ df</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   a     pastedName_b     c pastedName_d
 ##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;chr&gt;       
-## 1 m               15    24 x           
-## 2 g               88    66 b           
-## 3 d               74    40 r           
-## 4 n               87     9 w</code></pre>
+## 1 r               24    53 s           
+## 2 l               87    26 n           
+## 3 y               98    33 y           
+## 4 a               58    35 a</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -156,40 +156,6 @@ mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, select(df2, m
 # specifying what the join is by
 mass_df &lt;- tmp %&gt;% Reduce(function(df1, df2), left_join(df1, df2, by = &quot;index&quot;), .)</code></pre>
 </div>
-<div id="calculating-quantiles-the-tidy-way" class="section level1">
-<h1>Calculating quantiles the tidy way</h1>
-<p>This is straight from Stack Overflow, but comes in handy. Note that “probs” can be added to the <code>quantile</code> command depending on specific needs.</p>
-<pre class="r"><code>mtcars %&gt;%
-  nest(-cyl) %&gt;% 
-  mutate(quantiles = map(data, ~ quantile(.$mpg))) %&gt;%
-  unnest(map(quantiles, broom::tidy))</code></pre>
-<pre><code>## Warning: &#39;tidy.numeric&#39; is deprecated.
-## See help(&quot;Deprecated&quot;)
-
-## Warning: &#39;tidy.numeric&#39; is deprecated.
-## See help(&quot;Deprecated&quot;)
-
-## Warning: &#39;tidy.numeric&#39; is deprecated.
-## See help(&quot;Deprecated&quot;)</code></pre>
-<pre><code>## # A tibble: 15 x 3
-##      cyl names     x
-##    &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;
-##  1     6 0%     17.8
-##  2     6 25%    18.6
-##  3     6 50%    19.7
-##  4     6 75%    21  
-##  5     6 100%   21.4
-##  6     4 0%     21.4
-##  7     4 25%    22.8
-##  8     4 50%    26  
-##  9     4 75%    30.4
-## 10     4 100%   33.9
-## 11     8 0%     10.4
-## 12     8 25%    14.4
-## 13     8 50%    15.2
-## 14     8 75%    16.2
-## 15     8 100%   19.2</code></pre>
-</div>
 <div id="selection-of-multiple-variables" class="section level1">
 <h1>Selection of multiple variables</h1>
 <p>When using either <code>select</code> or wanting to <code>mutate_at</code> there are lots of helpers – <code>starts_with</code>, <code>ends_with</code>, <code>contains</code>, and <code>matches</code> and probably some that I’m missing.</p>
@@ -207,11 +173,11 @@ tmp</code></pre>
 <pre><code>## # A tibble: 5 x 4
 ##   g1_letters g1_num h1_letters h1_num
 ##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;       &lt;int&gt;
-## 1 p          566683 z           10588
-## 2 k          193392 p           51402
-## 3 i          402277 o            5115
-## 4 n          463562 j           29912
-## 5 a          199700 x            7870</code></pre>
+## 1 i          474394 q           35267
+## 2 b          465524 z           25441
+## 3 x          309567 f           18390
+## 4 e          198061 w           44753
+## 5 h          241059 m            8781</code></pre>
 <p>But we can also use the <code>intersect</code> function to create an AND statement</p>
 <pre class="r"><code>tmp &lt;- tibble(g1_letters = sample(letters, 5), 
               g1_num = sample(1:600000, 5),
@@ -231,7 +197,7 @@ tmp</code></pre>
 <pre><code>## # A tibble: 1 x 6
 ##    g1_num g1_weighted g2_num g2_weighted h1_num h1_weighted
 ##     &lt;int&gt; &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;  &lt;int&gt;       &lt;dbl&gt;
-## 1 1503290 601316sel   204668      81867. 156813      62725.</code></pre>
+## 1 1168782 467512.8sel  86198      34479. 188773      75509.</code></pre>
 </div>
 <div id="dplyr---group_split-function" class="section level1">
 <h1>dplyr - group_split function</h1>
@@ -330,11 +296,33 @@ group_split(split_by)</code></pre>
 ##  Two Sample t-test
 ## 
 ## data:  a by group
-## t = 42.537, df = 198, p-value &lt; 2.2e-16
+## t = 39.662, df = 198, p-value &lt; 2.2e-16
 ## alternative hypothesis: true difference in means is not equal to 0
 ## 95 percent confidence interval:
-##  28.61222 31.39409
+##  27.78215 30.68942
 ## sample estimates:
 ##  mean in group blue mean in group green 
-##            79.94385            49.94069</code></pre>
+##            79.14112            49.90534</code></pre>
+</div>
+<div id="arranging-within-a-group" class="section level1">
+<h1>Arranging within a group</h1>
+<pre class="r"><code>library(tidyverse)
+ToothGrowth %&gt;%
+    group_by(supp) %&gt;%
+    arrange(len, .by_group = TRUE)</code></pre>
+<pre><code>## # A tibble: 60 x 3
+## # Groups:   supp [2]
+##      len supp   dose
+##    &lt;dbl&gt; &lt;fct&gt; &lt;dbl&gt;
+##  1   8.2 OJ      0.5
+##  2   9.4 OJ      0.5
+##  3   9.7 OJ      0.5
+##  4   9.7 OJ      0.5
+##  5  10   OJ      0.5
+##  6  14.5 OJ      0.5
+##  7  14.5 OJ      1  
+##  8  15.2 OJ      0.5
+##  9  16.5 OJ      0.5
+## 10  17.6 OJ      0.5
+## # … with 50 more rows</code></pre>
 </div>

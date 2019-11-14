@@ -20,9 +20,21 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
 library(here)
 library(tidyverse)
 library(rvest)
+
+devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
 ```
 
 Snippet files are periodically updated with how-to's for better plotting techniques. 
+
+# Creating my own theme
+
+I've borrowed heavily from the `hrbrthemes` and `myriad` packages to create a clean theme. Get it from github with the following... 
+
+```{r, eval= FALSE}
+
+devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
+
+```
 
 # Adding text to barplots with position = "dodge"
 
@@ -38,7 +50,7 @@ tibble(type = rep(c('a','b'), each = 4),
              fill = type, label = scales::percent(frac))) + 
   geom_bar(stat = "identity", position = "dodge") + 
   coord_flip(ylim = c(0,.6)) + 
-  theme_minimal() + 
+  theme_twg() + 
   hrbrthemes::scale_y_percent() + 
   geom_text(aes(x = cat, y = frac+.04, 
                 label = scales::percent(frac)),
@@ -82,9 +94,6 @@ tibble(type = rep(c('a','b', 'c'), each = 4),
         axis.text=element_blank(),
         axis.ticks=element_blank(),
         plot.title = element_text(hjust = .5),
-        axis.title.x = element_text(hjust = 1, face = "italic", size = 8),
-        axis.title.y = element_text(hjust = 1, face = 'italic', size = 8),
-        plot.caption = element_text(color = "#BEBEBE", face = "italic"),
         strip.background =element_rect(fill="lightgray", color = NA)) + 
   labs(x = "x-axis label", y = "y-axis label",
        title = "Title over a row of faceted pie charts")
@@ -104,7 +113,7 @@ tibble(type = rep(c('a','b', 'c'), each = 4),
              xmax = 8, xmin = 6)) +
   facet_wrap(~type, ncol = 3) + geom_rect(colour = "white", show.legend = TRUE) +
   coord_polar(theta = "y") + 
-  theme_minimal() + 
+  theme_twg() + 
   xlim(c(4,8)) + 
   scale_fill_manual(values = c("#154577", "#999999", '#fccd22','#0c725a'),
                     labels = c("Cat", "Dog", 'Bird', "Snake"),
@@ -114,9 +123,6 @@ tibble(type = rep(c('a','b', 'c'), each = 4),
         axis.text=element_blank(),
         axis.ticks=element_blank(),
         plot.title = element_text(hjust = .5),
-        axis.title.x = element_text(hjust = 1, face = "italic", size = 8),
-        axis.title.y = element_text(hjust = 1, face = 'italic', size = 8),
-        plot.caption = element_text(color = "#BEBEBE", face = "italic"),
         strip.background =element_rect(fill="lightgray", color = NA)) + 
   labs(x = "x-axis label", y = "y-axis label",
        title = "Title over a row of faceted donut plots")
@@ -142,7 +148,7 @@ tibble(group = c('Group A', 'Group A',
   hrbrthemes::scale_y_percent() + 
   scale_fill_manual(values = c("#b6af06", "#004d7c")) + 
   geom_text(nudge_y = .04) + 
-  theme_minimal() + 
+  theme_twg() + 
   theme(legend.position = 'none',
         strip.background =element_rect(fill="lightgray", color = NA)) +
   labs(x = "", y = 'Percent')
@@ -158,7 +164,7 @@ tibble(date = seq.Date(as.Date("2019-01-01"), as.Date("2019-12-01"), by = "week"
   ggplot(aes(x = date, y = value)) + 
   geom_line(col = "dodgerblue") + 
   scale_x_date(date_breaks = "week") + 
-  theme_minimal() +
+  theme_twg() +
   hrbrthemes::scale_y_percent() +
   labs(x = "", y= "")
 ```
@@ -171,7 +177,7 @@ tibble(date = seq.Date(as.Date("2019-01-01"), as.Date("2019-12-01"), by = "week"
   ggplot(aes(x = date, y = value)) + 
   geom_line(col = "dodgerblue") + 
   scale_x_date(date_breaks = "2 weeks") + 
-  theme_minimal() + 
+  theme_twg() + 
   hrbrthemes::scale_y_percent() +
   labs(x = "", y= "") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -193,7 +199,7 @@ tibble(date = seq.Date(as.Date("2014-01-01"), as.Date("2019-12-01"), "month"),
                      na.value = "gray",
                      breaks = seq(20000, 100000, 20000),
                      labels = c("20k", "40k", "60k", "80k", "100k")) + 
-  theme_minimal() + 
+  theme_twg() + 
   theme(legend.title = element_blank(),
         plot.margin=unit(c(1,1,1,0),"cm")) +
   labs(x = "", y = "",
@@ -235,19 +241,9 @@ data %>%
                     name = "") +
   geom_segment(aes(xend = component, yend = benchmark-2, y = benchmark+2), size = 5, lineend = "butt",
                color = "black") + 
-  theme_minimal() + 
+  theme_twg() + 
   theme(strip.background = element_rect(fill="lightgray", color = NA),
-        legend.position = "none",
-        panel.grid.minor.x=element_blank(),
-        panel.grid.major.x=element_blank(),
-        plot.caption = element_text(hjust = 1,
-                                    face = "italic"),
-        plot.title = element_text(hjust = 0, size = 12, 
-                                  # margin = margin(b = 10), 
-                                  face = "bold"),
-        axis.title = element_text( 
-                                  size = 12,
-                                  face = 'italic')) +
+        legend.position = "none") +
   labs(x = "", y = "Score",
        title = "Component Scores for Each Group",
        caption = "Note: Black lines are Benchmarks")

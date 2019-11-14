@@ -135,17 +135,6 @@ mass_df <- tmp %>% Reduce(function(df1, df2), left_join(df1, select(df2, matches
 mass_df <- tmp %>% Reduce(function(df1, df2), left_join(df1, df2, by = "index"), .)
 ```
 
-# Calculating quantiles the tidy way
-
-This is straight from Stack Overflow, but comes in handy. Note that "probs" can be added to the `quantile` command depending on specific needs. 
-
-```{r}
-mtcars %>%
-  nest(-cyl) %>% 
-  mutate(quantiles = map(data, ~ quantile(.$mpg))) %>%
-  unnest(map(quantiles, broom::tidy))
-```
-
 # Selection of multiple variables
 
 When using either `select` or wanting to `mutate_at` there are lots of helpers -- `starts_with`, `ends_with`, `contains`, and `matches` and probably some that I'm missing. 
@@ -209,4 +198,13 @@ tibble(a = c(rnorm(100, mean = 50, sd = 5),rnorm(100, mean = 80, sd = 5)),
        group = c(rep("green", 100), rep("blue", 100))) %>%
   t.test(a ~ group, data = ., var.equal = TRUE)
   
+```
+
+# Arranging within a group
+
+```{r}
+library(tidyverse)
+ToothGrowth %>%
+    group_by(supp) %>%
+    arrange(len, .by_group = TRUE)
 ```
