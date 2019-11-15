@@ -31,12 +31,12 @@ output:
 </ul>
 </div>
 
-<p>Mapping based on the Housing Price Index from Freddie Mac</p>
 <div id="packages-used" class="section level2">
 <h2>Packages used:</h2>
 <p>This is using the <code>urbnmapr</code> <a href="https://medium.com/@urban_institute/how-to-create-state-and-county-maps-easily-in-r-577d29300bb2" target="_blank">package</a> for state and county choropleth maps.</p>
 <pre class="r"><code>devtools::install_github(“UrbanInstitute/urbnmapr”)
 pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr, geofacet)</code></pre>
+<p>At the state level, let’s map data on the change in the cost of housing using the Housing Price Index from Freddie Mac.</p>
 </div>
 <div id="get-the-data-necessary" class="section level2">
 <h2>Get the data necessary</h2>
@@ -100,11 +100,11 @@ data(counties)
 url1 &lt;- &quot;https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5&quot;
 GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))</code></pre>
 <pre><code>## Response [https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5]
-##   Date: 2019-11-15 17:53
+##   Date: 2019-11-15 17:59
 ##   Status: 200
 ##   Content-Type: application/vnd.ms-excel
 ##   Size: 1.46 MB
-## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//Rtmpw1nxrY/file16460780e0afb.xls</code></pre>
+## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpSg2lY0/file1685972632252.xls</code></pre>
 <pre class="r"><code>ed &lt;- readxl::read_excel(tf,skip=4) %&gt;%
   janitor::clean_names()
 
@@ -133,16 +133,16 @@ ed %&gt;%
 </div>
 <div id="specific-to-a-state" class="section level1">
 <h1>Specific to a state</h1>
-<p>Educational attainment, filtered down to the state level.</p>
+<p>We can filter down to the state level. Be sure to subset the polygon data…</p>
 <pre class="r"><code>data(counties)
 url1 &lt;- &quot;https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5&quot;
 GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))</code></pre>
 <pre><code>## Response [https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5]
-##   Date: 2019-11-15 17:53
+##   Date: 2019-11-15 17:59
 ##   Status: 200
 ##   Content-Type: application/vnd.ms-excel
 ##   Size: 1.46 MB
-## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//Rtmpw1nxrY/file164602151e46d.xls</code></pre>
+## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpSg2lY0/file168594b1b9e6.xls</code></pre>
 <pre class="r"><code>ed &lt;- readxl::read_excel(tf,skip=4) %&gt;%
   janitor::clean_names()
 
@@ -151,7 +151,7 @@ ed %&gt;%
   inner_join(counties, by = c(&quot;fips_code&quot; = &quot;county_fips&quot;)) %&gt;%
   filter(state_name == &quot;Washington&quot;) %&gt;%
   ggplot(mapping = aes(long, lat, group = group, fill = percent_of_adults_with_a_bachelors_degree_or_higher_2013_17)) +
-  geom_polygon(data = states, aes(long, lat, group = group), fill = &quot;#f0f0f5&quot;, color = &quot;white&quot;,
+  geom_polygon(data = subset(states, state_name == &quot;Washington&quot;), aes(long, lat, group = group), fill = &quot;#f0f0f5&quot;, color = &quot;white&quot;,
                size = 0) + 
   geom_polygon(color = &quot;#ffffff&quot;, size =0) +
   coord_map(projection =&quot;albers&quot;, lat0 = 39, lat1 =45) + 

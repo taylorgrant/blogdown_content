@@ -30,8 +30,6 @@ devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/mast
 us <- readOGR("~/R/blogdown_content/static/data/mapping/us_states_hexgrid.geojson", "OGRGeoJSON")
 ```
 
-Mapping based on the Housing Price Index from Freddie Mac
-
 ## Packages used:
 This is using the `urbnmapr` [package](https://medium.com/@urban_institute/how-to-create-state-and-county-maps-easily-in-r-577d29300bb2){target="_blank"} for state and county choropleth maps. 
 
@@ -39,6 +37,8 @@ This is using the `urbnmapr` [package](https://medium.com/@urban_institute/how-t
 devtools::install_github(“UrbanInstitute/urbnmapr”)
 pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr, geofacet)
 ```
+
+At the state level, let's map data on the change in the cost of housing using the Housing Price Index from Freddie Mac. 
 
 ## Get the data necessary
 ```{r, eval = FALSE}
@@ -100,7 +100,7 @@ ggplot(subset(dt2, GEO_Name != "DC"),
 # Map at the County Level
 
 Let's get data on educational achievement at the county level and map it. Again, using the `urbnmapr` package to bring in the shapefile data. 
-```{r}
+```{r, message=FALSE}
 # get the data and clean 
 data(counties)
 url1 <- "https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5"
@@ -133,9 +133,9 @@ ed %>%
 
 # Specific to a state
 
-Educational attainment, filtered down to the state level. 
+We can filter down to the state level. Be sure to subset the polygon data... 
 
-```{r}
+```{r, message=FALSE}
 data(counties)
 url1 <- "https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5"
 GET(url1, write_disk(tf <- tempfile(fileext = ".xls")))
@@ -147,7 +147,7 @@ ed %>%
   inner_join(counties, by = c("fips_code" = "county_fips")) %>%
   filter(state_name == "Washington") %>%
   ggplot(mapping = aes(long, lat, group = group, fill = percent_of_adults_with_a_bachelors_degree_or_higher_2013_17)) +
-  geom_polygon(data = states, aes(long, lat, group = group), fill = "#f0f0f5", color = "white",
+  geom_polygon(data = subset(states, state_name == "Washington"), aes(long, lat, group = group), fill = "#f0f0f5", color = "white",
                size = 0) + 
   geom_polygon(color = "#ffffff", size =0) +
   coord_map(projection ="albers", lat0 = 39, lat1 =45) + 
