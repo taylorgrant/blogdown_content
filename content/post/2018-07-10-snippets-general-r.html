@@ -23,6 +23,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <li><a href="#finding-all-functions-in-a-package">Finding all functions in a package</a></li>
 <li><a href="#getting-the-names-of-datasets-within-a-package">Getting the names of datasets within a package</a></li>
 <li><a href="#loading-all-functions-within-a-folder">Loading all functions within a folder</a></li>
+<li><a href="#seeing-all-datasets-within-a-package">Seeing all datasets within a package</a></li>
 </ul>
 </div>
 
@@ -40,13 +41,36 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 fns &lt;- unclass(lsf.str(envir = asNamespace(&quot;spotifyr&quot;), all = T))
 
 fns</code></pre>
-<pre><code>##  [1] &quot;get_album_popularity&quot;      &quot;get_album_tracks&quot;         
-##  [3] &quot;get_albums&quot;                &quot;get_artist_audio_features&quot;
-##  [5] &quot;get_artists&quot;               &quot;get_playlist_tracks&quot;      
-##  [7] &quot;get_spotify_access_token&quot;  &quot;get_track_audio_features&quot; 
-##  [9] &quot;get_track_popularity&quot;      &quot;get_user_audio_features&quot;  
-## [11] &quot;get_user_playlist_count&quot;   &quot;get_user_playlists&quot;       
-## [13] &quot;parse_playlist_list_to_df&quot;
+<pre><code>##  [1] &quot;add_tracks_to_playlist&quot;         &quot;change_playlist_details&quot;       
+##  [3] &quot;check_me_following&quot;             &quot;check_users_following&quot;         
+##  [5] &quot;create_playlist&quot;                &quot;dedupe_album_names&quot;            
+##  [7] &quot;follow_artists_or_users&quot;        &quot;follow_playlist&quot;               
+##  [9] &quot;get_album&quot;                      &quot;get_album_data&quot;                
+## [11] &quot;get_album_tracks&quot;               &quot;get_albums&quot;                    
+## [13] &quot;get_artist&quot;                     &quot;get_artist_albums&quot;             
+## [15] &quot;get_artist_audio_features&quot;      &quot;get_artist_top_tracks&quot;         
+## [17] &quot;get_artists&quot;                    &quot;get_category&quot;                  
+## [19] &quot;get_category_playlists&quot;         &quot;get_discography&quot;               
+## [21] &quot;get_featured_playlists&quot;         &quot;get_genre_artists&quot;             
+## [23] &quot;get_label_artists&quot;              &quot;get_my_current_playback&quot;       
+## [25] &quot;get_my_currently_playing&quot;       &quot;get_my_devices&quot;                
+## [27] &quot;get_my_followed_artists&quot;        &quot;get_my_playlists&quot;              
+## [29] &quot;get_my_profile&quot;                 &quot;get_my_recently_played&quot;        
+## [31] &quot;get_my_top_artists_or_tracks&quot;   &quot;get_new_releases&quot;              
+## [33] &quot;get_playlist&quot;                   &quot;get_playlist_audio_features&quot;   
+## [35] &quot;get_playlist_cover_image&quot;       &quot;get_playlist_tracks&quot;           
+## [37] &quot;get_recommendations&quot;            &quot;get_related_artists&quot;           
+## [39] &quot;get_spotify_access_token&quot;       &quot;get_spotify_authorization_code&quot;
+## [41] &quot;get_track&quot;                      &quot;get_track_audio_analysis&quot;      
+## [43] &quot;get_track_audio_features&quot;       &quot;get_tracks&quot;                    
+## [45] &quot;get_user_audio_features&quot;        &quot;get_user_playlists&quot;            
+## [47] &quot;get_user_profile&quot;               &quot;is_uri&quot;                        
+## [49] &quot;pause_my_playback&quot;              &quot;search_spotify&quot;                
+## [51] &quot;seek_to_position&quot;               &quot;set_my_repeat_mode&quot;            
+## [53] &quot;set_my_volume&quot;                  &quot;skip_my_playback&quot;              
+## [55] &quot;skip_my_playback_previous&quot;      &quot;start_my_playback&quot;             
+## [57] &quot;toggle_my_shuffle&quot;              &quot;transfer_my_playback&quot;          
+## [59] &quot;unfollow_playlist&quot;              &quot;verify_result&quot;                 
 ## attr(,&quot;envir&quot;)
 ## &lt;environment: namespace:spotifyr&gt;
 ## attr(,&quot;mode&quot;)
@@ -94,4 +118,16 @@ lapply(mget(nm), dim)</code></pre>
 # load functions
 file.sources = list.files(path = glue(dir, &quot;functions&quot;), pattern=&quot;*.R&quot;)
 sapply(glue(&quot;{dir}functions/{file.sources}&quot;), source, .GlobalEnv)</code></pre>
+</div>
+<div id="seeing-all-datasets-within-a-package" class="section level1">
+<h1>Seeing all datasets within a package</h1>
+<p>The <code>vcdExtra</code> package actually does this nicely</p>
+<pre class="r"><code>vcdExtra::datasets(&quot;dplyr&quot;)</code></pre>
+<pre><code>##                Item      class      dim                     Title
+## 1  band_instruments data.frame      3x2           Band membership
+## 2 band_instruments2 data.frame      3x2           Band membership
+## 3      band_members data.frame      3x2           Band membership
+## 4              nasa   tbl_cube  41472x4 NASA spatio-temporal data
+## 5          starwars data.frame    87x13       Starwars characters
+## 6            storms data.frame 10010x13         Storm tracks data</code></pre>
 </div>

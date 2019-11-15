@@ -79,3 +79,11 @@ The `R.utils` package also has a command for this, but this is a simple way to s
 file.sources = list.files(path = glue(dir, "functions"), pattern="*.R")
 sapply(glue("{dir}functions/{file.sources}"), source, .GlobalEnv)
 ```
+
+# Seeing all datasets within a package
+
+The `vcdExtra` package actually does this nicely
+
+```{r}
+vcdExtra::datasets("dplyr")
+```
