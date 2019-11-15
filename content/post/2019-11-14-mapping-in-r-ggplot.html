@@ -100,11 +100,11 @@ data(counties)
 url1 &lt;- &quot;https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5&quot;
 GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))</code></pre>
 <pre><code>## Response [https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5]
-##   Date: 2019-11-15 17:59
+##   Date: 2019-11-15 18:04
 ##   Status: 200
 ##   Content-Type: application/vnd.ms-excel
 ##   Size: 1.46 MB
-## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpSg2lY0/file1685972632252.xls</code></pre>
+## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpHYFKO6/file16a9653c301a6.xls</code></pre>
 <pre class="r"><code>ed &lt;- readxl::read_excel(tf,skip=4) %&gt;%
   janitor::clean_names()
 
@@ -138,11 +138,11 @@ ed %&gt;%
 url1 &lt;- &quot;https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5&quot;
 GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))</code></pre>
 <pre><code>## Response [https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5]
-##   Date: 2019-11-15 17:59
+##   Date: 2019-11-15 18:04
 ##   Status: 200
 ##   Content-Type: application/vnd.ms-excel
 ##   Size: 1.46 MB
-## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpSg2lY0/file168594b1b9e6.xls</code></pre>
+## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpHYFKO6/file16a9654bcba13.xls</code></pre>
 <pre class="r"><code>ed &lt;- readxl::read_excel(tf,skip=4) %&gt;%
   janitor::clean_names()
 
@@ -165,7 +165,7 @@ ed %&gt;%
         legend.position = &quot;right&quot;) +
   labs(x = &quot;&quot;, y = &quot;&quot;,
        title = &quot;The most well educated counties in America (2013-2017)&quot;,
-       subtitle = &quot;#1 is Falls Church, VA&quot;,
+       subtitle = &quot;#1 in WA is King County&quot;,
        caption = &quot;Source: USDA, Economic Research Service&quot;,
        fill = &quot;% Adults 25+ with\nBachelor&#39;s Degree&quot;) </code></pre>
 <p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>

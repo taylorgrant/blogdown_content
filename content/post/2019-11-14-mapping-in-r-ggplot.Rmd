@@ -161,7 +161,7 @@ ed %>%
         legend.position = "right") +
   labs(x = "", y = "",
        title = "The most well educated counties in America (2013-2017)",
-       subtitle = "#1 is Falls Church, VA",
+       subtitle = "#1 in WA is King County",
        caption = "Source: USDA, Economic Research Service",
        fill = "% Adults 25+ with\nBachelor's Degree") 
 ```
