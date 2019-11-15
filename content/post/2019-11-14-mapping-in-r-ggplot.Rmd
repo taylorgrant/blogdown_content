@@ -155,14 +155,16 @@ dt3 %>%
 
 Map each state as a time series. In this case, looking at net migration flows from each state from 2010-2018. 
 
-```{r}
-ggplot(migration, aes(x=year, y = net)) +
-  geom_line(col = "dodgerblue") +
+```{r, fig.height=7}
+ggplot(migration, aes(x=year, y = net, ymin = 0, ymax = net)) +
+  geom_line(color = "dodgerblue") +
   geom_hline(yintercept = 0, col = "black", linetype = "dotted") +
   facet_geo(~state, grid = "us_state_grid2", label = "code") + # abbrevation rather than name
   scale_x_continuous(breaks = seq(2010,2018,2),
                      labels = seq(10,18,2)) +
+  # theme_twg(base_size = 8) + 
   theme_twg() + 
+  theme(axis.text = element_text(size = rel(0.75))) +
   hrbrthemes::scale_y_comma() + 
   labs(title = "Net Migration per State 2010-2018",
        caption = "Source: U.S. Census Bureau, American Community Survey",

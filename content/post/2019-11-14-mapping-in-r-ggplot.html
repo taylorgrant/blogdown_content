@@ -148,13 +148,15 @@ ggplot(subset(dt2, GEO_Name != &quot;DC&quot;),
 <div id="geofacet-map" class="section level1">
 <h1>Geofacet map</h1>
 <p>Map each state as a time series. In this case, looking at net migration flows from each state from 2010-2018.</p>
-<pre class="r"><code>ggplot(migration, aes(x=year, y = net)) +
-  geom_line(col = &quot;dodgerblue&quot;) +
+<pre class="r"><code>ggplot(migration, aes(x=year, y = net, ymin = 0, ymax = net)) +
+  geom_line(color = &quot;dodgerblue&quot;) +
   geom_hline(yintercept = 0, col = &quot;black&quot;, linetype = &quot;dotted&quot;) +
   facet_geo(~state, grid = &quot;us_state_grid2&quot;, label = &quot;code&quot;) + # abbrevation rather than name
   scale_x_continuous(breaks = seq(2010,2018,2),
                      labels = seq(10,18,2)) +
+  # theme_twg(base_size = 8) + 
   theme_twg() + 
+  theme(axis.text = element_text(size = rel(0.75))) +
   hrbrthemes::scale_y_comma() + 
   labs(title = &quot;Net Migration per State 2010-2018&quot;,
        caption = &quot;Source: U.S. Census Bureau, American Community Survey&quot;,
