@@ -99,58 +99,71 @@ ggplot(subset(dt2, GEO_Name != "DC"),
 
 # Map at the County Level
 
+Let's get data on educational achievement at the county level and map it. Again, using the `urbnmapr` package to bring in the shapefile data. 
 ```{r}
-dt3 %>% 
-  mutate(county_fips = paste0(str_pad(FIPS_State_Code, 2, "left",0),
-                              str_pad(FIPS_County_Code, 3, "left",0))) %>% 
-  left_join(counties, by = c("county_fips")) %>%
-  ggplot(mapping = aes(long, lat, group = group, fill = log(real_hpi))) +
+# get the data and clean 
+data(counties)
+url1 <- "https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5"
+GET(url1, write_disk(tf <- tempfile(fileext = ".xls")))
+ed <- readxl::read_excel(tf,skip=4) %>%
+  janitor::clean_names()
+
+ed %>% 
+  select(fips_code, state, area_name, percent_of_adults_with_a_bachelors_degree_or_higher_2013_17) %>%
+  inner_join(counties, by = c("fips_code" = "county_fips")) %>%
+  ggplot(mapping = aes(long, lat, group = group, fill = percent_of_adults_with_a_bachelors_degree_or_higher_2013_17)) +
   geom_polygon(data = states, aes(long, lat, group = group), fill = "#f0f0f5", color = "white",
                size = 0) + 
   geom_polygon(color = "#ffffff", size =0) +
   coord_map(projection ="albers", lat0 = 39, lat1 =45) + 
   viridis::scale_fill_viridis(option = "E",
-                              breaks=c(log(50),log(100),log(200),log(400)),
-                              labels=c("-50%","0%","+100%","+200%"),
-                              limits=c(log(50),log(400))) + 
+                              breaks = seq(20,100,20),
+                              labels = c("20%","40%","60%","80%","100%")) +
   theme_twg(grid = FALSE) + 
   theme(legend.title = element_text(),
         axis.text = element_blank(),
         legend.key.width = unit(.2, 'in'),
         legend.position = "right") +
   labs(x = "", y = "",
-       title = "The coasts have gotten more expensive",
-       caption = "Freddie Mac House Price Index by State,\ndeflated by US BLS, Consumer Price Index",
-       fill = "Real House Price Growth\nSince Jan 1975") 
+       title = "The most well educated counties in America (2013-2017)",
+       subtitle = "#1 is Falls Church, VA",
+       caption = "Source: USDA, Economic Research Service",
+       fill = "% Adults 25+ with\nBachelor's Degree") 
 ```
 
 # Specific to a state
 
+Educational attainment, filtered down to the state level. 
+
 ```{r}
-dt3 %>% 
-  mutate(county_fips = paste0(str_pad(FIPS_State_Code, 2, "left",0),
-                              str_pad(FIPS_County_Code, 3, "left",0))) %>% 
-  left_join(counties, by = c("county_fips")) %>%
+data(counties)
+url1 <- "https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5"
+GET(url1, write_disk(tf <- tempfile(fileext = ".xls")))
+ed <- readxl::read_excel(tf,skip=4) %>%
+  janitor::clean_names()
+
+ed %>% 
+  select(fips_code, state, area_name, percent_of_adults_with_a_bachelors_degree_or_higher_2013_17) %>%
+  inner_join(counties, by = c("fips_code" = "county_fips")) %>%
   filter(state_name == "Washington") %>%
-  ggplot(mapping = aes(long, lat, group = group, fill = log(real_hpi))) +
-  geom_polygon(data = subset(states, state_name == "Washington"), 
-               aes(long, lat, group = group), fill = "#f0f0f5", color = "white",
+  ggplot(mapping = aes(long, lat, group = group, fill = percent_of_adults_with_a_bachelors_degree_or_higher_2013_17)) +
+  geom_polygon(data = states, aes(long, lat, group = group), fill = "#f0f0f5", color = "white",
                size = 0) + 
   geom_polygon(color = "#ffffff", size =0) +
   coord_map(projection ="albers", lat0 = 39, lat1 =45) + 
   viridis::scale_fill_viridis(option = "E",
-                              breaks=c(log(50),log(100),log(200),log(400)),
-                              labels=c("-50%","0%","+100%","+200%"),
-                              limits=c(log(50),log(400))) + 
+                              breaks = seq(20,100,20),
+                              labels = c("20%","40%","60%","80%","100%")) +
   theme_twg(grid = FALSE) + 
   theme(legend.title = element_text(),
         axis.text = element_blank(),
         legend.key.width = unit(.2, 'in'),
         legend.position = "right") +
   labs(x = "", y = "",
-       title = "Looking at Washington",
-       caption = "Freddie Mac House Price Index for WA,\ndeflated by US BLS, Consumer Price Index",
-       fill = "Real House Price Growth\nSince Jan 1975") 
+       title = "The most well educated counties in America (2013-2017)",
+       subtitle = "#1 is Falls Church, VA",
+       caption = "Source: USDA, Economic Research Service",
+       fill = "% Adults 25+ with\nBachelor's Degree") 
 ```
 
 # Geofacet map

@@ -94,56 +94,80 @@ ggplot(subset(dt2, GEO_Name != &quot;DC&quot;),
 </div>
 <div id="map-at-the-county-level" class="section level1">
 <h1>Map at the County Level</h1>
-<pre class="r"><code>dt3 %&gt;% 
-  mutate(county_fips = paste0(str_pad(FIPS_State_Code, 2, &quot;left&quot;,0),
-                              str_pad(FIPS_County_Code, 3, &quot;left&quot;,0))) %&gt;% 
-  left_join(counties, by = c(&quot;county_fips&quot;)) %&gt;%
-  ggplot(mapping = aes(long, lat, group = group, fill = log(real_hpi))) +
+<p>Let’s get data on educational achievement at the county level and map it. Again, using the <code>urbnmapr</code> package to bring in the shapefile data.</p>
+<pre class="r"><code># get the data and clean 
+data(counties)
+url1 &lt;- &quot;https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5&quot;
+GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))</code></pre>
+<pre><code>## Response [https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5]
+##   Date: 2019-11-15 17:53
+##   Status: 200
+##   Content-Type: application/vnd.ms-excel
+##   Size: 1.46 MB
+## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//Rtmpw1nxrY/file16460780e0afb.xls</code></pre>
+<pre class="r"><code>ed &lt;- readxl::read_excel(tf,skip=4) %&gt;%
+  janitor::clean_names()
+
+ed %&gt;% 
+  select(fips_code, state, area_name, percent_of_adults_with_a_bachelors_degree_or_higher_2013_17) %&gt;%
+  inner_join(counties, by = c(&quot;fips_code&quot; = &quot;county_fips&quot;)) %&gt;%
+  ggplot(mapping = aes(long, lat, group = group, fill = percent_of_adults_with_a_bachelors_degree_or_higher_2013_17)) +
   geom_polygon(data = states, aes(long, lat, group = group), fill = &quot;#f0f0f5&quot;, color = &quot;white&quot;,
                size = 0) + 
   geom_polygon(color = &quot;#ffffff&quot;, size =0) +
   coord_map(projection =&quot;albers&quot;, lat0 = 39, lat1 =45) + 
   viridis::scale_fill_viridis(option = &quot;E&quot;,
-                              breaks=c(log(50),log(100),log(200),log(400)),
-                              labels=c(&quot;-50%&quot;,&quot;0%&quot;,&quot;+100%&quot;,&quot;+200%&quot;),
-                              limits=c(log(50),log(400))) + 
+                              breaks = seq(20,100,20),
+                              labels = c(&quot;20%&quot;,&quot;40%&quot;,&quot;60%&quot;,&quot;80%&quot;,&quot;100%&quot;)) +
   theme_twg(grid = FALSE) + 
   theme(legend.title = element_text(),
         axis.text = element_blank(),
         legend.key.width = unit(.2, &#39;in&#39;),
         legend.position = &quot;right&quot;) +
   labs(x = &quot;&quot;, y = &quot;&quot;,
-       title = &quot;The coasts have gotten more expensive&quot;,
-       caption = &quot;Freddie Mac House Price Index by State,\ndeflated by US BLS, Consumer Price Index&quot;,
-       fill = &quot;Real House Price Growth\nSince Jan 1975&quot;) </code></pre>
+       title = &quot;The most well educated counties in America (2013-2017)&quot;,
+       subtitle = &quot;#1 is Falls Church, VA&quot;,
+       caption = &quot;Source: USDA, Economic Research Service&quot;,
+       fill = &quot;% Adults 25+ with\nBachelor&#39;s Degree&quot;) </code></pre>
 <p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 </div>
 <div id="specific-to-a-state" class="section level1">
 <h1>Specific to a state</h1>
-<pre class="r"><code>dt3 %&gt;% 
-  mutate(county_fips = paste0(str_pad(FIPS_State_Code, 2, &quot;left&quot;,0),
-                              str_pad(FIPS_County_Code, 3, &quot;left&quot;,0))) %&gt;% 
-  left_join(counties, by = c(&quot;county_fips&quot;)) %&gt;%
+<p>Educational attainment, filtered down to the state level.</p>
+<pre class="r"><code>data(counties)
+url1 &lt;- &quot;https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5&quot;
+GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))</code></pre>
+<pre><code>## Response [https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5]
+##   Date: 2019-11-15 17:53
+##   Status: 200
+##   Content-Type: application/vnd.ms-excel
+##   Size: 1.46 MB
+## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//Rtmpw1nxrY/file164602151e46d.xls</code></pre>
+<pre class="r"><code>ed &lt;- readxl::read_excel(tf,skip=4) %&gt;%
+  janitor::clean_names()
+
+ed %&gt;% 
+  select(fips_code, state, area_name, percent_of_adults_with_a_bachelors_degree_or_higher_2013_17) %&gt;%
+  inner_join(counties, by = c(&quot;fips_code&quot; = &quot;county_fips&quot;)) %&gt;%
   filter(state_name == &quot;Washington&quot;) %&gt;%
-  ggplot(mapping = aes(long, lat, group = group, fill = log(real_hpi))) +
-  geom_polygon(data = subset(states, state_name == &quot;Washington&quot;), 
-               aes(long, lat, group = group), fill = &quot;#f0f0f5&quot;, color = &quot;white&quot;,
+  ggplot(mapping = aes(long, lat, group = group, fill = percent_of_adults_with_a_bachelors_degree_or_higher_2013_17)) +
+  geom_polygon(data = states, aes(long, lat, group = group), fill = &quot;#f0f0f5&quot;, color = &quot;white&quot;,
                size = 0) + 
   geom_polygon(color = &quot;#ffffff&quot;, size =0) +
   coord_map(projection =&quot;albers&quot;, lat0 = 39, lat1 =45) + 
   viridis::scale_fill_viridis(option = &quot;E&quot;,
-                              breaks=c(log(50),log(100),log(200),log(400)),
-                              labels=c(&quot;-50%&quot;,&quot;0%&quot;,&quot;+100%&quot;,&quot;+200%&quot;),
-                              limits=c(log(50),log(400))) + 
+                              breaks = seq(20,100,20),
+                              labels = c(&quot;20%&quot;,&quot;40%&quot;,&quot;60%&quot;,&quot;80%&quot;,&quot;100%&quot;)) +
   theme_twg(grid = FALSE) + 
   theme(legend.title = element_text(),
         axis.text = element_blank(),
         legend.key.width = unit(.2, &#39;in&#39;),
         legend.position = &quot;right&quot;) +
   labs(x = &quot;&quot;, y = &quot;&quot;,
-       title = &quot;Looking at Washington&quot;,
-       caption = &quot;Freddie Mac House Price Index for WA,\ndeflated by US BLS, Consumer Price Index&quot;,
-       fill = &quot;Real House Price Growth\nSince Jan 1975&quot;) </code></pre>
+       title = &quot;The most well educated counties in America (2013-2017)&quot;,
+       subtitle = &quot;#1 is Falls Church, VA&quot;,
+       caption = &quot;Source: USDA, Economic Research Service&quot;,
+       fill = &quot;% Adults 25+ with\nBachelor&#39;s Degree&quot;) </code></pre>
 <p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 <div id="geofacet-map" class="section level1">
