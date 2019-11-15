@@ -27,6 +27,7 @@ output:
 <li><a href="#map-at-the-county-level">Map at the County Level</a></li>
 <li><a href="#specific-to-a-state">Specific to a state</a></li>
 <li><a href="#geofacet-map">Geofacet map</a></li>
+<li><a href="#hexmaps">Hexmaps</a></li>
 </ul>
 </div>
 
@@ -35,7 +36,7 @@ output:
 <h2>Packages used:</h2>
 <p>This is using the <code>urbnmapr</code> <a href="https://medium.com/@urban_institute/how-to-create-state-and-county-maps-easily-in-r-577d29300bb2" target="_blank">package</a> for state and county choropleth maps.</p>
 <pre class="r"><code>devtools::install_github(“UrbanInstitute/urbnmapr”)
-pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr)</code></pre>
+pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr, geofacet)</code></pre>
 </div>
 <div id="get-the-data-necessary" class="section level2">
 <h2>Get the data necessary</h2>
@@ -162,4 +163,59 @@ ggplot(subset(dt2, GEO_Name != &quot;DC&quot;),
        caption = &quot;Source: U.S. Census Bureau, American Community Survey&quot;,
        y = &quot;&quot;, x = &quot;&quot;)</code></pre>
 <p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="hexmaps" class="section level1">
+<h1>Hexmaps</h1>
+<pre class="r"><code>pacman::p_load(tidyverse, rgdal, rgeos, rvest)
+# download the geojson file from here &quot;https://team.carto.com/u/andrew/tables/andrew.us_states_hexgrid/public/map&quot;
+# load the map data 
+us &lt;- readOGR(&quot;data/mapping/us_states_hexgrid.geojson&quot;, &quot;OGRGeoJSON&quot;)</code></pre>
+<pre class="r"><code>pacman::p_load(tidyverse, rgdal, rgeos, rvest)
+# set up the centers and fortify for use in ggplot
+centers &lt;- cbind.data.frame(data.frame(gCentroid(us, byid=TRUE), id=us@data$iso3166_2))
+us_map &lt;- fortify(us, region = &quot;iso3166_2&quot;)
+
+# grab state names and abbreviations for use after scraping 
+library(urbnmapr)
+data(states)
+
+states &lt;- states %&gt;% distinct(state_name, .keep_all = TRUE) %&gt;% 
+  dplyr::select(state_abbv, state_name)
+
+# scrape a site for data 
+url &lt;- &quot;http://worldpopulationreview.com/states/alcohol-consumption-by-state/&quot;
+drink &lt;- url %&gt;%
+  read_html() %&gt;%
+  html_nodes(xpath = &#39;//*[@id=&quot;dataTable&quot;]/div[1]/div/div/div/div/div[2]/table&#39;) %&gt;%
+  html_table(header = TRUE) %&gt;% 
+  flatten_df() %&gt;% 
+  janitor::clean_names() %&gt;% 
+  left_join(states, by = c(&quot;state&quot; = &quot;state_name&quot;))
+
+# put data into the map data 
+us@data &lt;- us@data %&gt;% 
+  left_join(drink, by = c(&quot;iso3166_2&quot; = &quot;state_abbv&quot;))
+
+# plot 
+ggplot() + geom_map(data=us_map, map=us_map,
+                    aes(x=long, y=lat, map_id=id),
+                    color=&quot;white&quot;, size=0.5) +
+  geom_map(data=us@data, map=us_map,
+                    aes(fill=alcohol_consumption_in_gallons, map_id=iso3166_2)) +
+  geom_map(data=us@data, map=us_map,
+                    aes(map_id=iso3166_2),
+                    fill=&quot;#ffffff&quot;, alpha=0, color=&quot;white&quot;,
+                    show.legend=FALSE) +
+  geom_text(data=centers, aes(label=id, x=x, y=y), color=&quot;white&quot;, size=3) +
+  viridis::scale_fill_viridis(option = &quot;E&quot;, na.value=&quot;#7f7f7f&quot;, trans = &quot;log&quot;,
+                              breaks = c(1,2,3,4),
+                              labels = c(&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,&quot;4&quot;),
+                              name = &quot;Gallons/person&quot;) + 
+  coord_map() + 
+  theme_twg(grid = FALSE) + 
+  theme(axis.text = element_blank()) + 
+  labs(x = &quot;&quot;, y = &quot;&quot;,
+       title = &quot;Alcohol Consumption by State per Capita, 2019&quot;,
+       caption = &quot;Source: World Population Review&quot;)</code></pre>
+<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 </div>

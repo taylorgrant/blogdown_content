@@ -19,13 +19,15 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr)
+pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr, rgeos, rgdal, rvest)
 dt <- readRDS("~/R/blogdown_content/static/data/mapping/dt.RDS")
 dt2 <- readRDS("~/R/blogdown_content/static/data/mapping/dt2.RDS")
 dt3 <- readRDS("~/R/blogdown_content/static/data/mapping/dt3.RDS")
 migration <- readRDS("~/R/blogdown_content/static/data/mapping/migration.RDS")
 # load theme
 devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
+# map data 
+us <- readOGR("~/R/blogdown_content/static/data/mapping/us_states_hexgrid.geojson", "OGRGeoJSON")
 ```
 
 Mapping based on the Housing Price Index from Freddie Mac
@@ -35,7 +37,7 @@ This is using the `urbnmapr` [package](https://medium.com/@urban_institute/how-t
 
 ```{r eval = FALSE}
 devtools::install_github(“UrbanInstitute/urbnmapr”)
-pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr)
+pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr, geofacet)
 ```
 
 ## Get the data necessary
@@ -169,4 +171,63 @@ ggplot(migration, aes(x=year, y = net, ymin = 0, ymax = net)) +
   labs(title = "Net Migration per State 2010-2018",
        caption = "Source: U.S. Census Bureau, American Community Survey",
        y = "", x = "")
+```
+
+# Hexmaps 
+
+```{r, eval = FALSE}
+pacman::p_load(tidyverse, rgdal, rgeos, rvest)
+# download the geojson file from here "https://team.carto.com/u/andrew/tables/andrew.us_states_hexgrid/public/map"
+# load the map data 
+us <- readOGR("data/mapping/us_states_hexgrid.geojson", "OGRGeoJSON")
+```
+
+```{r, warning=FALSE}
+pacman::p_load(tidyverse, rgdal, rgeos, rvest)
+# set up the centers and fortify for use in ggplot
+centers <- cbind.data.frame(data.frame(gCentroid(us, byid=TRUE), id=us@data$iso3166_2))
+us_map <- fortify(us, region = "iso3166_2")
+
+# grab state names and abbreviations for use after scraping 
+library(urbnmapr)
+data(states)
+
+states <- states %>% distinct(state_name, .keep_all = TRUE) %>% 
+  dplyr::select(state_abbv, state_name)
+
+# scrape a site for data 
+url <- "http://worldpopulationreview.com/states/alcohol-consumption-by-state/"
+drink <- url %>%
+  read_html() %>%
+  html_nodes(xpath = '//*[@id="dataTable"]/div[1]/div/div/div/div/div[2]/table') %>%
+  html_table(header = TRUE) %>% 
+  flatten_df() %>% 
+  janitor::clean_names() %>% 
+  left_join(states, by = c("state" = "state_name"))
+
+# put data into the map data 
+us@data <- us@data %>% 
+  left_join(drink, by = c("iso3166_2" = "state_abbv"))
+
+# plot 
+ggplot() + geom_map(data=us_map, map=us_map,
+                    aes(x=long, y=lat, map_id=id),
+                    color="white", size=0.5) +
+  geom_map(data=us@data, map=us_map,
+                    aes(fill=alcohol_consumption_in_gallons, map_id=iso3166_2)) +
+  geom_map(data=us@data, map=us_map,
+                    aes(map_id=iso3166_2),
+                    fill="#ffffff", alpha=0, color="white",
+                    show.legend=FALSE) +
+  geom_text(data=centers, aes(label=id, x=x, y=y), color="white", size=3) +
+  viridis::scale_fill_viridis(option = "E", na.value="#7f7f7f", trans = "log",
+                              breaks = c(1,2,3,4),
+                              labels = c("1","2","3","4"),
+                              name = "Gallons/person") + 
+  coord_map() + 
+  theme_twg(grid = FALSE) + 
+  theme(axis.text = element_blank()) + 
+  labs(x = "", y = "",
+       title = "Alcohol Consumption by State per Capita, 2019",
+       caption = "Source: World Population Review")
 ```
