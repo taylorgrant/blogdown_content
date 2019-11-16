@@ -21,25 +21,30 @@ output:
 
 <div id="TOC">
 <ul>
-<li><a href="#packages-used">Packages used:</a></li>
-<li><a href="#get-the-data-necessary">Get the data necessary</a></li>
-<li><a href="#map-at-the-state-level">Map at the state level</a></li>
-<li><a href="#map-at-the-county-level">Map at the County Level</a></li>
-<li><a href="#specific-to-a-state">Specific to a state</a></li>
+<li><a href="#state-level-maps">State Level Maps</a><ul>
+<li><a href="#get-the-data">Get the data</a></li>
+<li><a href="#state-map">State map</a></li>
+</ul></li>
+<li><a href="#mapping-at-the-county-level">Mapping at the County Level</a><ul>
+<li><a href="#reading-in-the-data">Reading in the data</a></li>
+</ul></li>
+<li><a href="#mapping-a-single-state-at-county-level">Mapping a Single State at County Level</a></li>
 <li><a href="#geofacet-map">Geofacet map</a></li>
-<li><a href="#hexmaps">Hexmaps</a></li>
+<li><a href="#hexmaps">Hexmaps</a><ul>
+<li><a href="#download-the-geojson-file">Download the geojson file</a></li>
+<li><a href="#grab-some-data-to-use-as-a-fill">Grab some data to use as a fill</a></li>
+</ul></li>
 </ul>
 </div>
 
-<div id="packages-used" class="section level2">
-<h2>Packages used:</h2>
-<p>This is using the <code>urbnmapr</code> <a href="https://medium.com/@urban_institute/how-to-create-state-and-county-maps-easily-in-r-577d29300bb2" target="_blank">package</a> for state and county choropleth maps.</p>
-<pre class="r"><code>devtools::install_github(“UrbanInstitute/urbnmapr”)
-pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr, geofacet)</code></pre>
-<p>At the state level, let’s map data on the change in the cost of housing using the Housing Price Index from Freddie Mac.</p>
-</div>
-<div id="get-the-data-necessary" class="section level2">
-<h2>Get the data necessary</h2>
+<p>Trying to pull in as many map examples as possible over time. For a lot of the choropleth maps I’m using the <code>urbnmapr</code> <a href="https://medium.com/@urban_institute/how-to-create-state-and-county-maps-easily-in-r-577d29300bb2" target="_blank">package</a>.</p>
+<pre class="r"><code>pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr, geofacet)</code></pre>
+<p>For a first example, we’ll use the Housing Price Index from Freddie Mac.</p>
+<div id="state-level-maps" class="section level1">
+<h1>State Level Maps</h1>
+<div id="get-the-data" class="section level3">
+<h3>Get the data</h3>
+<p>Use <code>data.table</code> to read in the HPI data, but then immediately convert it to a dataframe to clean it with <code>dplyr</code>.</p>
 <pre class="r"><code># download house price data (Freddie Mac)
 dt &lt;- data.table::fread(&quot;http://www.freddiemac.com/fmac-resources/research/docs/fmhpi_master_file.csv&quot;)
 # get CPI data (FRED)
@@ -70,8 +75,8 @@ dt3 &lt;- dt %&gt;%
 # load theme for ggplot 
 devtools::source_url(&quot;https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R&quot;)</code></pre>
 </div>
-<div id="map-at-the-state-level" class="section level1">
-<h1>Map at the state level</h1>
+<div id="state-map" class="section level3">
+<h3>State map</h3>
 <pre class="r"><code># graph 
 ggplot(subset(dt2, GEO_Name != &quot;DC&quot;), 
        mapping = aes(long, lat, group = group, fill = log(real_hpi))) + 
@@ -92,23 +97,19 @@ ggplot(subset(dt2, GEO_Name != &quot;DC&quot;),
        fill = &quot;Real House Price Growth\nSince Jan 1975&quot;)  </code></pre>
 <p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
-<div id="map-at-the-county-level" class="section level1">
-<h1>Map at the County Level</h1>
-<p>Let’s get data on educational achievement at the county level and map it. Again, using the <code>urbnmapr</code> package to bring in the shapefile data.</p>
-<pre class="r"><code># get the data and clean 
-data(counties)
+</div>
+<div id="mapping-at-the-county-level" class="section level1">
+<h1>Mapping at the County Level</h1>
+<p>Here, we’ll use educational achievement data from the USDA.Again, using the <code>urbnmapr</code> package to bring in the shapefile data.</p>
+<div id="reading-in-the-data" class="section level3">
+<h3>Reading in the data</h3>
+<pre class="r"><code>data(counties)
 url1 &lt;- &quot;https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5&quot;
-GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))</code></pre>
-<pre><code>## Response [https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5]
-##   Date: 2019-11-15 18:04
-##   Status: 200
-##   Content-Type: application/vnd.ms-excel
-##   Size: 1.46 MB
-## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpHYFKO6/file16a9653c301a6.xls</code></pre>
-<pre class="r"><code>ed &lt;- readxl::read_excel(tf,skip=4) %&gt;%
-  janitor::clean_names()
-
-ed %&gt;% 
+GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))
+ed &lt;- readxl::read_excel(tf,skip=4) %&gt;%
+  janitor::clean_names()</code></pre>
+<p>Joining by the “counties” shapefile rather than “states” and doing so within the pipe.</p>
+<pre class="r"><code>ed %&gt;% 
   select(fips_code, state, area_name, percent_of_adults_with_a_bachelors_degree_or_higher_2013_17) %&gt;%
   inner_join(counties, by = c(&quot;fips_code&quot; = &quot;county_fips&quot;)) %&gt;%
   ggplot(mapping = aes(long, lat, group = group, fill = percent_of_adults_with_a_bachelors_degree_or_higher_2013_17)) +
@@ -129,24 +130,18 @@ ed %&gt;%
        subtitle = &quot;#1 is Falls Church, VA&quot;,
        caption = &quot;Source: USDA, Economic Research Service&quot;,
        fill = &quot;% Adults 25+ with\nBachelor&#39;s Degree&quot;) </code></pre>
-<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
-<div id="specific-to-a-state" class="section level1">
-<h1>Specific to a state</h1>
-<p>We can filter down to the state level. Be sure to subset the polygon data…</p>
+</div>
+<div id="mapping-a-single-state-at-county-level" class="section level1">
+<h1>Mapping a Single State at County Level</h1>
+<p>To map a single state, filter the dataset <em>and</em> the <code>geom_polygon</code></p>
 <pre class="r"><code>data(counties)
 url1 &lt;- &quot;https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5&quot;
-GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))</code></pre>
-<pre><code>## Response [https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5]
-##   Date: 2019-11-15 18:04
-##   Status: 200
-##   Content-Type: application/vnd.ms-excel
-##   Size: 1.46 MB
-## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpHYFKO6/file16a9654bcba13.xls</code></pre>
-<pre class="r"><code>ed &lt;- readxl::read_excel(tf,skip=4) %&gt;%
-  janitor::clean_names()
-
-ed %&gt;% 
+GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))
+ed &lt;- readxl::read_excel(tf,skip=4) %&gt;%
+  janitor::clean_names()</code></pre>
+<pre class="r"><code>ed %&gt;% 
   select(fips_code, state, area_name, percent_of_adults_with_a_bachelors_degree_or_higher_2013_17) %&gt;%
   inner_join(counties, by = c(&quot;fips_code&quot; = &quot;county_fips&quot;)) %&gt;%
   filter(state_name == &quot;Washington&quot;) %&gt;%
@@ -168,11 +163,11 @@ ed %&gt;%
        subtitle = &quot;#1 in WA is King County&quot;,
        caption = &quot;Source: USDA, Economic Research Service&quot;,
        fill = &quot;% Adults 25+ with\nBachelor&#39;s Degree&quot;) </code></pre>
-<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>
 <div id="geofacet-map" class="section level1">
 <h1>Geofacet map</h1>
-<p>Map each state as a time series. In this case, looking at net migration flows from each state from 2010-2018.</p>
+<p>The <code>geofacet</code> package is sort of fun to see a dataset for each state (lots of other countries as well). In this case, we’ll map the net migration flows from each state from 2010-2018.</p>
 <pre class="r"><code>ggplot(migration, aes(x=year, y = net, ymin = 0, ymax = net)) +
   geom_line(color = &quot;dodgerblue&quot;) +
   geom_hline(yintercept = 0, col = &quot;black&quot;, linetype = &quot;dotted&quot;) +
@@ -186,14 +181,19 @@ ed %&gt;%
   labs(title = &quot;Net Migration per State 2010-2018&quot;,
        caption = &quot;Source: U.S. Census Bureau, American Community Survey&quot;,
        y = &quot;&quot;, x = &quot;&quot;)</code></pre>
-<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 </div>
 <div id="hexmaps" class="section level1">
 <h1>Hexmaps</h1>
+<div id="download-the-geojson-file" class="section level3">
+<h3>Download the geojson file</h3>
 <pre class="r"><code>pacman::p_load(tidyverse, rgdal, rgeos, rvest)
 # download the geojson file from here &quot;https://team.carto.com/u/andrew/tables/andrew.us_states_hexgrid/public/map&quot;
 # load the map data 
 us &lt;- readOGR(&quot;data/mapping/us_states_hexgrid.geojson&quot;, &quot;OGRGeoJSON&quot;)</code></pre>
+</div>
+<div id="grab-some-data-to-use-as-a-fill" class="section level3">
+<h3>Grab some data to use as a fill</h3>
 <pre class="r"><code>pacman::p_load(tidyverse, rgdal, rgeos, rvest)
 # set up the centers and fortify for use in ggplot
 centers &lt;- cbind.data.frame(data.frame(gCentroid(us, byid=TRUE), id=us@data$iso3166_2))
@@ -241,5 +241,6 @@ ggplot() + geom_map(data=us_map, map=us_map,
   labs(x = &quot;&quot;, y = &quot;&quot;,
        title = &quot;Alcohol Consumption by State per Capita, 2019&quot;,
        caption = &quot;Source: World Population Review&quot;)</code></pre>
-<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
 </div>

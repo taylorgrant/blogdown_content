@@ -30,17 +30,19 @@ devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/mast
 us <- readOGR("~/R/blogdown_content/static/data/mapping/us_states_hexgrid.geojson", "OGRGeoJSON")
 ```
 
-## Packages used:
-This is using the `urbnmapr` [package](https://medium.com/@urban_institute/how-to-create-state-and-county-maps-easily-in-r-577d29300bb2){target="_blank"} for state and county choropleth maps. 
+Trying to pull in as many map examples as possible over time. For a lot of the choropleth maps I'm using the `urbnmapr` [package](https://medium.com/@urban_institute/how-to-create-state-and-county-maps-easily-in-r-577d29300bb2){target="_blank"}. 
 
 ```{r eval = FALSE}
-devtools::install_github(“UrbanInstitute/urbnmapr”)
 pacman::p_load(tidyverse, urbnmapr, geofacet, readxl, httr, geofacet)
 ```
 
-At the state level, let's map data on the change in the cost of housing using the Housing Price Index from Freddie Mac. 
+For a first example, we'll use the Housing Price Index from Freddie Mac.
 
-## Get the data necessary
+# State Level Maps 
+
+### Get the data 
+
+Use `data.table` to read in the HPI data, but then immediately convert it to a dataframe to clean it with `dplyr`. 
 ```{r, eval = FALSE}
 # download house price data (Freddie Mac)
 dt <- data.table::fread("http://www.freddiemac.com/fmac-resources/research/docs/fmhpi_master_file.csv")
@@ -73,7 +75,7 @@ dt3 <- dt %>%
 devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
 ```
 
-# Map at the state level 
+### State map 
 
 ```{r}
 # graph 
@@ -97,17 +99,30 @@ ggplot(subset(dt2, GEO_Name != "DC"),
 
 ```
 
-# Map at the County Level
+# Mapping at the County Level 
 
-Let's get data on educational achievement at the county level and map it. Again, using the `urbnmapr` package to bring in the shapefile data. 
-```{r, message=FALSE}
+Here, we'll use educational achievement data from the USDA.Again, using the `urbnmapr` package to bring in the shapefile data. 
+
+```{r, echo = FALSE, results = 'hide'}
 # get the data and clean 
 data(counties)
 url1 <- "https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5"
 GET(url1, write_disk(tf <- tempfile(fileext = ".xls")))
 ed <- readxl::read_excel(tf,skip=4) %>%
   janitor::clean_names()
+```
 
+### Reading in the data
+```{r, eval = FALSE}
+data(counties)
+url1 <- "https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5"
+GET(url1, write_disk(tf <- tempfile(fileext = ".xls")))
+ed <- readxl::read_excel(tf,skip=4) %>%
+  janitor::clean_names()
+```
+
+Joining by the "counties" shapefile rather than "states" and doing so within the pipe. 
+```{r, message = FALSE}
 ed %>% 
   select(fips_code, state, area_name, percent_of_adults_with_a_bachelors_degree_or_higher_2013_17) %>%
   inner_join(counties, by = c("fips_code" = "county_fips")) %>%
@@ -131,17 +146,27 @@ ed %>%
        fill = "% Adults 25+ with\nBachelor's Degree") 
 ```
 
-# Specific to a state
+# Mapping a Single State at County Level
 
-We can filter down to the state level. Be sure to subset the polygon data... 
+To map a single state, filter the dataset *and* the `geom_polygon`
 
-```{r, message=FALSE}
+```{r, echo = FALSE,results='hide'}
 data(counties)
 url1 <- "https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5"
 GET(url1, write_disk(tf <- tempfile(fileext = ".xls")))
 ed <- readxl::read_excel(tf,skip=4) %>%
   janitor::clean_names()
+```
 
+```{r, eval = FALSE}
+data(counties)
+url1 <- "https://www.ers.usda.gov/webdocs/DataFiles/48747/Education.xls?v=1754.5"
+GET(url1, write_disk(tf <- tempfile(fileext = ".xls")))
+ed <- readxl::read_excel(tf,skip=4) %>%
+  janitor::clean_names()
+```
+
+```{r, message = FALSE}
 ed %>% 
   select(fips_code, state, area_name, percent_of_adults_with_a_bachelors_degree_or_higher_2013_17) %>%
   inner_join(counties, by = c("fips_code" = "county_fips")) %>%
@@ -168,7 +193,7 @@ ed %>%
 
 # Geofacet map
 
-Map each state as a time series. In this case, looking at net migration flows from each state from 2010-2018. 
+The `geofacet` package is sort of fun to see a dataset for each state (lots of other countries as well). In this case, we'll map the net migration flows from each state from 2010-2018. 
 
 ```{r, fig.height=7}
 ggplot(migration, aes(x=year, y = net, ymin = 0, ymax = net)) +
@@ -188,12 +213,16 @@ ggplot(migration, aes(x=year, y = net, ymin = 0, ymax = net)) +
 
 # Hexmaps 
 
+### Download the geojson file
+
 ```{r, eval = FALSE}
 pacman::p_load(tidyverse, rgdal, rgeos, rvest)
 # download the geojson file from here "https://team.carto.com/u/andrew/tables/andrew.us_states_hexgrid/public/map"
 # load the map data 
 us <- readOGR("data/mapping/us_states_hexgrid.geojson", "OGRGeoJSON")
 ```
+
+### Grab some data to use as a fill
 
 ```{r, warning=FALSE}
 pacman::p_load(tidyverse, rgdal, rgeos, rvest)
