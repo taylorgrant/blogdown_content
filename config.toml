@@ -168,6 +168,13 @@ enableEmoji = true
   # Your favicon path, default is "/favicon.png"
   favicon = "https://res.cloudinary.com/dn83gtg0l/image/upload/v1519580839/favicon.png"
 
+  # Set to true to disable code folding
+  disable_codefolding = false
+  # Set to "hide" or "show" all codes by default
+  codefolding_show = "show"
+  # Set to true to exclude the "Show/hide all" button
+  codefolding_nobutton = false
+  
   # Header configuration
   # The link at the right of the header is customizable
   # You can add a link (as an icon) at the right of the header instead of the author's gravatar image or author's picture.
@@ -180,6 +187,7 @@ enableEmoji = true
   # they have to be referred from static root. Example
   # [[params.customCSS]]
   #   href = "css/mystyle.css"
+  custom_css = ["codefolding.css"]
 
   # Custom JS. Put here your custom JS files. They are loaded after the theme JS;
   # they have to be referred from static root. Example
