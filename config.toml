@@ -106,7 +106,6 @@ enableEmoji = true
   url = "/index.xml"
 
 [params]
-  highlightjsLang = ["r", "yaml"]
   # Customize date format use to render blog post date, categories and other
   # You must use date format used by Go Time package https://golang.org/pkg/time/
   # Months (not work with short month like "jan", "feb", etc) are translated if translation exists on i18n folders
@@ -118,8 +117,8 @@ enableEmoji = true
 
   # Syntax highlighter, possible choice between: "highlight.js" (recommanded) and "prism.js" (experimental)
   # You can comment it to disable syntax highlighting
-  # syntaxHighlighter = "highlight.js"
-
+  syntaxHighlighter = "highlight.js"
+  customJS = ["https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"]
   # Hide sidebar on all article page to let article take full width to improve reading, and enjoy wide images and cover images. (true: enable, false: disable)
   clearReading = true
 
