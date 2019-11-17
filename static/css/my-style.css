@@ -2,9 +2,10 @@
     max-width: 850px
 }
 
-/* @import url('https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css'); may conflict with default theme!*/
+/*@import url('https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css');*/
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons'); /*google icons*/
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'); /*font awesome icons*/
+/*alpha: http://www.color-hex.com/color/972d1d*/
 
 .input-lg {
   font-size: 30px;
@@ -13,11 +14,12 @@
   font-size: 20px;
 }
 .font-sm {
-    font-size: 0.7em;
+	font-size: 0.7em;
 }
 .texttt {
   font-family: monospace;
 }
+
 .alert {
 padding: 15px;
 margin-bottom: 20px;
@@ -29,6 +31,11 @@ color: #3c763d;
 background-color: #dff0d8;
 border-color: #d6e9c6;
 }
+.alert-warning{
+  color:#8a6d3b;
+  background-color:#fcf8e3;
+  border-color:#faebcc
+}
 .alert-danger,
 .alert-error {
   color: #b94a48;
@@ -39,29 +46,191 @@ border-color: #d6e9c6;
   color: #3a87ad;
   background-color: #d9edf7;
   border-color: #bce8f1;
-}
+} 
 .alert-gray {
   background-color: #f2f3f2;
   border-color: #f2f3f2;
 }
 
-/*style for printing*/
 @media print {
-    .noPrint {
-       display:none;
+	.noPrint {
+	   display:none;
    }
-    }
+	}
+
 
 /*link formatting*/
-a:link {
-    color: #478ca7;
-    text-decoration: none;
+:root {
+    --lightBlue: #478ca7; 
+    --lightBlue-hover: #82b5c9; 
+    --lightBlue-alpha: rgba(71, 140, 167, 0.3); 
+    
+    --lightGreen: #4ea500; 
+    --lightGreen-hover: #73c46c; 
+    --lightGreen-alpha03: rgba(78, 165, 0, 0.3); 
+    
+    --darkRed: #951d2d;  
+    --darkRed-alpha: rgba(149, 29, 45, 0.3); 
+    --lightRed: #c13c40;  /*#c13c40*/
+    --lightRed-hover: #cf8383; 
+    --lightRed-alpha: rgba(193, 60, 64, 0.3); 
+    
+    --lightOrange: #d7b572;
+    --darkOrange: #cc8800; /*#d7b572*/
+    --darkOrange-alpha: rgba(204, 136, 0, 0.3); 
+    --darkOrange2: #972D1D;
+    --darkOrange-alpha2: rgba(151, 45, 29, 0.3); 
+    --darkPink: #a93241;
+    --darkPink-alpha: rgba(169, 50, 65, 0.3); 
+    
+    --lightGrey: #ebebeb;  /*default sidebar link color #ebebeb, rgba(235, 235, 235)*/ 
+    --lightGrey-alpha03: rgba(235, 235, 235, 0.3);  
+    --lightGrey-alpha06: rgba(235, 235, 235, 0.6);  
+    --lightGrey-alpha08: rgba(235, 235, 235, 0.8);  
+    --darkGrey-code: #8b9fa7; /*#657b83*/
+    --lightGrey-background: #f7f8f8;
+    --lightGrey-code: #d6dbdb; /*#bbc4c4*/
+    --darkGrey-background: #3b4444;
+    --darkGrey-background-alpha08: rgba(59, 68, 68, 0.8); 
+    --darkGrey-background-alpha06: rgba(59, 68, 68, 0.6); 
+    --darkGrey-background-alpha03: rgba(59, 68, 68, 0.3); 
+    --white: #ffffff;
+    --white-alpha: rgba(255, 255, 255, 0.95); 
+    --transparent: rgba(255, 255, 255, 0); 
+}
+
+/*general link formating*/
+a:link, a:visited  {
+	color: var(--lightRed);
+	text-decoration: none;
 } 
-a:visited {
-    color: #478ca7;
-    text-decoration: none;
+a:hover{
+	color: var(--lightRed-hover);
+	text-decoration: none;
 }
-a:hover {
-    color: #82b5c9;
-    text-decoration: none;
+a:hover > .tag--primary {
+   color: var(--lightRed);
 }
+.tag--primary, a.tag--primary {
+   color: var(--lightRed) !important; 
+   border-color: var(--lightRed) !important; 
+}
+
+
+/*sidebar link formatting*/
+.sidebar-profile, .sidebar-buttons, 
+#about-card{  
+   background-color: var(--darkGrey-background-alpha03) !important; 
+   border-radius: 10px;
+   /*sidebar-button for standalone btns*/
+}
+.sidebar-profile-name, .sidebar-profile-bio, .sidebar-button-icon, .sidebar-button-desc, #about, #about-card-name, #about-card-bio, #about-card-job, #about-card-location, #about-btn-close{
+   color: var(--white) !important;
+}
+
+
+/*main panel blog front*/
+.hasCoverMetaIn{ 
+   background-color: var(--white); 
+   overflow:auto;
+}
+
+/*posts background*/
+.hasCover, .post-header, .post-content, .post-footer{ 
+   background-color: var(--white); 
+   padding: 10px;
+   border-radius: 10px;
+   box-sizing: border-box;
+   overflow:auto;
+}
+.post-header{
+   padding: 10px;
+   border-radius: 10px;
+}
+.post-header-cover--full > .main-content-wrap, .post-header-cover > .main-content-wrap{
+   background-color: var(--transparent) !important; 
+}
+
+/*post excerpts*/
+.postShorten, #footer{ /*.postShorten-wrap*/
+   background-color: var(--white) !important; 
+   padding: 10px;
+   border-radius: 10px;
+   border-bottom-style: none !important; 
+   box-sizing: border-box;
+}
+.btn--default, .btn--disabled{ /*.postShorten-wrap*/
+   background-color: var(--white) !important; 
+   padding: 10px;
+   border-radius: 10px;
+   box-sizing: border-box;
+}
+/*post excerpts text color*/
+.postShorten-wrap > div, .postShorten-wrap > div > .postShorten-meta, .postShorten-wrap > div > .postShorten-meta > a{ 
+   color: var(--darkGrey-background-alpha08) !important; 
+}
+.postShorten-wrap > div h1{ 
+   color: var(--darkGrey-background-alpha06) !important; 
+}
+/*thumbnail*/
+.postShorten-thumbnailimg{
+   border-radius: 5px;
+}
+
+
+/*highlight.js small tweaks for code snippets*/
+.hljs, .quote, .link .class .xml{
+   background-color: var(--darkGrey-background) !important; 
+   color: var(--lightGrey-code) !important; /*original color: #657b83*/
+   border-radius: 10px;
+}
+
+.hljs > .comment{
+   color: var(--darkGrey-code) !important;
+}
+.hljs > .keyword{
+   color: var(--lightRed-hover) !important;
+}
+.keyword{
+   color: var(--lightRed-hover) !important;
+}
+.hljs > .function{
+   color: var(--lightRed-hover) !important;
+}
+.hljs > .literal{ /*bool true-false*/
+   color: var(--lightOrange) !important;
+}
+.hljs > .number{
+   color: var(--lightGreen-hover) !important;
+}
+.hljs > .title{
+   color: var(--lightBlue-hover) !important;
+}
+.hljs > .string{
+   color: var(--lightBlue-hover) !important;
+}
+.hljs > .string > .vglnk { /*links inside code*/
+   color: var(--lightBlue-code) !important;
+}
+.hljs > .tag{
+   color: var(--lightGrey-code) !important;
+}
+.hljs > .tag{
+   color: var(--lightGrey-code) !important;
+}
+.hljs > .tag > .name{
+   color: var(--lightRed-hover) !important;
+}
+.hljs > .tag > .attr{
+   color: var(--lightOrange) !important;
+}
+.html > .hljs > .tag > .string{ /*links inside code*/
+   color: var(--lightBlue-hover) !important;
+}
+.html > .hljs > .tag > > .vglnk { /*links inside code*/
+   color: var(--lightBlue-hover) !important;
+}
+
+
+
+
