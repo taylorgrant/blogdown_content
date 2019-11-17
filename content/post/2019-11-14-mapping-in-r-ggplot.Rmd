@@ -5,8 +5,6 @@ date: '2019-11-14'
 slug: mapping-in-r-ggplot
 categories:
   - R
-  - lesson
-  - mapping
 tags:
   - ggplot
   - mapping

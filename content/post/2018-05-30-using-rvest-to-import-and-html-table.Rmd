@@ -4,7 +4,6 @@ author: ''
 date: '2018-05-30'
 slug: using-rvest-to-import-and-html-table
 categories:
-  - lesson
   - R
 tags:
   - rvest

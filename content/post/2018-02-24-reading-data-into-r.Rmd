@@ -4,7 +4,6 @@ date: '2019-11-15'
 slug: reading-data-into-r
 categories:
   - R
-  - lesson
 tags: 
   - data ingest
   - rvest

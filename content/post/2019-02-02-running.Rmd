@@ -3,7 +3,6 @@ title: Running
 author: ''
 date: '2019-09-04'
 categories:
-  - analysis
   - R
 tags:
   - highcharter
