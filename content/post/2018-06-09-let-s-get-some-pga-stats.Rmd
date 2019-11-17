@@ -80,7 +80,7 @@ ott <- url_1 %>% read_html() %>%
     html_attr('href') %>% 
   as_tibble() %>% 
   mutate(url_loc = row_number())
-ott[c(1:4, 35:38, 80:83),1:2]
+ott[c(1:4, 35:38, 80:82),1:2]
 ```
 It's clear that `rvest` is working from top to bottom as it collects all of the links. Links 3 and 4 are links to two of the category pages, and links 80 through 83 are tied to social icons found in the footer of the page. Our interest is in the links in the middle that include `/stats/stat/`. These are our statistics. 
 
@@ -262,9 +262,10 @@ Or you can simply unnest twice and retrieve all data.
 
 ```{r, echo = TRUE}
 dd %>% 
-  unnest() %>% 
-  unnest() %>% 
-  tail(10) %>% 
+  unnest() %>%
+  filter(year == 2018) %>%
+  unnest(cols = data) %>% 
+  head(10) %>%
   knitr::kable()
 ```
 
@@ -289,14 +290,15 @@ Strokes Gained is a relatively new statistic that was only first calculated and 
 sg2 %>% filter(title == "SG: Tee-to-Green") %>% unnest()
 ```
 
-Very cool! The function simply returns empty tibbles, and when we unnest for a second time, these are simply ignored. So, who led the PGA Tour in Strokes Gained in 2017, both off the tee and from tee to green?
+Very cool! The function simply returns empty tibbles, and when we unnest for a second time, these are simply ignored. So, who led the PGA Tour in Strokes Gained in 2017 off the tee?
 
 ```{r, echo = TRUE}
-sg2 %>% unnest() %>%
-  unnest() %>% 
+sg2 %>% unnest(data) %>%
+  filter(year == 2017 & title == "SG: Off-the-Tee") %>%
+  unnest(cols = data) %>% 
   group_by(title) %>%
-  filter(year == 2017 & rank_this_week == 1) %>% 
   select(title, year, rank = rank_this_week, player_name) %>%
+  head(10) %>%
   knitr::kable()
 ```
 

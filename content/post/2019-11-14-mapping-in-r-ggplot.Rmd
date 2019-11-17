@@ -97,6 +97,46 @@ ggplot(subset(dt2, GEO_Name != "DC"),
 
 ```
 
+### Animating the changes in HPI
+
+Using the `gganimate` package, we can animate this map to show the state HPI changes over time. To lighten the gif, only June from each year has been kept in the data. Note the effect of the recession.
+
+```{r, eval = FALSE}
+pacman::p_load(tidyverse, urbnmapr, gganimate)
+devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
+dt <- readRDS("~/R/blogdown_content/static/data/mapping/dt.RDS")
+
+dt <- dt %>% filter(GEO_Type == "State") 
+
+dtt <- dt %>% 
+  left_join(states, by = c("GEO_Name" = "state_abbv")) %>% 
+  filter(GEO_Name != "DC") %>% 
+  filter(Month %in% c(6))
+
+anim <- ggplot(dtt, aes(long, lat, group = group, fill = log(real_hpi))) + 
+  geom_polygon(color = "#ffffff", size = 0) + 
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  transition_states(date, transition_length = 10, state_length = 10,
+                    wrap = FALSE) +
+  viridis::scale_fill_viridis(option = "E",
+                              breaks=c(log(50),log(100),log(200),log(400)),
+                              labels=c("-50%","0%","+100%","+200%"),
+                              limits=c(log(50),log(400))) +
+  theme_twg(grid = FALSE) + 
+  theme(legend.title = element_text(),
+        axis.text = element_blank(),
+        legend.key.width = unit(.2, 'in'),
+        legend.position = "right") +
+  labs(x="",y="",
+       title = "Changes in Housing Price Index (1975 - 2018)",
+       subtitle = paste0("Date: {closest_state}"),
+       caption = "Freddie Mac House Price Index by State,\ndeflated by US BLS, 
+       Consumer Price Index",
+       fill = "Real House Price Growth\nSince 1975")
+anim_save("state_hpi.gif", anim, width=800, height=600)
+```
+![](/post/2019-11-14-mapping-in-r-ggplot_files/state_hpi.gif)
+
 # Mapping at the County Level 
 
 Here, we'll use educational achievement data from the USDA.Again, using the `urbnmapr` package to bring in the shapefile data. 
