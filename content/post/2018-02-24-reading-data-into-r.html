@@ -11,7 +11,7 @@ tags:
   - broom
 thumbnailImagePosition: left
 thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548283717/copy.jpg
-summary: "5 different ways to get data into R"
+summary: "Different ways to get data into R"
 output:
   blogdown::html_page:
     toc: true
@@ -21,7 +21,10 @@ output:
 <div id="TOC">
 <ul>
 <li><a href="#built-in-data-sets">Built in data sets</a></li>
-<li><a href="#reading-in-data-from-a-url">Reading in data from a URL</a></li>
+<li><a href="#reading-in-data-from-a-url">Reading in data from a URL</a><ul>
+<li><a href="#reading-in-a-csv">Reading in a csv</a></li>
+<li><a href="#reading-in-an-xls-file">Reading in an xls file</a></li>
+</ul></li>
 <li><a href="#reading-in-a-zip-file">Reading in a zip file</a></li>
 <li><a href="#reading-in-from-google-sheets">Reading in from Google Sheets</a></li>
 <li><a href="#scraping-data-from-the-web">Scraping data from the web</a></li>
@@ -50,6 +53,8 @@ ggplot(airquality, aes(x = Ozone, y = Temp)) +
 </div>
 <div id="reading-in-data-from-a-url" class="section level1">
 <h1>Reading in data from a URL</h1>
+<div id="reading-in-a-csv" class="section level2">
+<h2>Reading in a csv</h2>
 <p>As it has become the convention that data should be shared publicly, there are lots of wonderful places to find data online. For instance, here is one <a href="https://github.com/caesar0301/awesome-public-datasets" target="_blank">great collection</a> of data sources. An easy source for good data is the <a href="https://github.com/fivethirtyeight/data" target="_blank">FiveThirtyEight</a> data page on github, which provides data for all of their articles.</p>
 <p>Any csv that has a direct link to it can be downloaded using the <code>readr</code> package. In this case, we’ll read in the raw csv used for their <a href="https://fivethirtyeight.com/features/fandango-movies-ratings/" target="_blank">Fandango piece</a> and recreate a version of their data viz.</p>
 <pre class="r"><code>fan &lt;- read_csv(&quot;https://raw.githubusercontent.com/fivethirtyeight/data/master/fandango/fandango_score_comparison.csv&quot;)
@@ -76,6 +81,15 @@ fan %&gt;% gather(&quot;Site&quot;, &quot;Stars&quot;, c(7,14,16,18)) %&gt;%
   labs(x = &quot;Stars&quot;, y = &quot;&quot;, 
        title = &quot;Fandango LOVES Movies&quot;)</code></pre>
 <p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/fandango-1.png" width="672" /></p>
+</div>
+<div id="reading-in-an-xls-file" class="section level2">
+<h2>Reading in an xls file</h2>
+<p>Use <code>httr</code> to send a GET request and write it to tmp file. Then use the <code>readxl</code> package…</p>
+<pre class="r"><code>  library(httr)
+  url1 &lt;- &quot;https://www2.census.gov/programs-surveys/demo/tables/geographic-mobility/2018/state-to-state-migration/State_to_State_Migrations_Table_2018.xls&quot;
+  GET(url1, write_disk(tf &lt;- tempfile(fileext = &quot;.xls&quot;)))
+  df &lt;- readxl::read_excel(tf,skip=7)</code></pre>
+</div>
 </div>
 <div id="reading-in-a-zip-file" class="section level1">
 <h1>Reading in a zip file</h1>
@@ -142,7 +156,7 @@ gg +
   theme(legend.position=&quot;right&quot;, 
         legend.title = element_blank(),
         legend.key.width=unit(1, &quot;lines&quot;))</code></pre>
-<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 </div>
 <div id="reading-in-from-google-sheets" class="section level1">
 <h1>Reading in from Google Sheets</h1>
@@ -238,9 +252,9 @@ df %&gt;%
   labs(x = &quot;WAR&quot;, y = &quot;Statistic Value&quot;) + 
   theme(
     strip.background = element_rect(fill=&quot;gray&quot;, colour = &quot;transparent&quot;))</code></pre>
-<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
-<p>Compare this with the 6 statistics that explain the lowest amount of the variance.</p>
 <p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>Compare this with the 6 statistics that explain the lowest amount of the variance.</p>
+<p><img src="/post/2018-02-24-reading-data-into-r_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 </div>
 <div id="reading-in-multiple-files-from-folder" class="section level1">
 <h1>Reading in multiple files from folder</h1>

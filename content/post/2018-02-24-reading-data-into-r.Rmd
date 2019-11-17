@@ -11,7 +11,7 @@ tags:
   - broom
 thumbnailImagePosition: left
 thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548283717/copy.jpg
-summary: "5 different ways to get data into R"
+summary: "Different ways to get data into R"
 output:
   blogdown::html_page:
     toc: true
@@ -44,6 +44,8 @@ ggplot(airquality, aes(x = Ozone, y = Temp)) +
 
 # Reading in data from a URL
 
+## Reading in a csv
+
 As it has become the convention that data should be shared publicly, there are lots of wonderful places to find data online. For instance, here is one [great collection](https://github.com/caesar0301/awesome-public-datasets){target="_blank"} of data sources. An easy source for good data is the [FiveThirtyEight](https://github.com/fivethirtyeight/data){target="_blank"} data page on github, which provides data for all of their articles. 
 
 Any csv that has a direct link to it can be downloaded using the ```readr``` package. In this case, we'll read in the raw csv used for their [Fandango piece](https://fivethirtyeight.com/features/fandango-movies-ratings/){target="_blank"} and recreate a version of their data viz. 
@@ -72,6 +74,17 @@ fan %>% gather("Site", "Stars", c(7,14,16,18)) %>%
     theme(legend.position = "bottom") + 
   labs(x = "Stars", y = "", 
        title = "Fandango LOVES Movies")
+```
+
+## Reading in an xls file 
+
+Use `httr` to send a GET request and write it to tmp file. Then use the `readxl` package... 
+
+```{r, eval = FALSE}
+  library(httr)
+  url1 <- "https://www2.census.gov/programs-surveys/demo/tables/geographic-mobility/2018/state-to-state-migration/State_to_State_Migrations_Table_2018.xls"
+  GET(url1, write_disk(tf <- tempfile(fileext = ".xls")))
+  df <- readxl::read_excel(tf,skip=7)
 ```
 
 # Reading in a zip file
