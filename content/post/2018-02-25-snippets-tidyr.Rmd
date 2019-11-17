@@ -1,7 +1,7 @@
 ---
 title: 'Snippets: tidy data'
 author: ''
-date: '2018-02-25'
+date: '2019-11-16'
 slug: snippets-tidyr
 categories:
   - R 
@@ -15,8 +15,304 @@ thumbnailImagePosition: left
 thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/snippets.jpg
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+data("relig_income")
+data(billboard)
+```
+
 Snippet files are periodically updated with how-to’s for data wrangling. These commands are relevant for tidying dataframes - to rearrange data and change the structure of the data for easier use.
 
+# pivoting
+
+`gather` and `spread` are being replaced by the `pivot` function. How it works...
+
+## pivot_longer() 
+
+### String data in column names
+
+This feels very much like the old `gather()` function. 
+```{r}
+head(relig_income)
+relig_income %>%
+  pivot_longer(-religion, names_to = "income", values_to = "count")
+```
+
+### Numeric data in column names
+
+Now, here's where you can start to see the power of the function. We grab the columns with a select helper, give it a name, and then the `names_prefix` identifies what to drop from the new variable. And we can automatically drop NAs. Note that on the first run, "week" is a string; we can change the format in the pivot command as well. 
+
+```{r}
+head(billboard)
+billboard %>%
+  pivot_longer(
+    cols = starts_with("wk"),
+    names_to = "week",
+    names_prefix = "wk",
+    values_to = "rank",
+    values_drop_na = TRUE
+  )
+
+billboard %>% 
+  pivot_longer(
+    cols = starts_with("wk"), 
+    names_to = "week", 
+    names_prefix = "wk",
+    names_ptypes = list(week = integer()),
+    values_to = "rank",
+    values_drop_na = TRUE,
+  )
+```
+
+### Many variables in column names
+
+Even more complex, here we're taking multiple columns, gathering them, and then creating three new columns of data. The `names_pattern` uses the same specification as `separate()`, in this case regex to split out the data. To understand it, run it first, without the multiple columns, then again with it. 
+
+```{r}
+head(who)
+who %>% pivot_longer(
+  cols = new_sp_m014:newrel_f65,
+  # names_to = c("diagnosis", "gender", "age"),
+  # names_pattern = "new_?(.*)_(.)(.*)",
+  values_to = "count"
+) %>% sample_n(5)
+
+who %>% pivot_longer(
+  cols = new_sp_m014:newrel_f65,
+  names_to = c("diagnosis", "gender", "age"),
+  names_pattern = "new_?(.*)_(.)(.*)",
+  values_to = "count"
+) %>% sample_n(5)
+
+```
+
+To take it even further, we can identify these newly created variables as factors and define them within the same function using the `names_ptypes` command. 
+
+```{r}
+who %>% pivot_longer(
+  cols = new_sp_m014:newrel_f65,
+  names_to = c("diagnosis", "gender", "age"), 
+  names_pattern = "new_?(.*)_(.)(.*)",
+  names_ptypes = list(
+    gender = factor(levels = c("f", "m")),
+    age = factor(
+      levels = c("014", "1524", "2534", "3544", "4554", "5564", "65"), 
+      ordered = TRUE
+    )
+  ),
+  values_to = "count",
+)
+```
+
+### Multiple observations per row
+
+In the below, each row has two individuals, or sometimes an NA for the second. This gathers all rows except family, and the use ".value"  in the `names_to` command specifies that part of the column name should be a new variable. 
+
+```{r}
+family <- tribble(
+  ~family,  ~dob_child1,  ~dob_child2, ~gender_child1, ~gender_child2,
+       1L, "1998-11-26", "2000-01-29",             1L,             2L,
+       2L, "1996-06-22",           NA,             2L,             NA,
+       3L, "2002-07-11", "2004-04-05",             2L,             2L,
+       4L, "2004-10-10", "2009-08-27",             1L,             1L,
+       5L, "2000-12-05", "2005-02-28",             2L,             1L,
+) %>% mutate_at(vars(starts_with("dob")), parse_date)
+family
+
+family %>% 
+  pivot_longer(
+    -family, 
+    names_to = c(".value", "child"), 
+    names_sep = "_", 
+    values_drop_na = TRUE
+  )
+```
+
+Another example of using the ".value" is in the following. .value captures the new variable name and "time" is the numeric identifier. 
+
+```{r}
+pnl <- tibble(
+  x = 1:4,
+  a = c(1, 1,0, 0),
+  b = c(0, 1, 1, 1),
+  y1 = rnorm(4),
+  y2 = rnorm(4),
+  z1 = rep(3, 4),
+  z2 = rep(-2, 4),
+)
+pnl
+
+pnl %>% 
+  pivot_longer(
+    -c(x, a, b), 
+    names_to = c(".value", "time"), 
+    names_pattern = "(.)(.)"
+  )
+```
+
+## pivot_wider()
+
+Data capturing anytime a fish passes through a station. A row is only added if a fish was seen, so often times there will be NAs. If we widen the data so that each station is a column, the NAs are apparent. The NAs can be filled within the function using the `values_fill` command. 
+```{r}
+fish_encounters
+fish_encounters %>% pivot_wider(
+  names_from = station, 
+  values_from = seen,
+  # values_fill = list(seen = 0)
+) %>% head()
+
+fish_encounters %>% pivot_wider(
+  names_from = station, 
+  values_from = seen,
+  values_fill = list(seen = 0)
+) %>% head()
+```
+
+### Aggregation 
+
+This is actually sort of bonkers. We can spread data and aggregate it, all at the same time. The warpbreaks dataset captures 9 experiments for 2 different types of wool and 3 levels of tension. There is no unique way of spreading the data. 
+
+```{r}
+warpbreaks <- warpbreaks %>% as_tibble() %>% select(wool, tension, breaks)
+warpbreaks
+
+warpbreaks %>% count(wool, tension)
+
+warpbreaks %>% pivot_wider(names_from = wool, values_from = breaks)
+```
+
+But we can use `pivot_wider()` to spread the data and then to aggregate each wool and tension to the average. 
+```{r}
+warpbreaks %>% 
+  pivot_wider(
+    names_from = wool, 
+    values_from = breaks,
+    values_fn = list(breaks = mean)
+  )
+```
+
+### Generate column name from multiple variables
+
+Data with a country and production levels of specific products. What if wanted a column for each product *and* country?  
+```{r}
+production <- expand_grid(
+    product = c("A", "B"), 
+    country = c("AI", "EI"), 
+    year = 2000:2014
+  ) %>%
+  filter((product == "A" & country == "AI") | product == "B") %>% 
+  mutate(production = rnorm(nrow(.)))
+production
+```
+
+By specifying multiple `names_from` we can unite them into single columns. 
+
+```{r}
+production %>% pivot_wider(
+  names_from = c(product, country), 
+  values_from = production
+)
+```
+
+### Tidy Census data
+
+This looks very much like a standard use case of `spread()`. 
+```{r}
+us_rent_income
+
+us_rent_income %>% 
+  pivot_wider(names_from = variable, values_from = c(estimate, moe))
+```
+
+### Contact List 
+
+```{r}
+contacts <- tribble(
+  ~field, ~value,
+  "name", "Jiena McLellan",
+  "company", "Toyota", 
+  "name", "John Smith", 
+  "company", "google", 
+  "email", "john@google.com",
+  "name", "Huxley Ratcliffe"
+)
+contacts
+
+```
+
+There is no unique identifier for each person, so we have to create one. And from there we can then spread it all out. 
+
+```{r}
+contacts <- contacts %>% 
+  mutate(
+    person_id = cumsum(field == "name")
+  )
+contacts
+
+contacts %>% 
+  pivot_wider(names_from = field, values_from = value)
+```
+
+# Longer, then Wider 
+
+### World Bank data 
+
+The goal is to produce a tidy dataset where each variable is a column. 
+
+```{r}
+world_bank_pop
+```
+
+First, use `pivot_longer()` to start. 
+```{r}
+pop2 <- world_bank_pop %>% 
+  pivot_longer(`2000`:`2017`, names_to = "year", values_to = "value")
+pop2
+```
+But we are still left with multiple "indicator" variables per country. So now we have to separate. 
+```{r}
+pop3 <- pop2 %>% 
+  separate(indicator, c(NA, "area", "variable"))
+pop3
+```
+
+Now we can widen the data. 
+```{r}
+pop3 %>% 
+  pivot_wider(names_from = variable, values_from = value)
+```
+
+### Multiple Choice data 
+
+```{r}
+multi <- tribble(
+  ~id, ~choice1, ~choice2, ~choice3,
+  1, "A", "B", "C",
+  2, "C", "B",  NA,
+  3, "D",  NA,  NA,
+  4, "B", "D",  NA
+)
+multi
+```
+
+First, gather it with `pivot_longer()` dropping the NAs for people with fewere than 3 choices.  
+```{r}
+multi2 <- multi %>% 
+  pivot_longer(-id, values_drop_na = TRUE) %>% 
+  mutate(checked = TRUE)
+multi2
+```
+Then widen the data 
+```{r}
+multi2 %>% 
+  pivot_wider(
+    id_cols = id,
+    names_from = value, 
+    values_from = checked, 
+    values_fill = list(checked = FALSE)
+  )
+```
 
 # spread()
 
