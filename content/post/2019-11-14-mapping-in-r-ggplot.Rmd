@@ -318,12 +318,11 @@ ggplot() + geom_map(data=us_map, map=us_map,
 
 # Statebins 
 
-Easy graphing with the package `statebins`, which are really clean. 
+Easy graphing with the package `statebins`, which are really clean. All that's needed is one column with the state names and another with the value that's being passed through. Colors are controlled with a `brewer_pal` command that relies on the `RColorBrewer` palletes.
 
 ```{r}
 library(statebins)
-elections_2016b <- election_2016 %>% 
-  mutate(color = ifelse(winner == "Trump", "red", "blue"))
+head(election_2016)
 
 election_2016 %>% mutate(value = winner) %>%
 statebins(

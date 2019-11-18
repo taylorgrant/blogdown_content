@@ -284,12 +284,19 @@ ggplot() + geom_map(data=us_map, map=us_map,
 </div>
 <div id="statebins" class="section level1">
 <h1>Statebins</h1>
-<p>Easy graphing with the package <code>statebins</code>, which are really clean.</p>
+<p>Easy graphing with the package <code>statebins</code>, which are really clean. All that’s needed is one column with the state names and another with the value that’s being passed through. Colors are controlled with a <code>brewer_pal</code> command that relies on the <code>RColorBrewer</code> palletes.</p>
 <pre class="r"><code>library(statebins)
-elections_2016b &lt;- election_2016 %&gt;% 
-  mutate(color = ifelse(winner == &quot;Trump&quot;, &quot;red&quot;, &quot;blue&quot;))
-
-election_2016 %&gt;% mutate(value = winner) %&gt;%
+head(election_2016)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   state      winner 
+##   &lt;chr&gt;      &lt;chr&gt;  
+## 1 Alabama    Trump  
+## 2 Alaska     Trump  
+## 3 Arizona    Trump  
+## 4 Arkansas   Trump  
+## 5 California Clinton
+## 6 Colorado   Clinton</code></pre>
+<pre class="r"><code>election_2016 %&gt;% mutate(value = winner) %&gt;%
 statebins(
   font_size=3.5, dark_label = &quot;white&quot;, light_label = &quot;white&quot;,
   ggplot2_scale_function = scale_fill_manual,
