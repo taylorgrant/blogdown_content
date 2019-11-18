@@ -318,7 +318,7 @@ ggplot() + geom_map(data=us_map, map=us_map,
 
 # Statebins 
 
-Easy graphing with the package `statebins`, which are really clean. All that's needed is one column with the state names and another with the value that's being passed through. Colors are controlled with a `brewer_pal` command that relies on the `RColorBrewer` palletes.
+Easy graphing with the package `statebins`, which are really clean. All that's needed is one column with the state names and another with the value that's being passed through. Colors are controlled with a `brewer_pal` command that relies on the `RColorBrewer` palettes.
 
 ```{r}
 library(statebins)

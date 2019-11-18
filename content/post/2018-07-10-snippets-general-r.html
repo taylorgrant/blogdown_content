@@ -1,7 +1,7 @@
 ---
 title: 'Snippets: General R'
 author: ''
-date: '2018-07-10'
+date: '2019-11-18'
 slug: snippets-general-r
 categories:
   - R
@@ -19,7 +19,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 
 <div id="TOC">
 <ul>
-<li><a href="#easily-updating-r">Easily updating R</a></li>
+<li><a href="#plotting-colors-with-hexcode-labels">Plotting colors with hexcode labels</a></li>
 <li><a href="#finding-all-functions-in-a-package">Finding all functions in a package</a></li>
 <li><a href="#getting-the-names-of-datasets-within-a-package">Getting the names of datasets within a package</a></li>
 <li><a href="#loading-all-functions-within-a-folder">Loading all functions within a folder</a></li>
@@ -28,10 +28,30 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 </div>
 
 <p>Snippet files periodically updated. These functions and commands are relevant for working with R and RStudio.</p>
-<div id="easily-updating-r" class="section level1">
-<h1>Easily updating R</h1>
-<p>The <code>updateR</code> package is fantastic. Just using this line of code with the admin_password set will update everything and keep all packages in the new version of R.</p>
-<pre class="r"><code>updateR(admin_password = &quot;admin_password&quot;)</code></pre>
+<div id="plotting-colors-with-hexcode-labels" class="section level1">
+<h1>Plotting colors with hexcode labels</h1>
+<p>Here is a function that provides an easy way of seeing a color palette and retrieving the hexcodes.</p>
+<pre class="r"><code>show_pal &lt;- function(pal, labels = TRUE, label_size = 1, label_color = &quot;#000000&quot;) {
+  library(gplots)
+  pal &lt;- gplots::col2hex(pal)
+  n &lt;- length(pal)
+  n_col &lt;- ceiling(sqrt(n))
+  n_row &lt;- ceiling(n / n_col)
+  m &lt;- matrix(0, n_col, n_row)
+  m[n + 1] &lt;- 1
+  m &lt;- t(m)
+  pal &lt;- c(pal, rep(NA, n_row * n_col - length(pal)))
+  pal &lt;- matrix(pal, ncol = n_col, byrow = TRUE)
+  plot(c(0, dim(pal)[2]), c(0, -dim(pal)[1]), type = &quot;n&quot;, xlab = &quot;&quot;, ylab = &quot;&quot;,
+       axes = FALSE)
+  rect(col(pal) - 1, -row(pal) + 1, col(pal), -row(pal), col = pal, lwd = 3, border = &quot;white&quot;)
+  if (labels) text(col(pal) - 0.5, -row(pal) + 0.5, pal, cex = label_size, col = label_color)
+}
+
+# load a palette 
+pal &lt;- RColorBrewer::brewer.pal(n = 9, name = &#39;PuBu&#39;)
+show_pal(pal)</code></pre>
+<p><img src="/post/2018-07-10-snippets-general-r_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
 </div>
 <div id="finding-all-functions-in-a-package" class="section level1">
 <h1>Finding all functions in a package</h1>

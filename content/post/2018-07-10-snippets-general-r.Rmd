@@ -1,7 +1,7 @@
 ---
 title: 'Snippets: General R'
 author: ''
-date: '2018-07-10'
+date: '2019-11-18'
 slug: snippets-general-r
 categories:
   - R
@@ -23,12 +23,32 @@ pacman::p_load(tidyverse, here, blogdown)
 
 Snippet files periodically updated. These functions and commands are relevant for working with R and RStudio. 
 
-# Easily updating R
 
-The `updateR` package is fantastic. Just using this line of code with the admin_password set will update everything and keep all packages in the new version of R. 
+# Plotting colors with hexcode labels 
 
-```{r, eval = FALSE}
-updateR(admin_password = "admin_password")
+Here is a function that provides an easy way of seeing a color palette and retrieving the hexcodes. 
+
+```{r, warning = FALSE, message=FALSE}
+show_pal <- function(pal, labels = TRUE, label_size = 1, label_color = "#000000") {
+  library(gplots)
+  pal <- gplots::col2hex(pal)
+  n <- length(pal)
+  n_col <- ceiling(sqrt(n))
+  n_row <- ceiling(n / n_col)
+  m <- matrix(0, n_col, n_row)
+  m[n + 1] <- 1
+  m <- t(m)
+  pal <- c(pal, rep(NA, n_row * n_col - length(pal)))
+  pal <- matrix(pal, ncol = n_col, byrow = TRUE)
+  plot(c(0, dim(pal)[2]), c(0, -dim(pal)[1]), type = "n", xlab = "", ylab = "",
+       axes = FALSE)
+  rect(col(pal) - 1, -row(pal) + 1, col(pal), -row(pal), col = pal, lwd = 3, border = "white")
+  if (labels) text(col(pal) - 0.5, -row(pal) + 0.5, pal, cex = label_size, col = label_color)
+}
+
+# load a palette 
+pal <- RColorBrewer::brewer.pal(n = 9, name = 'PuBu')
+show_pal(pal)
 ```
 
 # Finding all functions in a package
