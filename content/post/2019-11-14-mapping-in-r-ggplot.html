@@ -29,10 +29,11 @@ output:
 </ul></li>
 <li><a href="#mapping-a-single-state-at-county-level">Mapping a Single State at County Level</a></li>
 <li><a href="#geofacet-map">Geofacet map</a></li>
-<li><a href="#hexmaps">Hexmaps</a><ul>
+<li><a href="#hexbins">Hexbins</a><ul>
 <li><a href="#download-the-geojson-file">Download the geojson file</a></li>
 <li><a href="#grab-some-data-to-use-as-a-fill">Grab some data to use as a fill</a></li>
 </ul></li>
+<li><a href="#working-with-shape-files">Working with shape files</a></li>
 </ul>
 </div>
 
@@ -219,14 +220,14 @@ ed &lt;- readxl::read_excel(tf,skip=4) %&gt;%
        y = &quot;&quot;, x = &quot;&quot;)</code></pre>
 <p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>
-<div id="hexmaps" class="section level1">
-<h1>Hexmaps</h1>
+<div id="hexbins" class="section level1">
+<h1>Hexbins</h1>
 <div id="download-the-geojson-file" class="section level3">
 <h3>Download the geojson file</h3>
 <pre class="r"><code>pacman::p_load(tidyverse, rgdal, rgeos, rvest)
 # download the geojson file from here &quot;https://team.carto.com/u/andrew/tables/andrew.us_states_hexgrid/public/map&quot;
 # load the map data 
-us &lt;- readOGR(&quot;data/mapping/us_states_hexgrid.geojson&quot;, &quot;OGRGeoJSON&quot;)</code></pre>
+us &lt;- readOGR(&quot;static/data/mapping/us_states_hexgrid.geojson&quot;, &quot;OGRGeoJSON&quot;)</code></pre>
 </div>
 <div id="grab-some-data-to-use-as-a-fill" class="section level3">
 <h3>Grab some data to use as a fill</h3>
@@ -279,4 +280,68 @@ ggplot() + geom_map(data=us_map, map=us_map,
        caption = &quot;Source: World Population Review&quot;)</code></pre>
 <p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 </div>
+</div>
+<div id="working-with-shape-files" class="section level1">
+<h1>Working with shape files</h1>
+<p>Just generally, how to import and work with shape files and <code>ggplot</code>…</p>
+<pre class="r"><code>pacman::p_load(tidyverse, sp, rgdal, rgeos)
+
+# create a local directory for the data
+localDir &lt;- &quot;my_gis_data&quot;
+if (!file.exists(localDir)) {
+  dir.create(localDir)
+}
+
+# download and unzip the data (this is the US congressional districts)
+url &lt;- &quot;https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_cd116_500k.zip&quot;
+file &lt;- paste(localDir, basename(url), sep=&#39;/&#39;)
+if (!file.exists(file)) {
+  download.file(url, file)
+  unzip(file,exdir=localDir)
+}</code></pre>
+<p>Now that the data is downloaded, we can start to work with it.</p>
+<pre class="r"><code># create a layer name for the shapefiles (text before file extension)
+layerName &lt;- &quot;cb_2018_us_cd116_500k&quot;
+
+# read data into a SpatialPolygonsDataFrame object
+dataProjected &lt;- readOGR(dsn=localDir, layer=layerName)
+
+# add to data a new column termed &quot;id&quot; composed of the rownames of data
+dataProjected@data$id &lt;- rownames(dataProjected@data)
+
+# create a data.frame from our spatial object
+congPoints &lt;- fortify(dataProjected, region = &quot;id&quot;)
+
+# merge the &quot;fortified&quot; data with the data from our spatial object
+cong_df &lt;- merge(countyPoints, dataProjected@data, by = &quot;id&quot;)</code></pre>
+<p>We just read in the data, added an id to the data and then used the <code>fortify()</code> function to convert it into a usable format for ggplot. And now we can plot…here no additional data has been added, but we can simply color by congressional district.</p>
+<pre class="r"><code>head(cong_df)</code></pre>
+<pre><code>##   id      long      lat order  hole piece group STATEFP CD116FP      AFFGEOID
+## 1  0 -88.19882 42.41557     1 FALSE     1   0.1      17      10 5001600US1710
+## 2  0 -88.19860 42.41557     2 FALSE     1   0.1      17      10 5001600US1710
+## 3  0 -88.18849 42.41556     3 FALSE     1   0.1      17      10 5001600US1710
+## 4  0 -88.18754 42.41555     4 FALSE     1   0.1      17      10 5001600US1710
+## 5  0 -88.18720 42.41555     5 FALSE     1   0.1      17      10 5001600US1710
+## 6  0 -88.17825 42.41553     6 FALSE     1   0.1      17      10 5001600US1710
+##   GEOID LSAD CDSESSN     ALAND   AWATER
+## 1  1710   C2     116 777404163 31605644
+## 2  1710   C2     116 777404163 31605644
+## 3  1710   C2     116 777404163 31605644
+## 4  1710   C2     116 777404163 31605644
+## 5  1710   C2     116 777404163 31605644
+## 6  1710   C2     116 777404163 31605644</code></pre>
+<pre class="r"><code>gg_cong &lt;- ggplot(data = subset(cong_df, STATEFP == 53), aes(x=long, y=lat, group = group,
+                                              fill = CD116FP)) +
+  geom_polygon()  +
+  coord_map() + 
+  geom_path(color = &quot;lightgray&quot;) +
+  viridis::scale_fill_viridis(option = &quot;E&quot;, discrete = TRUE) + 
+  theme_twg(grid = FALSE) + 
+  theme(legend.position = &quot;none&quot;, 
+        axis.text = element_blank()) + 
+  labs(title = &quot;Washington Congressional Districts&quot;,
+       x = &quot;&quot;, y = &quot;&quot;) 
+
+gg_cong</code></pre>
+<p><img src="/post/2019-11-14-mapping-in-r-ggplot_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 </div>

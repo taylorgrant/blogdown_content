@@ -26,6 +26,8 @@ migration <- readRDS("~/R/blogdown_content/static/data/mapping/migration.RDS")
 devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
 # map data 
 us <- readOGR("~/R/blogdown_content/static/data/mapping/us_states_hexgrid.geojson", "OGRGeoJSON")
+# statebin data 
+cong_df <- readRDS("~/R/blogdown_content/static/data/mapping/cong_df.RDS")
 ```
 
 Trying to pull in as many map examples as possible over time. For a lot of the choropleth maps I'm using the `urbnmapr` [package](https://medium.com/@urban_institute/how-to-create-state-and-county-maps-easily-in-r-577d29300bb2){target="_blank"}. 
@@ -249,7 +251,7 @@ ggplot(migration, aes(x=year, y = net, ymin = 0, ymax = net)) +
        y = "", x = "")
 ```
 
-# Hexmaps 
+# Hexbins 
 
 ### Download the geojson file
 
@@ -257,7 +259,7 @@ ggplot(migration, aes(x=year, y = net, ymin = 0, ymax = net)) +
 pacman::p_load(tidyverse, rgdal, rgeos, rvest)
 # download the geojson file from here "https://team.carto.com/u/andrew/tables/andrew.us_states_hexgrid/public/map"
 # load the map data 
-us <- readOGR("data/mapping/us_states_hexgrid.geojson", "OGRGeoJSON")
+us <- readOGR("static/data/mapping/us_states_hexgrid.geojson", "OGRGeoJSON")
 ```
 
 ### Grab some data to use as a fill
@@ -311,3 +313,66 @@ ggplot() + geom_map(data=us_map, map=us_map,
        title = "Alcohol Consumption by State per Capita, 2019",
        caption = "Source: World Population Review")
 ```
+
+# Working with shape files 
+
+Just generally, how to import and work with shape files and `ggplot`...
+
+```{r, eval = FALSE}
+pacman::p_load(tidyverse, sp, rgdal, rgeos)
+
+# create a local directory for the data
+localDir <- "my_gis_data"
+if (!file.exists(localDir)) {
+  dir.create(localDir)
+}
+
+# download and unzip the data (this is the US congressional districts)
+url <- "https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_us_cd116_500k.zip"
+file <- paste(localDir, basename(url), sep='/')
+if (!file.exists(file)) {
+  download.file(url, file)
+  unzip(file,exdir=localDir)
+}
+```
+
+Now that the data is downloaded, we can start to work with it. 
+
+```{r, eval = FALSE}
+# create a layer name for the shapefiles (text before file extension)
+layerName <- "cb_2018_us_cd116_500k"
+
+# read data into a SpatialPolygonsDataFrame object
+dataProjected <- readOGR(dsn=localDir, layer=layerName)
+
+# add to data a new column termed "id" composed of the rownames of data
+dataProjected@data$id <- rownames(dataProjected@data)
+
+# create a data.frame from our spatial object
+congPoints <- fortify(dataProjected, region = "id")
+
+# merge the "fortified" data with the data from our spatial object
+cong_df <- merge(countyPoints, dataProjected@data, by = "id")
+```
+
+We just read in the data, added an id to the data and then used the `fortify()` function to convert it into a usable format for ggplot. And now we can plot...here no additional data has been added, but we can simply color by congressional district. 
+
+```{r}
+head(cong_df)
+
+gg_cong <- ggplot(data = subset(cong_df, STATEFP == 53), aes(x=long, y=lat, group = group,
+                                              fill = CD116FP)) +
+  geom_polygon()  +
+  coord_map() + 
+  geom_path(color = "lightgray") +
+  viridis::scale_fill_viridis(option = "E", discrete = TRUE) + 
+  theme_twg(grid = FALSE) + 
+  theme(legend.position = "none", 
+        axis.text = element_blank()) + 
+  labs(title = "Washington Congressional Districts",
+       x = "", y = "") 
+
+gg_cong
+```
+
+
