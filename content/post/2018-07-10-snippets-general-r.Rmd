@@ -107,3 +107,12 @@ The `vcdExtra` package actually does this nicely
 ```{r}
 vcdExtra::datasets("dplyr")
 ```
+
+# Loading a dataset from a package without loading package itself
+
+I want a dataset from a package, but loading that package sometimes interferes with functions from another package. Load only the dataset with 
+
+```{r, eval = FALSE}
+data(Howell1, package = "rethinking")
+```
+
