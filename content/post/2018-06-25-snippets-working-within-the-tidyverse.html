@@ -1,23 +1,3 @@
----
-title: 'Snippets: Working within the tidyverse'
-author: ''
-date: '2019-09-20'
-categories:
-  - R
-tags:
-  - dplyr
-  - tidy data
-  - tidyverse
-slug: snippets-working-within-the-tidyverse
-summary: Commands, tips, and tricks that are useful within the tidyverse of packages,
-  especially when using piped operations.
-output:
-  blogdown::html_page:
-    toc: yes
-thumbnailImagePosition: left
-thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/snippets.jpg
----
-
 
 <div id="TOC">
 <ul>
@@ -31,6 +11,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <li><a href="#dplyr---group_split-function">dplyr - group_split function</a></li>
 <li><a href="#piping-into-a-t.test">Piping into a t.test</a></li>
 <li><a href="#arranging-within-a-group">Arranging within a group</a></li>
+<li><a href="#using-cross-and-map-to-paste">Using <code>cross</code> and <code>map</code> to paste</a></li>
 </ul>
 </div>
 
@@ -51,10 +32,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 p         7     4 q    
-## 2 w        70    38 p    
-## 3 n        41    73 a    
-## 4 g        51    78 l</code></pre>
+## 1 u        41    64 l    
+## 2 z        28    16 o    
+## 3 w        58    13 s    
+## 4 y         4     8 u</code></pre>
 </div>
 <div id="using-rename_at-to-rename-specific-columns" class="section level1">
 <h1>Using rename_at to rename specific columns</h1>
@@ -72,10 +53,10 @@ df</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   a     pastedName_b     c pastedName_d
 ##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;chr&gt;       
-## 1 r               25    31 l           
-## 2 b               97    25 y           
-## 3 p               50    98 e           
-## 4 m               95    34 q</code></pre>
+## 1 a                5    73 s           
+## 2 n                9    71 m           
+## 3 t               84    21 e           
+## 4 m                7    99 w</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -195,11 +176,11 @@ tmp</code></pre>
 <pre><code>## # A tibble: 5 x 4
 ##   g1_letters g1_num h1_letters h1_num
 ##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;       &lt;int&gt;
-## 1 s          451798 d           48502
-## 2 p           15983 p           10506
-## 3 o          381366 w           27402
-## 4 z          408185 h           53463
-## 5 u          418008 b           45597</code></pre>
+## 1 w          544770 i           47528
+## 2 k          485672 d           57435
+## 3 g           72326 g           57724
+## 4 f          277987 z           39072
+## 5 d           80238 c           46947</code></pre>
 <p>But we can also use the <code>intersect</code> function to create an AND statement</p>
 <pre class="r"><code>tmp &lt;- tibble(g1_letters = sample(letters, 5), 
               g1_num = sample(1:600000, 5),
@@ -219,7 +200,7 @@ tmp</code></pre>
 <pre><code>## # A tibble: 1 x 6
 ##    g1_num g1_weighted g2_num g2_weighted h1_num h1_weighted
 ##     &lt;int&gt; &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;  &lt;int&gt;       &lt;dbl&gt;
-## 1 1565490 626196sel   175828      70331. 103830       41532</code></pre>
+## 1 1676877 670750.8sel  74707      29883. 174554      69822.</code></pre>
 </div>
 <div id="dplyr---group_split-function" class="section level1">
 <h1>dplyr - group_split function</h1>
@@ -260,11 +241,11 @@ group_split(split_by)</code></pre>
 ## 
 ## [[2]]
 ## # A tibble: 1 x 13
-##   name  height  mass hair_color skin_color eye_color birth_year gender
-##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
-## 1 Jabb…    175  1358 &lt;NA&gt;       green-tan… orange           600 herma…
-## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
-## #   vehicles &lt;list&gt;, starships &lt;list&gt;
+##   name  height  mass hair_color skin_color eye_color birth_year gender homeworld
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    
+## 1 Jabb…    175  1358 &lt;NA&gt;       green-tan… orange           600 herma… Nal Hutta
+## # … with 4 more variables: species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;,
+## #   starships &lt;list&gt;
 ## 
 ## [[3]]
 ## # A tibble: 62 x 13
@@ -280,34 +261,34 @@ group_split(split_by)</code></pre>
 ##  8 Chew…    228   112 brown      unknown    blue           200   male  
 ##  9 Han …    180    80 brown      fair       brown           29   male  
 ## 10 Gree…    173    74 &lt;NA&gt;       green      black           44   male  
-## # … with 52 more rows, and 5 more variables: homeworld &lt;chr&gt;,
-## #   species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;, starships &lt;list&gt;
+## # … with 52 more rows, and 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;,
+## #   films &lt;list&gt;, vehicles &lt;list&gt;, starships &lt;list&gt;
 ## 
 ## [[4]]
 ## # A tibble: 2 x 13
-##   name  height  mass hair_color skin_color eye_color birth_year gender
-##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
-## 1 IG-88    200   140 none       metal      red               15 none  
-## 2 BB8       NA    NA none       none       black             NA none  
-## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
-## #   vehicles &lt;list&gt;, starships &lt;list&gt;
+##   name  height  mass hair_color skin_color eye_color birth_year gender homeworld
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    
+## 1 IG-88    200   140 none       metal      red               15 none   &lt;NA&gt;     
+## 2 BB8       NA    NA none       none       black             NA none   &lt;NA&gt;     
+## # … with 4 more variables: species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;,
+## #   starships &lt;list&gt;
 ## 
 ## [[5]]
 ## # A tibble: 3 x 13
-##   name  height  mass hair_color skin_color eye_color birth_year gender
-##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
-## 1 C-3PO    167    75 &lt;NA&gt;       gold       yellow           112 &lt;NA&gt;  
-## 2 R2-D2     96    32 &lt;NA&gt;       white, bl… red               33 &lt;NA&gt;  
-## 3 R5-D4     97    32 &lt;NA&gt;       white, red red               NA &lt;NA&gt;  
-## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
-## #   vehicles &lt;list&gt;, starships &lt;list&gt;
+##   name  height  mass hair_color skin_color eye_color birth_year gender homeworld
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    
+## 1 C-3PO    167    75 &lt;NA&gt;       gold       yellow           112 &lt;NA&gt;   Tatooine 
+## 2 R2-D2     96    32 &lt;NA&gt;       white, bl… red               33 &lt;NA&gt;   Naboo    
+## 3 R5-D4     97    32 &lt;NA&gt;       white, red red               NA &lt;NA&gt;   Tatooine 
+## # … with 4 more variables: species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;,
+## #   starships &lt;list&gt;
 ## 
 ## attr(,&quot;ptype&quot;)
 ## # A tibble: 0 x 13
-## # … with 13 variables: name &lt;chr&gt;, height &lt;int&gt;, mass &lt;dbl&gt;,
-## #   hair_color &lt;chr&gt;, skin_color &lt;chr&gt;, eye_color &lt;chr&gt;, birth_year &lt;dbl&gt;,
-## #   gender &lt;chr&gt;, homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
-## #   vehicles &lt;list&gt;, starships &lt;list&gt;</code></pre>
+## # … with 13 variables: name &lt;chr&gt;, height &lt;int&gt;, mass &lt;dbl&gt;, hair_color &lt;chr&gt;,
+## #   skin_color &lt;chr&gt;, eye_color &lt;chr&gt;, birth_year &lt;dbl&gt;, gender &lt;chr&gt;,
+## #   homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;,
+## #   starships &lt;list&gt;</code></pre>
 </div>
 <div id="piping-into-a-t.test" class="section level1">
 <h1>Piping into a t.test</h1>
@@ -318,13 +299,13 @@ group_split(split_by)</code></pre>
 ##  Two Sample t-test
 ## 
 ## data:  a by group
-## t = 42.303, df = 198, p-value &lt; 2.2e-16
+## t = 45.958, df = 198, p-value &lt; 2.2e-16
 ## alternative hypothesis: true difference in means is not equal to 0
 ## 95 percent confidence interval:
-##  27.77807 30.49452
+##  29.27846 31.90372
 ## sample estimates:
 ##  mean in group blue mean in group green 
-##            79.51194            50.37565</code></pre>
+##            80.80535            50.21425</code></pre>
 </div>
 <div id="arranging-within-a-group" class="section level1">
 <h1>Arranging within a group</h1>
@@ -347,4 +328,55 @@ ToothGrowth %&gt;%
 ##  9  16.5 OJ      0.5
 ## 10  17.6 OJ      0.5
 ## # … with 50 more rows</code></pre>
+</div>
+<div id="using-cross-and-map-to-paste" class="section level1">
+<h1>Using <code>cross</code> and <code>map</code> to paste</h1>
+<p>The <code>cross()</code> function is similar to <code>expand.grid</code>. Here, we create a list and use <code>map</code> to paste it together where each in a separate list.</p>
+<pre class="r"><code>data &lt;- list(qq = &quot;Q&quot;,
+             q = 1:4,
+             hyphen = &quot;-&quot;,
+             yr = 13:19)
+
+data %&gt;%
+  cross() %&gt;%
+  map(lift(paste0)) %&gt;% 
+  head()</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;Q1-13&quot;
+## 
+## [[2]]
+## [1] &quot;Q2-13&quot;
+## 
+## [[3]]
+## [1] &quot;Q3-13&quot;
+## 
+## [[4]]
+## [1] &quot;Q4-13&quot;
+## 
+## [[5]]
+## [1] &quot;Q1-14&quot;
+## 
+## [[6]]
+## [1] &quot;Q2-14&quot;</code></pre>
+<p>But we can use <code>setNames</code> and then reduce put it into a data.frame.</p>
+<pre class="r"><code>data &lt;- list(qq = &quot;Q&quot;,
+             q = 1:4,
+             hyphen = &quot;-&quot;,
+             yr = 13:19)
+
+data %&gt;%
+  cross() %&gt;%
+  map(lift(paste0)) %&gt;% 
+  map(setNames, c(&quot;QTR&quot;)) %&gt;% 
+  reduce(bind_rows) %&gt;%
+  head()</code></pre>
+<pre><code>## # A tibble: 6 x 1
+##   QTR  
+##   &lt;chr&gt;
+## 1 Q1-13
+## 2 Q2-13
+## 3 Q3-13
+## 4 Q4-13
+## 5 Q1-14
+## 6 Q2-14</code></pre>
 </div>

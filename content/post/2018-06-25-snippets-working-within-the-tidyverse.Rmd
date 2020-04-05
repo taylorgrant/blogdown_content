@@ -226,3 +226,35 @@ ToothGrowth %>%
     group_by(supp) %>%
     arrange(len, .by_group = TRUE)
 ```
+
+# Using `cross` and `map` to paste
+
+The `cross()` function is similar to `expand.grid`. Here, we create a list and use `map` to paste it together where each in a separate list. 
+
+```{r}
+data <- list(qq = "Q",
+             q = 1:4,
+             hyphen = "-",
+             yr = 13:19)
+
+data %>%
+  cross() %>%
+  map(lift(paste0)) %>% 
+  head()
+```
+
+But we can use `setNames` and then reduce put it into a data.frame. 
+
+```{r}
+data <- list(qq = "Q",
+             q = 1:4,
+             hyphen = "-",
+             yr = 13:19)
+
+data %>%
+  cross() %>%
+  map(lift(paste0)) %>% 
+  map(setNames, c("QTR")) %>% 
+  reduce(bind_rows) %>%
+  head()
+```
