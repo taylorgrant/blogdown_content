@@ -250,5 +250,24 @@ data %>%
 
 ```
 
+# Unifying Legends
 
+If you manually specify colors and add shapes in a scatterplot, two legends are created. You can unify them by naming them the same thing, or naming them both as `NULL`.
+
+```{r}
+library(patchwork)
+
+p1 <- ggplot(mtcars, aes(x = hp, y = mpg, group = factor(gear), col = factor(gear), shape = factor(gear) )) + 
+  geom_point() + 
+  scale_color_manual(name = "Color", values = c("purple", "green", "navyblue")) +
+  scale_shape_manual(name = "Shapes", values = c(16, 15 ,14))
+
+p2 <- ggplot(mtcars, aes(x = hp, y = mpg, group = factor(gear), col = factor(gear), shape = factor(gear))) + 
+  geom_point() + 
+  scale_color_manual(name = NULL, values = c("purple", "green", "navyblue")) +
+  scale_shape_manual(name = NULL, values = c(16, 15 ,14))
+
+p1 | p2
+
+```
 
