@@ -1,3 +1,23 @@
+---
+title: 'Snippets: Working within the tidyverse'
+author: ''
+date: '2019-09-20'
+categories:
+  - R
+tags:
+  - dplyr
+  - tidy data
+  - tidyverse
+slug: snippets-working-within-the-tidyverse
+summary: Commands, tips, and tricks that are useful within the tidyverse of packages,
+  especially when using piped operations.
+output:
+  blogdown::html_page:
+    toc: yes
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/snippets.jpg
+---
+
 
 <div id="TOC">
 <ul>
@@ -32,10 +52,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 u        41    64 l    
-## 2 z        28    16 o    
-## 3 w        58    13 s    
-## 4 y         4     8 u</code></pre>
+## 1 u         9    25 u    
+## 2 q        26    83 j    
+## 3 z        80    56 a    
+## 4 m         3    28 t</code></pre>
 </div>
 <div id="using-rename_at-to-rename-specific-columns" class="section level1">
 <h1>Using rename_at to rename specific columns</h1>
@@ -53,10 +73,10 @@ df</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   a     pastedName_b     c pastedName_d
 ##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;chr&gt;       
-## 1 a                5    73 s           
-## 2 n                9    71 m           
-## 3 t               84    21 e           
-## 4 m                7    99 w</code></pre>
+## 1 n               95    55 n           
+## 2 f               72    30 z           
+## 3 v                7    49 m           
+## 4 j               63    87 s</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -176,11 +196,11 @@ tmp</code></pre>
 <pre><code>## # A tibble: 5 x 4
 ##   g1_letters g1_num h1_letters h1_num
 ##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;       &lt;int&gt;
-## 1 w          544770 i           47528
-## 2 k          485672 d           57435
-## 3 g           72326 g           57724
-## 4 f          277987 z           39072
-## 5 d           80238 c           46947</code></pre>
+## 1 a          429115 j            7716
+## 2 q          214813 y           11264
+## 3 y          182448 q           42156
+## 4 v          520611 k           17576
+## 5 w          449754 p            7229</code></pre>
 <p>But we can also use the <code>intersect</code> function to create an AND statement</p>
 <pre class="r"><code>tmp &lt;- tibble(g1_letters = sample(letters, 5), 
               g1_num = sample(1:600000, 5),
@@ -200,7 +220,7 @@ tmp</code></pre>
 <pre><code>## # A tibble: 1 x 6
 ##    g1_num g1_weighted g2_num g2_weighted h1_num h1_weighted
 ##     &lt;int&gt; &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;  &lt;int&gt;       &lt;dbl&gt;
-## 1 1676877 670750.8sel  74707      29883. 174554      69822.</code></pre>
+## 1 1096130 438452sel   173501      69400. 187518      75007.</code></pre>
 </div>
 <div id="dplyr---group_split-function" class="section level1">
 <h1>dplyr - group_split function</h1>
@@ -299,13 +319,13 @@ group_split(split_by)</code></pre>
 ##  Two Sample t-test
 ## 
 ## data:  a by group
-## t = 45.958, df = 198, p-value &lt; 2.2e-16
+## t = 45.243, df = 198, p-value &lt; 2.2e-16
 ## alternative hypothesis: true difference in means is not equal to 0
 ## 95 percent confidence interval:
-##  29.27846 31.90372
+##  29.68082 32.38616
 ## sample estimates:
 ##  mean in group blue mean in group green 
-##            80.80535            50.21425</code></pre>
+##            79.55430            48.52081</code></pre>
 </div>
 <div id="arranging-within-a-group" class="section level1">
 <h1>Arranging within a group</h1>
