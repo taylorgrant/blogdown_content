@@ -1,7 +1,7 @@
 ---
 title: 'Snippets: ggplot'
 author: ''
-date: '2019-09-04'
+date: '2020-04-09'
 slug: snippets-ggplot
 categories:
   - R
@@ -27,6 +27,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
 <li><a href="#heatmaps">Heatmaps</a></li>
 <li><a href="#adding-a-benchmark-to-a-bar-graph">Adding a benchmark to a bar graph</a></li>
 <li><a href="#unifying-legends">Unifying Legends</a></li>
+<li><a href="#dropping-a-series-from-a-legend">Dropping a series from a legend</a></li>
 </ul>
 </div>
 
@@ -214,4 +215,14 @@ p2 &lt;- ggplot(mtcars, aes(x = hp, y = mpg, group = factor(gear), col = factor(
 
 p1 | p2</code></pre>
 <p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+<div id="dropping-a-series-from-a-legend" class="section level1">
+<h1>Dropping a series from a legend</h1>
+<p>Sometimes you want to call attention to some, but not all series in a plot. This is easily done by setting the breaks and labels.</p>
+<pre class="r"><code>ggplot(iris, aes(x=Petal.Length, y = Petal.Width, group = Species, col = Species)) + 
+  geom_point() + 
+  scale_color_manual(values = c(&quot;red&quot;, &quot;blue&quot;, &quot;purple&quot;),
+                     breaks = c(&quot;versicolor&quot;, &quot;virginica&quot;),
+                     labels = c(&#39;versicolor&#39;, &quot;virginica&quot;))</code></pre>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>

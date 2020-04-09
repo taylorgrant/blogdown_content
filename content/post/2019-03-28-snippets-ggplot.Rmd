@@ -1,7 +1,7 @@
 ---
 title: 'Snippets: ggplot'
 author: ''
-date: '2019-09-04'
+date: '2020-04-09'
 slug: snippets-ggplot
 categories:
   - R
@@ -271,3 +271,14 @@ p1 | p2
 
 ```
 
+# Dropping a series from a legend
+
+Sometimes you want to call attention to some, but not all series in a plot. This is easily done by setting the breaks and labels. 
+
+```{r}
+ggplot(iris, aes(x=Petal.Length, y = Petal.Width, group = Species, col = Species)) + 
+  geom_point() + 
+  scale_color_manual(values = c("red", "blue", "purple"),
+                     breaks = c("versicolor", "virginica"),
+                     labels = c('versicolor', "virginica"))
+```
