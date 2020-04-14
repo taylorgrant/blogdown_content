@@ -121,3 +121,12 @@ str_count(string, '\\w+')
 # the above is counting commas as breaks, so remove the comma count
 str_count(string, '\\w+') - str_count(string, ",") 
 ```
+
+# Removing trailing and leading punctuation
+
+In this case, we'll strip out periods, but the punctuation can be replaced
+
+```{r}
+test <- c('.name.1.','name.2','.name.3.')
+gsub('^\\.|\\.$', '', test)
+```

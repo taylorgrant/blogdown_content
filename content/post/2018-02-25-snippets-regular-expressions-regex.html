@@ -29,6 +29,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <li><a href="#pull-out-the-last-n-and-first-n-characters-in-string">Pull out the last N and first N characters in string</a></li>
 <li><a href="#programmatically-inserting-a-line-break-in-strings">Programmatically inserting a line break in strings</a></li>
 <li><a href="#counting-words-in-a-string">Counting words in a string</a></li>
+<li><a href="#removing-trailing-and-leading-punctuation">Removing trailing and leading punctuation</a></li>
 </ul>
 </div>
 
@@ -130,4 +131,11 @@ str_count(string, &#39;\\w+&#39;)</code></pre>
 <pre class="r"><code># the above is counting commas as breaks, so remove the comma count
 str_count(string, &#39;\\w+&#39;) - str_count(string, &quot;,&quot;) </code></pre>
 <pre><code>## [1] 19</code></pre>
+</div>
+<div id="removing-trailing-and-leading-punctuation" class="section level1">
+<h1>Removing trailing and leading punctuation</h1>
+<p>In this case, we’ll strip out periods, but the punctuation can be replaced</p>
+<pre class="r"><code>test &lt;- c(&#39;.name.1.&#39;,&#39;name.2&#39;,&#39;.name.3.&#39;)
+gsub(&#39;^\\.|\\.$&#39;, &#39;&#39;, test)</code></pre>
+<pre><code>## [1] &quot;name.1&quot; &quot;name.2&quot; &quot;name.3&quot;</code></pre>
 </div>
