@@ -130,3 +130,13 @@ In this case, we'll strip out periods, but the punctuation can be replaced
 test <- c('.name.1.','name.2','.name.3.')
 gsub('^\\.|\\.$', '', test)
 ```
+
+# Efficiently converting all versions of a word
+
+Working with text and there are different versions and misspellings of a term
+
+```{r}
+string <- "i was buffereing but then buffered and buffering on the bluff"
+# assuming a consistent word stem
+str_replace_all(string, "buffer[a-z]+", "buffer")
+```

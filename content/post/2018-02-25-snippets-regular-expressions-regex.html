@@ -30,6 +30,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <li><a href="#programmatically-inserting-a-line-break-in-strings">Programmatically inserting a line break in strings</a></li>
 <li><a href="#counting-words-in-a-string">Counting words in a string</a></li>
 <li><a href="#removing-trailing-and-leading-punctuation">Removing trailing and leading punctuation</a></li>
+<li><a href="#efficiently-converting-all-versions-of-a-word">Efficiently converting all versions of a word</a></li>
 </ul>
 </div>
 
@@ -138,4 +139,12 @@ str_count(string, &#39;\\w+&#39;) - str_count(string, &quot;,&quot;) </code></pr
 <pre class="r"><code>test &lt;- c(&#39;.name.1.&#39;,&#39;name.2&#39;,&#39;.name.3.&#39;)
 gsub(&#39;^\\.|\\.$&#39;, &#39;&#39;, test)</code></pre>
 <pre><code>## [1] &quot;name.1&quot; &quot;name.2&quot; &quot;name.3&quot;</code></pre>
+</div>
+<div id="efficiently-converting-all-versions-of-a-word" class="section level1">
+<h1>Efficiently converting all versions of a word</h1>
+<p>Working with text and there are different versions and misspellings of a term</p>
+<pre class="r"><code>string &lt;- &quot;i was buffereing but then buffered and buffering on the bluff&quot;
+# assuming a consistent word stem
+str_replace_all(string, &quot;buffer[a-z]+&quot;, &quot;buffer&quot;)</code></pre>
+<pre><code>## [1] &quot;i was buffer but then buffer and buffer on the bluff&quot;</code></pre>
 </div>
