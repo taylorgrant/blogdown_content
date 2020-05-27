@@ -31,6 +31,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <li><a href="#counting-words-in-a-string">Counting words in a string</a></li>
 <li><a href="#removing-trailing-and-leading-punctuation">Removing trailing and leading punctuation</a></li>
 <li><a href="#efficiently-converting-all-versions-of-a-word">Efficiently converting all versions of a word</a></li>
+<li><a href="#splitting-words-on-space-or-other-character">Splitting words on space or other character</a></li>
 </ul>
 </div>
 
@@ -147,4 +148,11 @@ gsub(&#39;^\\.|\\.$&#39;, &#39;&#39;, test)</code></pre>
 # assuming a consistent word stem
 str_replace_all(string, &quot;buffer[a-z]+&quot;, &quot;buffer&quot;)</code></pre>
 <pre><code>## [1] &quot;i was buffer but then buffer and buffer on the bluff&quot;</code></pre>
+</div>
+<div id="splitting-words-on-space-or-other-character" class="section level1">
+<h1>Splitting words on space or other character</h1>
+<pre class="r"><code>string &lt;- c(&quot;apple: banana: orange: kiwi&quot;)
+str_split(string, boundary(&#39;word&#39;))</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;apple&quot;  &quot;banana&quot; &quot;orange&quot; &quot;kiwi&quot;</code></pre>
 </div>
