@@ -287,7 +287,7 @@ ggplot(iris, aes(x=Petal.Length, y = Petal.Width, group = Species, col = Species
 
 Let's compare the median salary of a police officer in each state to the median salary in that state. 
 
-```{r}
+```{r, fig.height=7}
 pacman::p_load(tidyverse, readxl, janitor, here, glue, httr, rvest)
 
 ## get police officer salary data ## 
