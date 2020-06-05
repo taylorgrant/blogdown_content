@@ -1,7 +1,7 @@
 ---
 title: 'Snippets: ggplot'
 author: ''
-date: '2020-04-09'
+date: '2020-06-04'
 slug: snippets-ggplot
 categories:
   - R
@@ -28,6 +28,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
 <li><a href="#adding-a-benchmark-to-a-bar-graph">Adding a benchmark to a bar graph</a></li>
 <li><a href="#unifying-legends">Unifying Legends</a></li>
 <li><a href="#dropping-a-series-from-a-legend">Dropping a series from a legend</a></li>
+<li><a href="#making-a-dumbbell-plot">Making a dumbbell plot</a></li>
 </ul>
 </div>
 
@@ -39,7 +40,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
 </div>
 <div id="adding-text-to-barplots-with-position-dodge" class="section level1">
 <h1>Adding text to barplots with position = “dodge”</h1>
-<p>With grouped bar charts <code>position = &quot;dodge&quot;</code> is used and the <code>geom_text</code> function also needs to be put into the same position. Note some other aesthetic changes here – <code>coord_flip()</code> was used and within that the limits of the y-axis were extended (this is because <code>coord_cartesian()</code> doesn’t work with the coordinates flipped). Within the <code>theme</code> section the title was centered, the axis labels were pushed to the edges and italicized, the caption font was altered. We also borrowed the <code>hrbrthemes</code> package function <code>scale_y_percent</code> to easily convert the axis to a percentage.</p>
+<p>With grouped bar charts <code>position = "dodge"</code> is used and the <code>geom_text</code> function also needs to be put into the same position. Note some other aesthetic changes here – <code>coord_flip()</code> was used and within that the limits of the y-axis were extended (this is because <code>coord_cartesian()</code> doesn’t work with the coordinates flipped). Within the <code>theme</code> section the title was centered, the axis labels were pushed to the edges and italicized, the caption font was altered. We also borrowed the <code>hrbrthemes</code> package function <code>scale_y_percent</code> to easily convert the axis to a percentage.</p>
 <pre class="r"><code>tibble(type = rep(c(&#39;a&#39;,&#39;b&#39;), each = 4),
          cat = rep(c(&#39;cat&#39;, &#39;dog&#39;, &#39;bird&#39;, &#39;snake&#39;),2),
          n = sample(1:500, 8)) %&gt;%
@@ -225,4 +226,101 @@ p1 | p2</code></pre>
                      breaks = c(&quot;versicolor&quot;, &quot;virginica&quot;),
                      labels = c(&#39;versicolor&#39;, &quot;virginica&quot;))</code></pre>
 <p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+<div id="making-a-dumbbell-plot" class="section level1">
+<h1>Making a dumbbell plot</h1>
+<p>Let’s compare the median salary of a police officer in each state to the median salary in that state.</p>
+<pre class="r"><code>pacman::p_load(tidyverse, readxl, janitor, here, glue, httr, rvest)
+
+## get police officer salary data ## 
+GET(&quot;https://www.bls.gov/oes/special.requests/oes_research_2019_sec_99.xlsx&quot;, write_disk(path &lt;- tempfile(fileext = &quot;.xlsx&quot;)))</code></pre>
+<pre><code>## Response [https://www.bls.gov/oes/special.requests/oes_research_2019_sec_99.xlsx]
+##   Date: 2020-06-05 01:44
+##   Status: 200
+##   Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+##   Size: 8.44 MB
+## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//Rtmp9vjhTM/file133af51cc4a34.xlsx</code></pre>
+<pre class="r"><code>tmp &lt;-
+  read_excel(path) %&gt;% 
+  clean_names()
+
+names(tmp)</code></pre>
+<pre><code>##  [1] &quot;area&quot;        &quot;area_title&quot;  &quot;naics&quot;       &quot;naics_title&quot; &quot;occ_code&quot;   
+##  [6] &quot;occ_title&quot;   &quot;o_group&quot;     &quot;i_group&quot;     &quot;tot_emp&quot;     &quot;emp_prse&quot;   
+## [11] &quot;pct_total&quot;   &quot;h_mean&quot;      &quot;a_mean&quot;      &quot;mean_prse&quot;   &quot;h_pct10&quot;    
+## [16] &quot;h_pct25&quot;     &quot;h_median&quot;    &quot;h_pct75&quot;     &quot;h_pct90&quot;     &quot;a_pct10&quot;    
+## [21] &quot;a_pct25&quot;     &quot;a_median&quot;    &quot;a_pct75&quot;     &quot;a_pct90&quot;     &quot;annual&quot;     
+## [26] &quot;hourly&quot;</code></pre>
+<pre class="r"><code>cop &lt;- tmp %&gt;% filter(occ_title == &quot;Police and Sheriff&#39;s Patrol Officers&quot;) %&gt;% 
+  filter(str_detect(naics_title, &quot;Federal, State&quot;)) %&gt;% 
+  distinct(area, .keep_all = TRUE)
+
+tmp_cop &lt;- cop %&gt;% 
+  select(area_title, a_median)
+
+tmp_cop %&gt;% filter(area_title == &quot;Oklahoma&quot;)</code></pre>
+<pre><code>## # A tibble: 1 x 2
+##   area_title a_median
+##   &lt;chr&gt;      &lt;chr&gt;   
+## 1 Oklahoma   *</code></pre>
+<pre class="r"><code># get median salary from wikipedia
+url &lt;- &quot;https://en.wikipedia.org/wiki/List_of_U.S._states_and_territories_by_median_wage_and_mean_wage&quot;
+
+median &lt;- url %&gt;% 
+  read_html() %&gt;% 
+  html_nodes(xpath = &#39;/html/body/div[3]/div[3]/div[4]/div/table[2]&#39;) %&gt;% 
+  html_table() %&gt;% 
+  flatten_df()
+
+# join the medians 
+tmp_median &lt;- median %&gt;% 
+  clean_names() %&gt;% 
+  left_join(tmp_cop, by = c(&quot;stateor_territory&quot; = &quot;area_title&quot;)) %&gt;% 
+  filter(!is.na(a_median))
+
+# clean and get the difference
+tmp_median &lt;- tmp_median %&gt;% 
+  mutate(median_wage_in_us_1 = str_replace_all(median_wage_in_us_1, &quot;\\$&quot;, &quot;&quot;),
+         median_wage_in_us_1 = str_replace_all(median_wage_in_us_1, &quot;,&quot;, &quot;&quot;)) %&gt;% 
+  mutate_at(vars(c(median_wage_in_us_1, a_median)), as.numeric)  %&gt;% 
+  filter(!is.na(median_wage_in_us_1)) %&gt;% 
+  mutate(diff = a_median - median_wage_in_us_1,
+         round(diff),
+         diff2 = paste0(&quot;+$&quot;, round(diff/1000), &quot;k&quot;)) %&gt;%
+  filter(stateor_territory != &quot;Oklahoma&quot;) # oklahoma isn&#39;t in the BLS data...</code></pre>
+<pre><code>## Warning in mask$eval_all_mutate(dots[[i]]): NAs introduced by coercion
+
+## Warning in mask$eval_all_mutate(dots[[i]]): NAs introduced by coercion</code></pre>
+<pre class="r"><code># plot it 
+ggplot() + 
+  geom_segment(data = tmp_median, aes(x = reorder(stateor_territory, a_median), xend = reorder(stateor_territory, a_median), y = median_wage_in_us_1, yend = a_median),
+               color = &quot;gray&quot;) +
+  geom_point(data = tmp_median, aes(x = reorder(stateor_territory, a_median), y = median_wage_in_us_1), 
+             color = my_colors(&quot;bly&quot;)[1], size = 2) +
+  geom_point(data = tmp_median, aes(x = reorder(stateor_territory, a_median), y = a_median), 
+             color = my_colors(&quot;bly&quot;)[2], size = 2) +
+  coord_flip() +
+  scale_x_discrete(expand = expansion(mult = c(0.03, 0.12))) + 
+  scale_y_continuous(labels=scales::dollar_format(prefix=&quot;$&quot;),
+                     breaks = seq(50000,100000, 25000)) +
+  theme_twg(grid = &quot;Y&quot;) +
+  geom_rect(data = tmp_median, aes(ymin=118000, ymax=126000, xmin=-Inf, xmax=Inf), fill=&quot;#efefe3&quot;) +
+  geom_text(data=tmp_median, aes(label = diff2, x = reorder(stateor_territory, a_median), y=122000), 
+            fontface=&quot;bold&quot;, size=2.5) +
+  geom_text(data = filter(tmp_median, stateor_territory == &quot;California&quot;),
+            aes(x = stateor_territory, y = median_wage_in_us_1, label = &quot;Median Salary\nin State&quot;),
+            vjust = -.4, size = 3.1, color = my_colors(&#39;bly&#39;)[1],
+            fontface = &quot;bold&quot;) +
+  geom_text(data = filter(tmp_median, stateor_territory == &quot;California&quot;),
+            aes(x = stateor_territory, y = a_median, label = &quot;Median Salary\nPolice Officer&quot;),
+            vjust = -.4, size = 3.1, color = my_colors(&#39;bly&#39;)[2],
+            fontface = &quot;bold&quot;) +
+  geom_text(data=filter(tmp_median, stateor_territory == &quot;California&quot;), aes(x=stateor_territory, 
+                                                                            y=122000, label=&quot;$ DIFF&quot;),
+            color=&quot;#7a7d7e&quot;, size=3.1, vjust=-1.8, fontface=&quot;bold&quot;, family=&quot;Calibri&quot;) +
+  labs(x = NULL, y = NULL,
+       title = &quot;Salary Comparison: Median Police Officer versus State Median&quot;,
+       subtitle = &quot;On average, the median salary for an officer is $23k greater&quot;,
+       caption = &quot;Source: Bureau of Labor Statistics&quot;)</code></pre>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 </div>

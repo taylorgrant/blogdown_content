@@ -1,7 +1,7 @@
 ---
 title: 'Snippets: ggplot'
 author: ''
-date: '2020-04-09'
+date: '2020-06-04'
 slug: snippets-ggplot
 categories:
   - R
@@ -281,4 +281,86 @@ ggplot(iris, aes(x=Petal.Length, y = Petal.Width, group = Species, col = Species
   scale_color_manual(values = c("red", "blue", "purple"),
                      breaks = c("versicolor", "virginica"),
                      labels = c('versicolor', "virginica"))
+```
+
+# Making a dumbbell plot
+
+Let's compare the median salary of a police officer in each state to the median salary in that state. 
+
+```{r}
+pacman::p_load(tidyverse, readxl, janitor, here, glue, httr, rvest)
+
+## get police officer salary data ## 
+GET("https://www.bls.gov/oes/special.requests/oes_research_2019_sec_99.xlsx", write_disk(path <- tempfile(fileext = ".xlsx")))
+tmp <-
+  read_excel(path) %>% 
+  clean_names()
+
+names(tmp)
+cop <- tmp %>% filter(occ_title == "Police and Sheriff's Patrol Officers") %>% 
+  filter(str_detect(naics_title, "Federal, State")) %>% 
+  distinct(area, .keep_all = TRUE)
+
+tmp_cop <- cop %>% 
+  select(area_title, a_median)
+
+tmp_cop %>% filter(area_title == "Oklahoma")
+
+# get median salary from wikipedia
+url <- "https://en.wikipedia.org/wiki/List_of_U.S._states_and_territories_by_median_wage_and_mean_wage"
+
+median <- url %>% 
+  read_html() %>% 
+  html_nodes(xpath = '/html/body/div[3]/div[3]/div[4]/div/table[2]') %>% 
+  html_table() %>% 
+  flatten_df()
+
+# join the medians 
+tmp_median <- median %>% 
+  clean_names() %>% 
+  left_join(tmp_cop, by = c("stateor_territory" = "area_title")) %>% 
+  filter(!is.na(a_median))
+
+# clean and get the difference
+tmp_median <- tmp_median %>% 
+  mutate(median_wage_in_us_1 = str_replace_all(median_wage_in_us_1, "\\$", ""),
+         median_wage_in_us_1 = str_replace_all(median_wage_in_us_1, ",", "")) %>% 
+  mutate_at(vars(c(median_wage_in_us_1, a_median)), as.numeric)  %>% 
+  filter(!is.na(median_wage_in_us_1)) %>% 
+  mutate(diff = a_median - median_wage_in_us_1,
+         round(diff),
+         diff2 = paste0("+$", round(diff/1000), "k")) %>%
+  filter(stateor_territory != "Oklahoma") # oklahoma isn't in the BLS data...
+
+# plot it 
+ggplot() + 
+  geom_segment(data = tmp_median, aes(x = reorder(stateor_territory, a_median), xend = reorder(stateor_territory, a_median), y = median_wage_in_us_1, yend = a_median),
+               color = "gray") +
+  geom_point(data = tmp_median, aes(x = reorder(stateor_territory, a_median), y = median_wage_in_us_1), 
+             color = my_colors("bly")[1], size = 2) +
+  geom_point(data = tmp_median, aes(x = reorder(stateor_territory, a_median), y = a_median), 
+             color = my_colors("bly")[2], size = 2) +
+  coord_flip() +
+  scale_x_discrete(expand = expansion(mult = c(0.03, 0.12))) + 
+  scale_y_continuous(labels=scales::dollar_format(prefix="$"),
+                     breaks = seq(50000,100000, 25000)) +
+  theme_twg(grid = "Y") +
+  geom_rect(data = tmp_median, aes(ymin=118000, ymax=126000, xmin=-Inf, xmax=Inf), fill="#efefe3") +
+  geom_text(data=tmp_median, aes(label = diff2, x = reorder(stateor_territory, a_median), y=122000), 
+            fontface="bold", size=2.5) +
+  geom_text(data = filter(tmp_median, stateor_territory == "California"),
+            aes(x = stateor_territory, y = median_wage_in_us_1, label = "Median Salary\nin State"),
+            vjust = -.4, size = 3.1, color = my_colors('bly')[1],
+            fontface = "bold") +
+  geom_text(data = filter(tmp_median, stateor_territory == "California"),
+            aes(x = stateor_territory, y = a_median, label = "Median Salary\nPolice Officer"),
+            vjust = -.4, size = 3.1, color = my_colors('bly')[2],
+            fontface = "bold") +
+  geom_text(data=filter(tmp_median, stateor_territory == "California"), aes(x=stateor_territory, 
+                                                                            y=122000, label="$ DIFF"),
+            color="#7a7d7e", size=3.1, vjust=-1.8, fontface="bold", family="Calibri") +
+  labs(x = NULL, y = NULL,
+       title = "Salary Comparison: Median Police Officer versus State Median",
+       subtitle = "On average, the median salary for an officer is $23k greater",
+       caption = "Source: Bureau of Labor Statistics")
 ```
