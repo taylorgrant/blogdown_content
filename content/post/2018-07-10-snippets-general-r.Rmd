@@ -116,3 +116,10 @@ I want a dataset from a package, but loading that package sometimes interferes w
 data(Howell1, package = "rethinking")
 ```
 
+# Editing a package function
+
+If there is a function that is failing for some reason, can edit with `trace`
+
+```{r, eval = FALSE}
+trace("[function_name]", edit = TRUE)
+```
