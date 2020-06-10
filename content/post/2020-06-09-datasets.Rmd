@@ -1,0 +1,102 @@
+---
+title: Datasets
+author: ''
+date: '2020-06-09'
+slug: datasets
+categories: 
+  - data
+tags: 
+  - datasets
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548283717/copy.jpg
+summary: "A running collection of interesting sources of data"
+output:
+  blogdown::html_page:
+    toc: false
+
+---
+
+Updated as I find them...
+
+# News and Reporting 
+
+- [Buzzfeed News](https://github.com/BuzzFeedNews/everything/blob/master/README.md){target="_blank"}
+- [FiveThirtyEight](https://data.fivethirtyeight.com/){target="_blank"}
+- [The Economist](https://github.com/theeconomist/){target="_blank"}
+- [The Upshot (NYTimes)](https://github.com/TheUpshot){target="_blank"}
+- [Baltimore Sun](https://github.com/baltimore-sun-data){target="_blank"}
+- [Los Angeles Times](https://github.com/datadesk){target="_blank"}
+- [MediaCloud](https://mediacloud.org/){target="_blank"}
+
+------------------ 
+
+# Random / Fun 
+
+- [#TidyTuesday](https://github.com/rfordatascience/tidytuesday){target="_blank"}
+- [The Pudding](https://github.com/the-pudding/data){target="_blank"}
+- [Data is Plural](https://docs.google.com/spreadsheets/d/1wZhPLMCHKJvwOkP4juclhjFgqIY8fQFMemwKL2c64vk/edit#gid=0){target="_blank"}
+- [Kaggle](https://www.kaggle.com/datasets?fileType=csv){target="_blank"}
+- [Zillow Housing Data](https://www.zillow.com/research/data/){target="_blank"}
+- US Popular Baby Names [babynamer R package](https://github.com/abresler/babynamer){target="_blank"}
+
+------------------
+
+# Trends / Relative Interest
+- [Wikipedia Page Interest](https://pageviews.toolforge.org/?project=en.wikipedia.org&platform=all-access&agent=user&redirects=0&range=latest-20&pages=Cat|Dog){target="_blank"}
+- [Google Trends](https://trends.google.com/trends/?geo=US){target="_blank"}
+- [Michigan Consumer Sentiment](http://www.sca.isr.umich.edu/){target="_blank"}
+- [YouGov](https://today.yougov.com/){target="_blank"}
+
+------------------
+
+# Covid
+- [Apple Mobility Data](https://www.apple.com/covid19/mobility){target="_blank"}
+- [Indeed Hiring Lab](https://www.hiringlab.org/){target="_blank"}
+- [State and Local Economic Tracker](https://tracktherecovery.org/){target='_blank'}
+- [NYTimes](https://github.com/nytimes/covid-19-data){target="_blank"}
+
+------------------
+
+# Social Science / Surveys 
+- [American National Election Studies](https://electionstudies.org/){target="_blank"}
+- [Cooperative Congressional Election Study](https://cces.gov.harvard.edu/){target="_blank"}
+- [Pew Research Center](https://www.people-press.org/){target="_blank"}
+- [Monmouth Polling](https://www.monmouth.edu/polling-institute/){target="_blank"}
+- [World Values Survey](http://www.worldvaluessurvey.org/wvs.jsp){target="_blank}
+- [General Social Survey](https://gss.norc.org/){target="_blank"}
+- [Nationscape/Voter Surveys](https://www.voterstudygroup.org/data){target="_blank"}
+- [Harvard Dataverse](https://dataverse.harvard.edu/){target="_blank"}
+
+------------------
+
+# Government 
+- [Unemployment - Weekly Claims](https://oui.doleta.gov/unemploy/claims.asp){target="_blank"}
+- [Unemployment - CPS Monthly](https://www.bls.gov/cps/tables.htm){target="_blank"}
+- [Unemployment - State & Local](https://www.bls.gov/lau/){target="_blank"}
+- [Inflation](https://www.bls.gov/bls/inflation.htm){target="_blank"}
+- [Earnings and Wages](https://www.bls.gov/bls/wages.htm){target="_blank"}
+- [Consumer Expenditure Surveys](https://www.bls.gov/cex/){target="_blank"}
+- [American Time Use Survey](https://www.bls.gov/tus/){target="_blank"}
+- [Personal Income, Expenditures, Savings](https://apps.bea.gov/iTable/index_nipa.cfm){target="_blank"}
+- [QCEW - Workers and Wage per State/County](https://data.bls.gov/cew/apps/data_views/data_views.htm#tab=Tables){target="_blank"}
+- [US Census](https://www.census.gov/data.html){target="_blank"}
+- [US Census - New Home Sales](https://www.census.gov/econ/currentdata/dbsearch?program=RESSALES&startYear=1963&endYear=2019&categories=ASOLD&dataType=TOTAL&geoLevel=US&adjusted=1&notAdjusted=0&errorData=0){target="_blank"}
+- [US Census - Residential Single Family Home Sales](https://www.census.gov/construction/nrs/index.html){target="_blank}
+- [Federal Reserve of St. Louis (FRED)](https://fred.stlouisfed.org/){target="_blank"}
+
+------------------
+
+# R Packages to Import Data
+- BLS data: [blscrapeR](https://cran.r-project.org/web/packages/blscrapeR/index.html){target="_blank"}
+- Stock data: [quantmod](https://github.com/joshuaulrich/quantmod){target="_blank}
+- BEA data: [bea](https://github.com/us-bea/bea.R){target="_blank}
+- SEC Filings: [edgar](https://cran.r-project.org/package=edgar){target="_blank"}
+  - SIC Codes: [edgarWebR](https://github.com/mwaldstein/edgarWebR){target="_blank"}
+- FRED data: [FredR](https://github.com/jcizel/FredR){target="_blank}
+- Census data (decennial and 5-year ACS): [tidycensus](https://walker-data.com/tidycensus/){target="_blank"}
+- Census data (full API): [censusapi](https://github.com/hrecht/censusapi){target="_blank"}
+- Census IPUMS microdata: [ipumsr](https://github.com/mnpopcenter/ipumsr){target="_blank"}
+- Twitter data: [rtweet](https://cran.r-project.org/web/packages/rtweet/index.html){target="_blank"}
+- Real Estate date: [realtR](https://asbcllc.com/r_packages/realtR/2018/introduction/index.html){target="_blank"}
+- Finance data: [pedquant](http://pedquant.com/){target="_blank"}
+- World Bank data: [wbstats](https://cran.r-project.org/web/packages/wbstats/index.html){target="_blank"}
