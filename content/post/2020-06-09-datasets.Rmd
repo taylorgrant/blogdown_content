@@ -83,6 +83,7 @@ Updated as I find them...
 - [US Census - New Home Sales](https://www.census.gov/econ/currentdata/dbsearch?program=RESSALES&startYear=1963&endYear=2019&categories=ASOLD&dataType=TOTAL&geoLevel=US&adjusted=1&notAdjusted=0&errorData=0){target="_blank"}
 - [US Census - Residential Single Family Home Sales](https://www.census.gov/construction/nrs/index.html){target="_blank}
 - [Federal Reserve of St. Louis (FRED)](https://fred.stlouisfed.org/){target="_blank"}
+- [Highway Statistics incl. Vehicle and Driver Registrations](https://www.fhwa.dot.gov/policyinformation/statistics/2018/){target="_blank"}
 
 ------------------
 
