@@ -70,19 +70,33 @@ Updated as I find them...
 ------------------
 
 # Government 
+
+## General 
+- [US Census](https://www.census.gov/data.html){target="_blank"}
+- [Federal Reserve of St. Louis (FRED)](https://fred.stlouisfed.org/){target="_blank"}
+
+## Labor
 - [Unemployment - Weekly Claims](https://oui.doleta.gov/unemploy/claims.asp){target="_blank"}
 - [Unemployment - CPS Monthly](https://www.bls.gov/cps/tables.htm){target="_blank"}
 - [Unemployment - State & Local](https://www.bls.gov/lau/){target="_blank"}
-- [Inflation](https://www.bls.gov/bls/inflation.htm){target="_blank"}
 - [Earnings and Wages](https://www.bls.gov/bls/wages.htm){target="_blank"}
+- [QCEW - Workers and Wage per State/County](https://data.bls.gov/cew/apps/data_views/data_views.htm#tab=Tables){target="_blank"}
+
+## Households and Consumer
+- [Inflation](https://www.bls.gov/bls/inflation.htm){target="_blank"}
+- [Consumer Price Index](https://www.bls.gov/cpi/){target="_blank"}
+- [Personal Income, Expenditures, Savings](https://apps.bea.gov/iTable/index_nipa.cfm){target="_blank"}
+- [Consumer Credit](https://www.federalreserve.gov/releases/g19/current/){target="_blank"}
+- [Household Debt and Credit](https://www.newyorkfed.org/microeconomics/hhdc/background.html){target="_blank"}
 - [Consumer Expenditure Surveys](https://www.bls.gov/cex/){target="_blank"}
 - [American Time Use Survey](https://www.bls.gov/tus/){target="_blank"}
-- [Personal Income, Expenditures, Savings](https://apps.bea.gov/iTable/index_nipa.cfm){target="_blank"}
-- [QCEW - Workers and Wage per State/County](https://data.bls.gov/cew/apps/data_views/data_views.htm#tab=Tables){target="_blank"}
-- [US Census](https://www.census.gov/data.html){target="_blank"}
-- [US Census - New Home Sales](https://www.census.gov/econ/currentdata/dbsearch?program=RESSALES&startYear=1963&endYear=2019&categories=ASOLD&dataType=TOTAL&geoLevel=US&adjusted=1&notAdjusted=0&errorData=0){target="_blank"}
+
+## Home Sales
+- [US Census - New Home Sales and Prices](https://www.census.gov/econ/currentdata/dbsearch?program=RESSALES&startYear=1963&endYear=2019&categories=ASOLD&dataType=TOTAL&geoLevel=US&adjusted=1&notAdjusted=0&errorData=0){target="_blank"}
+  - Select "Download all data for this report/survey"
 - [US Census - Residential Single Family Home Sales](https://www.census.gov/construction/nrs/index.html){target="_blank}
-- [Federal Reserve of St. Louis (FRED)](https://fred.stlouisfed.org/){target="_blank"}
+
+## Other
 - [Highway Statistics incl. Vehicle and Driver Registrations](https://www.fhwa.dot.gov/policyinformation/statistics/2018/){target="_blank"}
 - [Monthly Retail Sales](https://www.census.gov/retail/marts/www/timeseries.html){target="_blank"}
 
