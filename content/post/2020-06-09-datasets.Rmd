@@ -46,6 +46,7 @@ Updated as I find them...
 - [Google Trends](https://trends.google.com/trends/?geo=US){target="_blank"}
 - [Michigan Consumer Sentiment](http://www.sca.isr.umich.edu/){target="_blank"}
 - [YouGov](https://today.yougov.com/){target="_blank"}
+- [Opportunity Insights Economic Tracker](https://github.com/Opportunitylab/EconomicTracker){target="_blank"}
 
 ------------------
 
