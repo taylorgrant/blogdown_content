@@ -236,11 +236,11 @@ p1 | p2</code></pre>
 ## get police officer salary data ## 
 GET(&quot;https://www.bls.gov/oes/special.requests/oes_research_2019_sec_99.xlsx&quot;, write_disk(path &lt;- tempfile(fileext = &quot;.xlsx&quot;)))</code></pre>
 <pre><code>## Response [https://www.bls.gov/oes/special.requests/oes_research_2019_sec_99.xlsx]
-##   Date: 2020-06-20 22:15
+##   Date: 2020-06-20 22:18
 ##   Status: 200
 ##   Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 ##   Size: 8.44 MB
-## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmptHDzoB/file7be6378dcfbb.xlsx</code></pre>
+## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpudZQ9C/file7e21523740bf.xlsx</code></pre>
 <pre class="r"><code>tmp &lt;-
   read_excel(path) %&gt;% 
   clean_names()
@@ -379,6 +379,7 @@ df %&gt;% filter(str_detect(Demographics, fixed(&quot;NFL Fans&quot;, ignore_cas
         strip.text.y.left = element_text(angle = 0, size = 11, hjust = .5),
         strip.background = element_rect(fill = &quot;#E8E8E8&quot;, color = &quot;#E8E8E8&quot;)) +
   labs(x = NULL, y = NULL,
-       title = title)</code></pre>
+       title = title,
+       caption = &quot;Source: Morning Consult, 6/9/20-6/11/20&quot;)</code></pre>
 <p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 </div>

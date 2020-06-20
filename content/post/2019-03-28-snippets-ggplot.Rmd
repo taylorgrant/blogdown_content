@@ -474,6 +474,7 @@ df %>% filter(str_detect(Demographics, fixed("NFL Fans", ignore_case = TRUE))) %
         strip.text.y.left = element_text(angle = 0, size = 11, hjust = .5),
         strip.background = element_rect(fill = "#E8E8E8", color = "#E8E8E8")) +
   labs(x = NULL, y = NULL,
-       title = title)
+       title = title,
+       caption = "Source: Morning Consult, 6/9/20-6/11/20")
 
 ```
