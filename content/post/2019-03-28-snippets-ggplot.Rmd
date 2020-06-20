@@ -1,7 +1,7 @@
 ---
 title: 'Snippets: ggplot'
 author: ''
-date: '2020-06-04'
+date: '2020-06-20'
 slug: snippets-ggplot
 categories:
   - R
@@ -442,13 +442,14 @@ df <- df %>%
 
 ```
 
-We'll now take the popularity of 9 different quarterbacks and will facet by the player, and group the responses of NFL fans by their age and ethnicity. We'll also inlcude the overall opinion of all NFL fans for each quarterback. 
+We'll now take the popularity of 9 different quarterbacks and will facet by the player, and group the responses of NFL fans by their age. We'll also include the overall opinion of all NFL fans for each quarterback. 
 
 To make the plot, we'll use `coord_flip` to so that the chicklet plot is horizontal and we're going to reverse the positions of the facet and the axis text. We'll also rotate the orientation of the facet text from vertical to horizontal for easier reading. 
 
 ```{r warning=FALSE, fig.height=9}
 library(ggchicklet)
 df %>% filter(str_detect(Demographics, fixed("NFL Fans", ignore_case = TRUE))) %>% 
+  filter(!str_detect(Demographics, fixed("white", ignore_case = TRUE))) %>%
   group_by(Question) %>% 
   select(Question, Demographics, contains('pct')) %>% 
   gather(response, pct, 3:ncol(.)) %>% 
@@ -468,7 +469,7 @@ df %>% filter(str_detect(Demographics, fixed("NFL Fans", ignore_case = TRUE))) %
   hrbrthemes::scale_y_percent(expand = c(0,0), position = "right") +
   guides(fill=guide_legend(nrow=1, byrow = TRUE)) +
   theme(legend.position="bottom",
-        axis.text = element_text(size = 11),
+        axis.text = element_text(size = 10),
         plot.title.position = "plot",
         strip.text.y.left = element_text(angle = 0, size = 11, hjust = .5),
         strip.background = element_rect(fill = "#E8E8E8", color = "#E8E8E8")) +
