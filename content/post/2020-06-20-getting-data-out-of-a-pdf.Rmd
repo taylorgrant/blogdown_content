@@ -1,0 +1,184 @@
+---
+title: Getting data out of a pdf
+author: ''
+date: '2020-06-20'
+slug: getting-data-out-of-a-pdf
+categories:
+  - R
+  - data
+tags:
+  - pdftools
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548283717/copy.jpg
+summary: "Using the `pdftools` pacakge to extract data from a pdf"
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+pacman::p_load(tidyverse, here, glue, janitor, pdftools)
+
+## read in the pdf 
+tmp <- pdf_text(here('static', 'data', 'read_pdfs', 'june10_june12.pdf')) # blm protest
+```
+
+Several days a week, Morning Consult will publish the demographic breakdowns from one of their surveys in pdf form. The pdfs can be up to 300 pages long, and trying to use the data requires manually cutting and pasting data into R and then graphing. It's not hard, but it's tedious, and with so many questions being asked, I'm guessing there will be multiple occasions that I'll want some data. So instead, I'll write a function that more efficiently ingests and cleans the data of interest. 
+
+The first thing to do is to download the data, which I've done manually. Then read in the pdf using `pdftools`. We can then check to make sure that everything was read in correctly.  
+
+```{r, eval = FALSE}
+
+tmp <- pdf_text(here("polls", "[pdf_name].pdf"))
+
+head(tmp)
+```
+```{r, echo = FALSE}
+head(tmp)
+```
+
+As the [original post](https://ropensci.org/blog/2016/03/01/pdftools-and-jeroen/){target="_blank"} for pdftools says, it's pretty dumb. It doesn't understand tables, it just reads in text and it will then be up to us to decide how we parse what we want. But what is nice is that pdftools does preserve spacing pretty well, and it retains paging. This means that if we want to get data out of page 61 of the pdf:
+
+<img src = "/img/mc1.png"></img>
+
+We can simply isolate the page we want, and then create our own parsing rules to pull out what we want. In this case the data is nicely formatted with no missing values, which makes our job considerably easier.  
+
+```{r}
+cat(tmp[61])
+```
+
+We're going to use two functions. The first will create our column names based on possible responses, which can change depending on the question asked. The second will parse the actual response data.
+
+### Response headers 
+
+Ideally, we would just pull the line from the table with the responses, but responses vary by question, and some of them are spread across multiple lines. Rather than trying to solve this programmatically, I'll just put in a little bit of manual labor writing each one out. 
+
+```{r eval = TRUE}
+set_responses <- function(res) {
+  ## set the names for data table ## 
+  response_count <- length(res)
+  app <- c("_pct", "_n")
+  rep(app, response_count)
+  nms <- c('Question', "Demographics", paste0(rep(res, each = 2), rep(app, response_count)), "Total")
+  return(nms)
+}
+
+resp <- c("Very important", "Somewhat important", "Not too important", "Not important at all", "Don't know")
+set_responses(resp)
+```
+
+### Data ingest and clean
+
+This function does all of the rest of the work. We pass in the page number and it does the rest. We set the range of the data using `tbl_start` and `tbl_stop` which simply looks for specific terms. The Morning Consult pdfs are very well structured and consistent. Were this not the case, we would have to be more creative in how we define the table range. 
+
+```{r eval = TRUE}
+tidy_mc <- function(page) {
+  
+  ## function to strip out the punctuation
+  stripPunct <- function(x) as.numeric(str_replace_all(x, "%|\\(|\\)", ""))
+  
+  ## which page to read in ##
+  tmp_pg <- tmp[page]
+  ## split on the newline \n ##
+  tmp_table <- str_split(tmp_pg, "\n", simplify = TRUE)
+  ## determine where the data stops and starts ## 
+  tbl_start <- which(str_detect(tmp_table, "Demographic"))
+  tbl_stop <- which(str_detect(tmp_table, "Continued|Note:")) # two endings depending on the page
+  ## pull the table number ## 
+  table_num <- tmp_table[,2]
+  ## keep rows between our start and stop ##  
+  tbl1 <- tmp_table[,(tbl_start+1):(tbl_stop-1)]
+  ## get rid of white space ## 
+  tbl1 <- str_trim(tbl1)
+  ## any time there are 2 spaces, add delimiter ## 
+  tbl2 <- str_replace_all(tbl1, "\\s{2,}", "|")
+  tbl2 <- str_replace_all(tbl2, "% ", "%|")
+  tbl2 <- str_replace_all(tbl2, "\\) ", ")|")
+  ## define table as text connection and read in with read.csv 
+  text_con <- textConnection(tbl2)
+  data_table <- read.csv(text_con, sep = "|", header = FALSE)
+  
+  ## clean up and set as numeric ## 
+  data_table <- data_table %>% 
+    mutate(across(V2:ncol(.), stripPunct)) %>% 
+    mutate(table_num = str_trim(table_num)) %>% 
+    relocate(table_num) # new dplyr 1.0 functions
+}
+```
+
+Now that we have these in place, let's pull out the data. Most of these questions have 4 pages worth of demographic response data. The only value we're passing into the function is the page; this way we can use the `map` function to run over multiple pages. 
+
+Let's say we're interested in whether or not it's important for Donald Trump to address racial inequality, Table MCC3_8, that runs across pages 61-64. 
+
+```{r}
+## question ##
+pages <- 61:64
+resp <- c("Very important", "Somewhat important", "Not too important", "Not important at all", "Don't know")
+
+# set the responses 
+nms <- set_responses(resp)
+## get the data and set responses
+df <- pages %>% 
+  map_dfr(tidy_mc) %>% 
+  set_names(nms)
+
+head(df, 3)
+```
+
+### Graphing Function
+Now that we have our data, let's write a function to graph the response percentages by demographic group. This function uses the `str_detect` function to pull out the groups, which is a little imperfect because some groups within the survey - such as generations - don't have a consistent identifier.  
+
+```{r} 
+mc_plot <- function(title, sub, demo, date) {
+  
+  question <- pull(distinct(df, Question))
+  
+  p <- df %>% 
+    filter(str_detect(Demographics, fixed(demo, ignore_case = TRUE))) %>% 
+    select(Demographics, contains('pct')) %>% 
+    gather(response, pct, 2:ncol(.)) %>% 
+    mutate(pct = pct/100,
+           response = str_replace_all(response, "_", " "),
+           response = str_trim(str_replace_all(response, "pct", "")),
+           response = factor(response, levels = lvls)) %>%
+    ggplot(aes(x = response, y = pct, group = Demographics, fill = Demographics)) + 
+    geom_bar(stat = 'identity', position = "dodge", width = .8, col = "black", size = .15) + 
+    hrbrthemes::scale_y_percent() + 
+    scale_fill_manual(values = pal,
+                      name = NULL) +
+    theme_twg() 
+  if (str_detect(demo, "Registered")) {
+    p <- p + theme(axis.text = element_text(size = 11),
+                   legend.position = "none")
+  } else {
+    p <-  p + theme(axis.text = element_text(size = 11),
+                    legend.position = "top")
+  }
+  p <- p + labs(x = NULL, y = NULL, 
+                title = title,
+                subtitle = sub,
+                caption = glue("Source: Morning Consult, {date}"))
+  
+}
+
+```
+
+This function requires us to do a little more manual work -- we need to give the plot a title and subtitle, and we need to define the demographic group we're pulling out, and then provide the date of the survey for the plot caption. We're also going to convert our response headers to a factor, so we also need to set the factor levels so that we have the proper ordering on the axis. Additionally, we'll set a color palette for our graph.  
+
+```{r}
+## set the color palette
+pal <- my_colors("solr5")
+## title and factor levels 
+title <- "How important is it for Donald Trump to address racial\ninequality in the U.S., which refers to differences across\nraces in income, access to quality healthcare, access to\nvoting rights or general quality of life?"
+lvls <- c("Very important", "Somewhat important", "Not too important", "Not important at all", "Don't know")
+date <- "6/10/20-6/12/20"
+
+## graph  
+sub <- "By Race/Ethnicity"
+demo <- "Ethnicity"
+p1 <- mc_plot(title, sub, demo, date)
+p1
+```
+
+Interestingly, while a majority of every race/ethnicity believe it's important, about 20% of  African-American and Hispanic respondents say it's Not Important at All that Trump to address racial inequality in America. I guess that ship has sailed at this point.   
+

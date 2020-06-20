@@ -1,0 +1,220 @@
+---
+title: Getting data out of a pdf
+author: ''
+date: '2020-06-20'
+slug: getting-data-out-of-a-pdf
+categories:
+  - R
+  - data
+tags:
+  - pdftools
+thumbnailImagePosition: left
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548283717/copy.jpg
+summary: "Using the `pdftools` pacakge to extract data from a pdf"
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#response-headers">Response headers</a></li>
+<li><a href="#data-ingest-and-clean">Data ingest and clean</a></li>
+<li><a href="#graphing-function">Graphing Function</a></li>
+</ul>
+</div>
+
+<p>Several days a week, Morning Consult will publish the demographic breakdowns from one of their surveys in pdf form. The pdfs can be up to 300 pages long, and trying to use the data requires manually cutting and pasting data into R and then graphing. It’s not hard, but it’s tedious, and with so many questions being asked, I’m guessing there will be multiple occasions that I’ll want some data. So instead, I’ll write a function that more efficiently ingests and cleans the data of interest.</p>
+<p>The first thing to do is to download the data, which I’ve done manually. Then read in the pdf using <code>pdftools</code>. We can then check to make sure that everything was read in correctly.</p>
+<pre class="r"><code>tmp &lt;- pdf_text(here(&quot;polls&quot;, &quot;[pdf_name].pdf&quot;))
+
+head(tmp)</code></pre>
+<pre><code>## [1] &quot;                              National Tracking Poll #200648\n                                       June 10-12, 2020\n                                   Crosstabulation Results\nMethodology:\nThis poll was conducted between June 10-June 12, 2020 among a national sample of 1303 Registered\nVoters. The interviews were conducted online and the data were weighted to approximate a target\nsample of Registered Voters based on age, gender, educational attainment, race, and region. Results\nfrom the full survey have a margin of error of plus or minus 3 percentage points.\n&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+## [2] &quot;Table Index\n  1   Table MCC1_1: How much have you seen, read, or heard about each of the following? Protests\n      and demonstrations in dozens of U.S. cities in response to the death of George Floyd . . . . .        9\n  2   Table MCC1_2: How much have you seen, read, or heard about each of the following? George\n      Floyd, a black Minneapolis man, dying after police officer Derek Chauvin kneeled on his neck\n      for several minutes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    12\n  3   Table MCC1_3: How much have you seen, read, or heard about each of the following? Police\n      officers in Louisville, Kentucky, fatally shooting Breonna Taylor after entering her home with\n      a warrant . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    15\n  4   Table MCC1_4: How much have you seen, read, or heard about each of the following? Pres-\n      ident Trump suggesting on Twitter that Buffalo Police pushing Martin Gugino, a 75 year old\n      white man, could have been a set-up . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      18\n  5   Table MCC2_1: In general, do you support or oppose each of the following during the on-\n      going protests in response to the death of George Floyd and others in the African American\n      community? The protest in general . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      21\n  6   Table MCC2_2: In general, do you support or oppose each of the following during the on-\n      going protests in response to the death of George Floyd and others in the African American\n      community? Protesters . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      25\n  7   Table MCC2_3: In general, do you support or oppose each of the following during the on-\n      going protests in response to the death of George Floyd and others in the African American\n      community? The police . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      29\n  8   Table MCC3_1: How important is it for each of the following to address racial inequality in\n      the U.S., which refers to differences across races in income, access to quality healthcare, access\n      to voting rights or general quality of life? Religious leaders . . . . . . . . . . . . . . . . . . . 33\n  9   Table MCC3_2: How important is it for each of the following to address racial inequality in\n      the U.S., which refers to differences across races in income, access to quality healthcare, access\n      to voting rights or general quality of life? Business leaders . . . . . . . . . . . . . . . . . . .  37\n  10  Table MCC3_3: How important is it for each of the following to address racial inequality in\n      the U.S., which refers to differences across races in income, access to quality healthcare, access\n      to voting rights or general quality of life? Company CEOs . . . . . . . . . . . . . . . . . . .      41\n  11  Table MCC3_4: How important is it for each of the following to address racial inequality in\n      the U.S., which refers to differences across races in income, access to quality healthcare, access\n      to voting rights or general quality of life? Mayors . . . . . . . . . . . . . . . . . . . . . . .    45\n  12  Table MCC3_5: How important is it for each of the following to address racial inequality in\n      the U.S., which refers to differences across races in income, access to quality healthcare, access\n      to voting rights or general quality of life? Governors . . . . . . . . . . . . . . . . . . . . . .   49\n                                                      2\n&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+## [3] &quot;National Tracking Poll #200648, June, 2020\n    13     Table MCC3_6: How important is it for each of the following to address racial inequality in\n           the U.S., which refers to differences across races in income, access to quality healthcare, access\n           to voting rights or general quality of life? Police . . . . . . . . . . . . . . . . . . . . . . . . 53\n    14     Table MCC3_7: How important is it for each of the following to address racial inequality in\n           the U.S., which refers to differences across races in income, access to quality healthcare, access\n           to voting rights or general quality of life? Members of Congress . . . . . . . . . . . . . . . .    57\n    15     Table MCC3_8: How important is it for each of the following to address racial inequality in\n           the U.S., which refers to differences across races in income, access to quality healthcare, access\n           to voting rights or general quality of life? President Donald Trump . . . . . . . . . . . . . .     61\n    16     Table MCC3_9: How important is it for each of the following to address racial inequality in\n           the U.S., which refers to differences across races in income, access to quality healthcare, access\n           to voting rights or general quality of life? The media . . . . . . . . . . . . . . . . . . . . . .  65\n    17     Table MCC3_10: How important is it for each of the following to address racial inequality in\n           the U.S., which refers to differences across races in income, access to quality healthcare, access\n           to voting rights or general quality of life? The general public . . . . . . . . . . . . . . . . . . 69\n    18     Table MCC4_1: How important is it for each of the following to help handle the protests and\n           demonstrations in dozens of U.S. cities in response to the death of George Floyd? Religious\n           leaders . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 73\n    19     Table MCC4_2: How important is it for each of the following to help handle the protests and\n           demonstrations in dozens of U.S. cities in response to the death of George Floyd? Business leaders 77\n    20     Table MCC4_3: How important is it for each of the following to help handle the protests and\n           demonstrations in dozens of U.S. cities in response to the death of George Floyd? Company\n           CEOs . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    81\n    21     Table MCC4_4: How important is it for each of the following to help handle the protests and\n           demonstrations in dozens of U.S. cities in response to the death of George Floyd? Mayors . .        85\n    22     Table MCC4_5: How important is it for each of the following to help handle the protests and\n           demonstrations in dozens of U.S. cities in response to the death of George Floyd? Governors .       89\n    23     Table MCC4_6: How important is it for each of the following to help handle the protests and\n           demonstrations in dozens of U.S. cities in response to the death of George Floyd? Police . . .      93\n    24     Table MCC4_7: How important is it for each of the following to help handle the protests and\n           demonstrations in dozens of U.S. cities in response to the death of George Floyd? Members of\n           Congress . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  97\n    25     Table MCC4_8: How important is it for each of the following to help handle the protests and\n           demonstrations in dozens of U.S. cities in response to the death of George Floyd? President\n           Donald Trump . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 101\n    26     Table MCC4_9: How important is it for each of the following to help handle the protests and\n           demonstrations in dozens of U.S. cities in response to the death of George Floyd? The media . 105\n                                                                                                                3\n&quot;
+## [4] &quot;                                                                                            Morning Consult\n27 Table MCC5_1: Now, thinking about the protests and demonstrations in dozens of U.S. cities\n   in response to the death of George Floyd, how would you describe the job each of the following\n   are doing in addressing the situation? Religious leaders . . . . . . . . . . . . . . . . . . . . 109\n28 Table MCC5_2: Now, thinking about the protests and demonstrations in dozens of U.S. cities\n   in response to the death of George Floyd, how would you describe the job each of the following\n   are doing in addressing the situation? Business leaders . . . . . . . . . . . . . . . . . . . . . 113\n29 Table MCC5_3: Now, thinking about the protests and demonstrations in dozens of U.S. cities\n   in response to the death of George Floyd, how would you describe the job each of the following\n   are doing in addressing the situation? Company CEOs . . . . . . . . . . . . . . . . . . . . . 117\n30 Table MCC5_4: Now, thinking about the protests and demonstrations in dozens of U.S. cities\n   in response to the death of George Floyd, how would you describe the job each of the following\n   are doing in addressing the situation? Mayors . . . . . . . . . . . . . . . . . . . . . . . . . 121\n31 Table MCC5_5: Now, thinking about the protests and demonstrations in dozens of U.S. cities\n   in response to the death of George Floyd, how would you describe the job each of the following\n   are doing in addressing the situation? Governors . . . . . . . . . . . . . . . . . . . . . . . . 125\n32 Table MCC5_6: Now, thinking about the protests and demonstrations in dozens of U.S. cities\n   in response to the death of George Floyd, how would you describe the job each of the following\n   are doing in addressing the situation? Police . . . . . . . . . . . . . . . . . . . . . . . . . . 129\n33 Table MCC5_7: Now, thinking about the protests and demonstrations in dozens of U.S. cities\n   in response to the death of George Floyd, how would you describe the job each of the following\n   are doing in addressing the situation? Members of Congress . . . . . . . . . . . . . . . . . . 133\n34 Table MCC5_8: Now, thinking about the protests and demonstrations in dozens of U.S. cities\n   in response to the death of George Floyd, how would you describe the job each of the following\n   are doing in addressing the situation? President Donald Trump . . . . . . . . . . . . . . . . 137\n35 Table MCC5_9: Now, thinking about the protests and demonstrations in dozens of U.S. cities\n   in response to the death of George Floyd, how would you describe the job each of the following\n   are doing in addressing the situation? Joe Biden . . . . . . . . . . . . . . . . . . . . . . . . 141\n36 Table MCC5_10: Now, thinking about the protests and demonstrations in dozens of U.S. cities\n   in response to the death of George Floyd, how would you describe the job each of the following\n   are doing in addressing the situation? The media . . . . . . . . . . . . . . . . . . . . . . . 145\n37 Table MCC6_1: Would you support or oppose cities taking the following measures to address\n   protests and demonstrations in dozens of U.S. cities in response to the death of George Floyd?\n   Establishing curfews in cities with protests . . . . . . . . . . . . . . . . . . . . . . . . . . . 149\n38 Table MCC6_2: Would you support or oppose cities taking the following measures to address\n   protests and demonstrations in dozens of U.S. cities in response to the death of George Floyd?\n   Calling in the national guard to supplement city police forces . . . . . . . . . . . . . . . . . 153\n39 Table MCC6_3: Would you support or oppose cities taking the following measures to address\n   protests and demonstrations in dozens of U.S. cities in response to the death of George Floyd?\n   Calling in the U.S. military to supplement city police forces . . . . . . . . . . . . . . . . . . 157\n                                                                                                         4\n&quot;                                                                                          
+## [5] &quot;National Tracking Poll #200648, June, 2020\n    40     Table MCC7: Which of the following comes closer to your view, even if neither is exactly right? 161\n    41     Table MCC8: Which of the following comes closer to your view, even if neither is exactly right? 165\n    42     Table MCC9_1: Thinking about the current events in the United States, do each of the fol-\n           lowing make you more likely to vote for Republican candidates or Democratic candidates in\n           the 2020 election? The coronavirus pandemic . . . . . . . . . . . . . . . . . . . . . . . . . 169\n    43     Table MCC9_2: Thinking about the current events in the United States, do each of the fol-\n           lowing make you more likely to vote for Republican candidates or Democratic candidates in\n           the 2020 election? The economic impacts from the coronavirus pandemic in the United States 173\n    44     Table MCC9_3: Thinking about the current events in the United States, do each of the follow-\n           ing make you more likely to vote for Republican candidates or Democratic candidates in the\n           2020 election? State government responses to the protests and demonstrations in cities across\n           the United States . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 177\n    45     Table MCC9_4: Thinking about the current events in the United States, do each of the follow-\n           ing make you more likely to vote for Republican candidates or Democratic candidates in the\n           2020 election? The federal government response to the protests and demonstrations in cities\n           across the United States . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 181\n    46     Table MCC10: Specifically, are you more or less likely to vote for President Trump or Joe Biden\n           as a result of George Floyd’s death and subsequent protests? . . . . . . . . . . . . . . . . . . 185\n    47     Table MCC11_1: Now, thinking about the current protests in dozens of U.S. cities, how im-\n           portant do you think the following are? Protecting private property such as businesses or retail\n           stores from looting or damage . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 188\n    48     Table MCC11_2: Now, thinking about the current protests in dozens of U.S. cities, how im-\n           portant do you think the following are? Protecting rights of protesters and demonstrators to\n           assemble . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 191\n    49     Table MCC12: How have city and state leaders performed on protecting businesses and retail\n           stores? . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 194\n    50     Table MCC13: How have city and state leaders performed on protecting rights of protesters\n           and demonstrators to assemble? . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 197\n    51     Table MCC14: In light of the recent protests, which of the following statements comes closest\n           to your view, even if neither is exactly right? . . . . . . . . . . . . . . . . . . . . . . . . . . 200\n    52     Table MCC15: Thinking about any statements you’ve seen read, or heard from companies in\n           light of the recent protests, which of the following best describes why you think these companies\n           released these statements? . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 204\n    53     Table MCC16_1: How effective do you think companies and their leaders are at each of the\n           following? Reducing and helping to combat police violence . . . . . . . . . . . . . . . . . . 208\n    54     Table MCC16_2: How effective do you think companies and their leaders are at each of the\n           following? Reducing and helping to combat racial inequality . . . . . . . . . . . . . . . . . 211\n                                                                                                                 5\n&quot;                                                       
+## [6] &quot;                                                                                                Morning Consult\n55 Table MCC16_3: How effective do you think companies and their leaders are at each of the\n   following? Nurturing a culture of diversity, inclusion, and acceptance within their organizations214\n56 Table MCC17_1: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Make an official statement supporting protesters . . . . . . . . . . . . . . . . . . . . . . . . 217\n57 Table MCC17_2: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Do not make an official statement . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 221\n58 Table MCC17_3: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Make an official statement supporting the police . . . . . . . . . . . . . . . . . . . . . . . . 225\n59 Table MCC17_4: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Make an official statement supporting the rights of the protesters while also supporting the police229\n60 Table MCC17_5: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Make an official statement supporting protesters without acting in support of their cause . . . 233\n61 Table MCC17_6: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Make a statement on social media . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 237\n62 Table MCC17_7: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Post additional security in front of all ’at risk’ stores or locations . . . . . . . . . . . . . . . . 241\n63 Table MCC17_8: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Close ’at risk’ stores or locations until the unrest has died down . . . . . . . . . . . . . . . . 245\n64 Table MCC17_9: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Set up a fund to support small businesses or retailers impacted by the looting . . . . . . . . . 249\n65 Table MCC17_10: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Donate to community cleanup funds following protests . . . . . . . . . . . . . . . . . . . . 253\n66 Table MCC17_11: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Donate to organizations that pay bail for people who have been arrested while protesting . . 257\n67 Table MCC17_12: Now, thinking about the current protests and demonstrations in dozens of\n   U.S. cities, would you have a more or less favorable view of companies that did the following?\n   Donate to social justice groups or causes . . . . . . . . . . . . . . . . . . . . . . . . . . . . 261\n                                                                                                             6\n&quot;</code></pre>
+<p>As the <a href="https://ropensci.org/blog/2016/03/01/pdftools-and-jeroen/" target="_blank">original post</a> for pdftools says, it’s pretty dumb. It doesn’t understand tables, it just reads in text and it will then be up to us to decide how we parse what we want. But what is nice is that pdftools does preserve spacing pretty well, and it retains paging. This means that if we want to get data out of page 61 of the pdf:</p>
+<p><img src = "/img/mc1.png"></img></p>
+<p>We can simply isolate the page we want, and then create our own parsing rules to pull out what we want. In this case the data is nicely formatted with no missing values, which makes our job considerably easier.</p>
+<pre class="r"><code>cat(tmp[61])</code></pre>
+<pre><code>## National Tracking Poll #200648, June, 2020
+## Table MCC3_8
+## Table MCC3_8: How important is it for each of the following to address racial inequality in the U.S., which refers to differences across races in income,
+## access to quality healthcare, access to voting rights or general quality of life?
+## President Donald Trump
+##                                                                 Somewhat             Not too     Not important         Don’t Know /
+##             Demographic                    Very important       important           important          at all           No Opinion            Total N
+##   Registered Voters                         59%   (766)       18%     (231)        7%     (93)    11%      (143)        5%      (70)               1303
+##   Gender: Male                              53%   (320)       17%     (105)       10%      (61)   16%       (95)        5%      (28)                610
+##   Gender: Female                           64%    (445)       18%     (126)        5%     (32)     7%       (48)        6%      (42)                693
+##   Age: 18-34                                58%    (188)      16%      (54)        9%     (29)    12%       (41)        5%      (15)                327
+##   Age: 35-44                                57%    (114)      18%      (37)        5%      (10)   12%       (24)        7%      (14)                198
+##   Age: 45-64                               60%    (284)       17%       (81)       7%     (35)    10%       (50)        5%      (26)                475
+##   Age: 65+                                  59%    (180)      20%      (60)        6%      (19)   10%       (29)        5%      (15)                303
+##   GenZers: 1997-2012                       64%      (77)       11%      (13)      11%      (13)   11%        (13)       4%       (4)                 119
+##   Millennials: 1981-1996                    54%    (169)      20%      (63)        6%     (20)    13%       (40)        6%      (19)                310
+##   GenXers: 1965-1980                        57%    (192)      18%      (61)        7%     (25)    10%       (35)        7%      (23)                336
+##   Baby Boomers: 1946-1964                   61%   (293)       17%       (81)       7%     (34)    10%       (47)        5%      (23)                478
+##   PID: Dem (no lean)                        61%   (328)        11%     (59)        6%     (32)    17%       (89)        5%      (27)                535
+##   PID: Ind (no lean)                        55%    (193)      19%      (65)        8%     (29)    10%       (34)        8%      (29)                350
+##   PID: Rep (no lean)                        58%   (244)       25%     (106)        8%     (32)     5%       (20)        3%      (14)                418
+##   PID/Gender: Dem Men                       53%    (130)      10%      (25)       10%     (23)   23%        (55)        4%      (10)                244
+##   PID/Gender: Dem Women                     68%    (198)      12%      (35)        3%       (9)   11%       (33)        6%      (16)                291
+##   PID/Gender: Ind Men                      46%      (78)      21%      (36)       12%     (20)    14%       (24)        7%      (12)                170
+##   PID/Gender: Ind Women                    64%     (115)      16%      (29)        5%       (9)    6%       (10)        9%      (17)                180
+##   PID/Gender: Rep Men                       57%    (112)      22%      (44)        9%      (18)    8%       (16)        3%        (5)               195
+##   PID/Gender: Rep Women                     59%    (132)      28%      (63)        6%      (14)    2%         (5)       4%       (9)                222
+##   Ideo: Liberal (1-3)                      64%    (266)       12%      (49)        6%     (24)    16%       (66)        2%        (8)               413
+##   Ideo: Moderate (4)                        61%   (206)       16%      (53)        8%     (26)    11%       (37)        5%      (19)                341
+##   Ideo: Conservative (5-7)                  55%   (254)       26%     (118)        8%     (38)     7%       (30)        4%      (18)                458
+##   Educ: &lt; College                           58%   (472)       17%     (141)        6%     (52)    12%       (99)        7%      (55)                820
+##   Educ: Bachelors degree                    56%    (174)      22%      (67)        8%     (26)    10%        (31)       3%       (11)               308
+##   Educ: Post-grad                           68%    (120)      13%      (23)        8%      (15)    7%        (13)       3%        (5)               175
+##   Income: Under 50k                         56%   (368)       17%      (111)       7%     (47)    14%       (91)        7%      (45)                661
+##   Income: 50k-100k                          62%   (266)       17%      (74)        7%     (30)     9%       (40)        4%      (18)                429
+##   Income: 100k+                             61%    (131)      22%      (46)        8%      (17)    6%       (12)        3%        (7)               214
+##   Ethnicity: White                          59%   (620)       19%     (201)        7%     (79)     9%       (98)        5%      (56)               1054
+##                                                                    Continued on next page
+##                                                                                                                                                          61</code></pre>
+<p>We’re going to use two functions. The first will create our column names based on possible responses, which can change depending on the question asked. The second will parse the actual response data.</p>
+<div id="response-headers" class="section level3">
+<h3>Response headers</h3>
+<p>Ideally, we would just pull the line from the table with the responses, but responses vary by question, and some of them are spread across multiple lines. Rather than trying to solve this programmatically, I’ll just put in a little bit of manual labor writing each one out.</p>
+<pre class="r"><code>set_responses &lt;- function(res) {
+  ## set the names for data table ## 
+  response_count &lt;- length(res)
+  app &lt;- c(&quot;_pct&quot;, &quot;_n&quot;)
+  rep(app, response_count)
+  nms &lt;- c(&#39;Question&#39;, &quot;Demographics&quot;, paste0(rep(res, each = 2), rep(app, response_count)), &quot;Total&quot;)
+  return(nms)
+}
+
+resp &lt;- c(&quot;Very important&quot;, &quot;Somewhat important&quot;, &quot;Not too important&quot;, &quot;Not important at all&quot;, &quot;Don&#39;t know&quot;)
+set_responses(resp)</code></pre>
+<pre><code>##  [1] &quot;Question&quot;                 &quot;Demographics&quot;            
+##  [3] &quot;Very important_pct&quot;       &quot;Very important_n&quot;        
+##  [5] &quot;Somewhat important_pct&quot;   &quot;Somewhat important_n&quot;    
+##  [7] &quot;Not too important_pct&quot;    &quot;Not too important_n&quot;     
+##  [9] &quot;Not important at all_pct&quot; &quot;Not important at all_n&quot;  
+## [11] &quot;Don&#39;t know_pct&quot;           &quot;Don&#39;t know_n&quot;            
+## [13] &quot;Total&quot;</code></pre>
+</div>
+<div id="data-ingest-and-clean" class="section level3">
+<h3>Data ingest and clean</h3>
+<p>This function does all of the rest of the work. We pass in the page number and it does the rest. We set the range of the data using <code>tbl_start</code> and <code>tbl_stop</code> which simply looks for specific terms. The Morning Consult pdfs are very well structured and consistent. Were this not the case, we would have to be more creative in how we define the table range.</p>
+<pre class="r"><code>tidy_mc &lt;- function(page) {
+  
+  ## function to strip out the punctuation
+  stripPunct &lt;- function(x) as.numeric(str_replace_all(x, &quot;%|\\(|\\)&quot;, &quot;&quot;))
+  
+  ## which page to read in ##
+  tmp_pg &lt;- tmp[page]
+  ## split on the newline \n ##
+  tmp_table &lt;- str_split(tmp_pg, &quot;\n&quot;, simplify = TRUE)
+  ## determine where the data stops and starts ## 
+  tbl_start &lt;- which(str_detect(tmp_table, &quot;Demographic&quot;))
+  tbl_stop &lt;- which(str_detect(tmp_table, &quot;Continued|Note:&quot;)) # two endings depending on the page
+  ## pull the table number ## 
+  table_num &lt;- tmp_table[,2]
+  ## keep rows between our start and stop ##  
+  tbl1 &lt;- tmp_table[,(tbl_start+1):(tbl_stop-1)]
+  ## get rid of white space ## 
+  tbl1 &lt;- str_trim(tbl1)
+  ## any time there are 2 spaces, add delimiter ## 
+  tbl2 &lt;- str_replace_all(tbl1, &quot;\\s{2,}&quot;, &quot;|&quot;)
+  tbl2 &lt;- str_replace_all(tbl2, &quot;% &quot;, &quot;%|&quot;)
+  tbl2 &lt;- str_replace_all(tbl2, &quot;\\) &quot;, &quot;)|&quot;)
+  ## define table as text connection and read in with read.csv 
+  text_con &lt;- textConnection(tbl2)
+  data_table &lt;- read.csv(text_con, sep = &quot;|&quot;, header = FALSE)
+  
+  ## clean up and set as numeric ## 
+  data_table &lt;- data_table %&gt;% 
+    mutate(across(V2:ncol(.), stripPunct)) %&gt;% 
+    mutate(table_num = str_trim(table_num)) %&gt;% 
+    relocate(table_num) # new dplyr 1.0 functions
+}</code></pre>
+<p>Now that we have these in place, let’s pull out the data. Most of these questions have 4 pages worth of demographic response data. The only value we’re passing into the function is the page; this way we can use the <code>map</code> function to run over multiple pages.</p>
+<p>Let’s say we’re interested in whether or not it’s important for Donald Trump to address racial inequality, Table MCC3_8, that runs across pages 61-64.</p>
+<pre class="r"><code>## question ##
+pages &lt;- 61:64
+resp &lt;- c(&quot;Very important&quot;, &quot;Somewhat important&quot;, &quot;Not too important&quot;, &quot;Not important at all&quot;, &quot;Don&#39;t know&quot;)
+
+# set the responses 
+nms &lt;- set_responses(resp)
+## get the data and set responses
+df &lt;- pages %&gt;% 
+  map_dfr(tidy_mc) %&gt;% 
+  set_names(nms)</code></pre>
+<pre><code>## Warning in fn(col, ...): NAs introduced by coercion</code></pre>
+<pre class="r"><code>head(df, 3)</code></pre>
+<pre><code>##       Question      Demographics Very important_pct Very important_n
+## 1 Table MCC3_8 Registered Voters                 59              766
+## 2 Table MCC3_8      Gender: Male                 53              320
+## 3 Table MCC3_8    Gender: Female                 64              445
+##   Somewhat important_pct Somewhat important_n Not too important_pct
+## 1                     18                  231                     7
+## 2                     17                  105                    10
+## 3                     18                  126                     5
+##   Not too important_n Not important at all_pct Not important at all_n
+## 1                  93                       11                    143
+## 2                  61                       16                     95
+## 3                  32                        7                     48
+##   Don&#39;t know_pct Don&#39;t know_n Total
+## 1              5           70  1303
+## 2              5           28   610
+## 3              6           42   693</code></pre>
+</div>
+<div id="graphing-function" class="section level3">
+<h3>Graphing Function</h3>
+<p>Now that we have our data, let’s write a function to graph the response percentages by demographic group. This function uses the <code>str_detect</code> function to pull out the groups, which is a little imperfect because some groups within the survey - such as generations - don’t have a consistent identifier.</p>
+<pre class="r"><code>mc_plot &lt;- function(title, sub, demo, date) {
+  
+  question &lt;- pull(distinct(df, Question))
+  
+  p &lt;- df %&gt;% 
+    filter(str_detect(Demographics, fixed(demo, ignore_case = TRUE))) %&gt;% 
+    select(Demographics, contains(&#39;pct&#39;)) %&gt;% 
+    gather(response, pct, 2:ncol(.)) %&gt;% 
+    mutate(pct = pct/100,
+           response = str_replace_all(response, &quot;_&quot;, &quot; &quot;),
+           response = str_trim(str_replace_all(response, &quot;pct&quot;, &quot;&quot;)),
+           response = factor(response, levels = lvls)) %&gt;%
+    ggplot(aes(x = response, y = pct, group = Demographics, fill = Demographics)) + 
+    geom_bar(stat = &#39;identity&#39;, position = &quot;dodge&quot;, width = .8, col = &quot;black&quot;, size = .15) + 
+    hrbrthemes::scale_y_percent() + 
+    scale_fill_manual(values = pal,
+                      name = NULL) +
+    theme_twg() 
+  if (str_detect(demo, &quot;Registered&quot;)) {
+    p &lt;- p + theme(axis.text = element_text(size = 11),
+                   legend.position = &quot;none&quot;)
+  } else {
+    p &lt;-  p + theme(axis.text = element_text(size = 11),
+                    legend.position = &quot;top&quot;)
+  }
+  p &lt;- p + labs(x = NULL, y = NULL, 
+                title = title,
+                subtitle = sub,
+                caption = glue(&quot;Source: Morning Consult, {date}&quot;))
+  
+}</code></pre>
+<p>This function requires us to do a little more manual work – we need to give the plot a title and subtitle, and we need to define the demographic group we’re pulling out, and then provide the date of the survey for the plot caption. We’re also going to convert our response headers to a factor, so we also need to set the factor levels so that we have the proper ordering on the axis. Additionally, we’ll set a color palette for our graph.</p>
+<pre class="r"><code>## set the color palette
+pal &lt;- my_colors(&quot;solr5&quot;)
+## title and factor levels 
+title &lt;- &quot;How important is it for Donald Trump to address racial\ninequality in the U.S., which refers to differences across\nraces in income, access to quality healthcare, access to\nvoting rights or general quality of life?&quot;
+lvls &lt;- c(&quot;Very important&quot;, &quot;Somewhat important&quot;, &quot;Not too important&quot;, &quot;Not important at all&quot;, &quot;Don&#39;t know&quot;)
+date &lt;- &quot;6/10/20-6/12/20&quot;
+
+## graph  
+sub &lt;- &quot;By Race/Ethnicity&quot;
+demo &lt;- &quot;Ethnicity&quot;
+p1 &lt;- mc_plot(title, sub, demo, date)
+p1</code></pre>
+<p><img src="/post/2020-06-20-getting-data-out-of-a-pdf_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Interestingly, while a majority of every race/ethnicity believe it’s important, about 20% of African-American and Hispanic respondents say it’s Not Important at All that Trump to address racial inequality in America. I guess that ship has sailed at this point.</p>
+</div>
