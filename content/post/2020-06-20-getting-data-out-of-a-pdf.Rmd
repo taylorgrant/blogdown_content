@@ -181,7 +181,7 @@ p1 <- mc_plot(title, sub, demo, date)
 p1
 ```
 
-Interestingly, while a majority of every race/ethnicity believe it's important, about 20% of  African-American and Hispanic respondents say it's Not Important at All that Trump to address racial inequality in America. I guess that ship has sailed at this point. 
+Interestingly, while a majority of every race/ethnicity believe it's important, about 20% of  African-American and Hispanic respondents say it's "Not Important at All" that Trump addresses racial inequality in America. I guess that ship has sailed at this point. 
 
 
 ### Using `pmap` to graph multiple demos
