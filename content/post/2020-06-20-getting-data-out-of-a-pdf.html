@@ -9,7 +9,7 @@ categories:
 tags:
   - pdftools
 thumbnailImagePosition: left
-thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548283717/copy.jpg
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1592669938/Reading_Data_Tracker_example.jpg
 summary: "Using the `pdftools` pacakge to extract data from a pdf"
 output:
   blogdown::html_page:
@@ -22,6 +22,7 @@ output:
 <li><a href="#response-headers">Response headers</a></li>
 <li><a href="#data-ingest-and-clean">Data ingest and clean</a></li>
 <li><a href="#graphing-function">Graphing Function</a></li>
+<li><a href="#using-pmap-to-graph-multiple-demos">Using <code>pmap</code> to graph multiple demos</a></li>
 </ul>
 </div>
 
@@ -206,7 +207,7 @@ df &lt;- pages %&gt;%
 <pre class="r"><code>## set the color palette
 pal &lt;- my_colors(&quot;solr5&quot;)
 ## title and factor levels 
-title &lt;- &quot;How important is it for Donald Trump to address racial\ninequality in the U.S., which refers to differences across\nraces in income, access to quality healthcare, access to\nvoting rights or general quality of life?&quot;
+title &lt;- &quot;How important is it for Donald Trump to address racialinequality in the U.S.,\nwhich refers to differences across races in income, access to quality healthcare,\naccess to voting rights or general quality of life?&quot;
 lvls &lt;- c(&quot;Very important&quot;, &quot;Somewhat important&quot;, &quot;Not too important&quot;, &quot;Not important at all&quot;, &quot;Don&#39;t know&quot;)
 date &lt;- &quot;6/10/20-6/12/20&quot;
 
@@ -217,4 +218,51 @@ p1 &lt;- mc_plot(title, sub, demo, date)
 p1</code></pre>
 <p><img src="/post/2020-06-20-getting-data-out-of-a-pdf_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>Interestingly, while a majority of every race/ethnicity believe it’s important, about 20% of African-American and Hispanic respondents say it’s Not Important at All that Trump to address racial inequality in America. I guess that ship has sailed at this point.</p>
+</div>
+<div id="using-pmap-to-graph-multiple-demos" class="section level3">
+<h3>Using <code>pmap</code> to graph multiple demos</h3>
+<p>Finally, we can add some code to the <code>mc_plot()</code> function to map across multiple demographic groups and save each graph. Right after we assign labels to our ggplot object “p”, we use this. This creates a new folder based on the date of the survey and then saves each plot by the Table/Question number and the demographic. Additionally, because I’m often writing about the results, we also return the response statistics.</p>
+<pre class="r"><code>mc_plot &lt;- function(title, sub, demo, date) {
+  
+  question &lt;- pull(distinct(df, Question))
+  
+  p &lt;- df %&gt;% 
+    filter(str_detect(Demographics, fixed(demo, ignore_case = TRUE))) %&gt;% 
+    select(Demographics, contains(&#39;pct&#39;)) %&gt;% 
+    gather(response, pct, 2:ncol(.)) %&gt;% 
+    mutate(pct = pct/100,
+           response = str_replace_all(response, &quot;_&quot;, &quot; &quot;),
+           response = str_trim(str_replace_all(response, &quot;pct&quot;, &quot;&quot;)),
+           response = factor(response, levels = lvls)) %&gt;%
+    ggplot(aes(x = response, y = pct, group = Demographics, fill = Demographics)) + 
+    geom_bar(stat = &#39;identity&#39;, position = &quot;dodge&quot;, width = .8, col = &quot;black&quot;, size = .15) + 
+    hrbrthemes::scale_y_percent() + 
+    scale_fill_manual(values = pal,
+                      name = NULL) +
+    theme_twg() 
+  if (str_detect(demo, &quot;Registered&quot;)) {
+    p &lt;- p + theme(axis.text = element_text(size = 11),
+                   legend.position = &quot;none&quot;)
+  } else {
+    p &lt;-  p + theme(axis.text = element_text(size = 11),
+                    legend.position = &quot;top&quot;)
+  }
+  p &lt;- p + labs(x = NULL, y = NULL, 
+                title = title,
+                subtitle = sub,
+                caption = glue(&quot;Source: Morning Consult, {date}&quot;))
+  
+  ## create directory if going to save the plot 
+  ifelse(!dir.exists(file.path(here(&#39;figures&#39;, str_replace_all(date, &quot; |/&quot;, &quot;&quot;)))), 
+         dir.create(file.path(here(&#39;figures&#39;, str_replace_all(date, &quot; |/&quot;, &quot;&quot;)))), FALSE)
+  ## save the plot
+  ggsave(here(&#39;figures&#39;, str_replace_all(date, &quot; |/&quot;, &quot;&quot;), glue(&#39;{question}_{str_replace_all(sub, &quot;/&quot;, &quot;&quot;)}.png&#39;)), dpi = 300, width = 6.4, height = 5.94)
+  
+  ## return the data for analysis
+  df %&gt;% 
+    clean_names() %&gt;%
+    filter(str_detect(demographics, fixed(demo, ignore_case = TRUE))) %&gt;% 
+    select(question, demographics, contains(&#39;pct&#39;)) %&gt;% 
+    distinct(question, demographics, .keep_all = TRUE)
+}</code></pre>
 </div>

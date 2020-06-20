@@ -9,7 +9,7 @@ categories:
 tags:
   - pdftools
 thumbnailImagePosition: left
-thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548283717/copy.jpg
+thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1592669938/Reading_Data_Tracker_example.jpg
 summary: "Using the `pdftools` pacakge to extract data from a pdf"
 output:
   blogdown::html_page:
@@ -166,10 +166,11 @@ mc_plot <- function(title, sub, demo, date) {
 This function requires us to do a little more manual work -- we need to give the plot a title and subtitle, and we need to define the demographic group we're pulling out, and then provide the date of the survey for the plot caption. We're also going to convert our response headers to a factor, so we also need to set the factor levels so that we have the proper ordering on the axis. Additionally, we'll set a color palette for our graph.  
 
 ```{r}
+
 ## set the color palette
 pal <- my_colors("solr5")
 ## title and factor levels 
-title <- "How important is it for Donald Trump to address racial\ninequality in the U.S., which refers to differences across\nraces in income, access to quality healthcare, access to\nvoting rights or general quality of life?"
+title <- "How important is it for Donald Trump to address racialinequality in the U.S.,\nwhich refers to differences across races in income, access to quality healthcare,\naccess to voting rights or general quality of life?"
 lvls <- c("Very important", "Somewhat important", "Not too important", "Not important at all", "Don't know")
 date <- "6/10/20-6/12/20"
 
@@ -180,5 +181,57 @@ p1 <- mc_plot(title, sub, demo, date)
 p1
 ```
 
-Interestingly, while a majority of every race/ethnicity believe it's important, about 20% of  African-American and Hispanic respondents say it's Not Important at All that Trump to address racial inequality in America. I guess that ship has sailed at this point.   
+Interestingly, while a majority of every race/ethnicity believe it's important, about 20% of  African-American and Hispanic respondents say it's Not Important at All that Trump to address racial inequality in America. I guess that ship has sailed at this point. 
+
+
+### Using `pmap` to graph multiple demos
+
+Finally, we can add some code to the `mc_plot()` function to map across multiple demographic groups and save each graph. Right after we assign labels to our ggplot object "p", we use this. This creates a new folder based on the date of the survey and then saves each plot by the Table/Question number and the demographic. Additionally, because I'm often writing about the results, we also return the response statistics. 
+
+```{r eval = FALSE}
+
+mc_plot <- function(title, sub, demo, date) {
+  
+  question <- pull(distinct(df, Question))
+  
+  p <- df %>% 
+    filter(str_detect(Demographics, fixed(demo, ignore_case = TRUE))) %>% 
+    select(Demographics, contains('pct')) %>% 
+    gather(response, pct, 2:ncol(.)) %>% 
+    mutate(pct = pct/100,
+           response = str_replace_all(response, "_", " "),
+           response = str_trim(str_replace_all(response, "pct", "")),
+           response = factor(response, levels = lvls)) %>%
+    ggplot(aes(x = response, y = pct, group = Demographics, fill = Demographics)) + 
+    geom_bar(stat = 'identity', position = "dodge", width = .8, col = "black", size = .15) + 
+    hrbrthemes::scale_y_percent() + 
+    scale_fill_manual(values = pal,
+                      name = NULL) +
+    theme_twg() 
+  if (str_detect(demo, "Registered")) {
+    p <- p + theme(axis.text = element_text(size = 11),
+                   legend.position = "none")
+  } else {
+    p <-  p + theme(axis.text = element_text(size = 11),
+                    legend.position = "top")
+  }
+  p <- p + labs(x = NULL, y = NULL, 
+                title = title,
+                subtitle = sub,
+                caption = glue("Source: Morning Consult, {date}"))
+  
+  ## create directory if going to save the plot 
+  ifelse(!dir.exists(file.path(here('figures', str_replace_all(date, " |/", "")))), 
+         dir.create(file.path(here('figures', str_replace_all(date, " |/", "")))), FALSE)
+  ## save the plot
+  ggsave(here('figures', str_replace_all(date, " |/", ""), glue('{question}_{str_replace_all(sub, "/", "")}.png')), dpi = 300, width = 6.4, height = 5.94)
+  
+  ## return the data for analysis
+  df %>% 
+    clean_names() %>%
+    filter(str_detect(demographics, fixed(demo, ignore_case = TRUE))) %>% 
+    select(question, demographics, contains('pct')) %>% 
+    distinct(question, demographics, .keep_all = TRUE)
+}
+```
 
