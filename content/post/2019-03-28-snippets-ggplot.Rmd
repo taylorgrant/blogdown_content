@@ -22,6 +22,7 @@ library(tidyverse)
 library(rvest)
 
 devtools::source_url("https://raw.githubusercontent.com/taylorgrant/sandbox/master/theme_twg.R")
+
 ```
 
 Snippet files are periodically updated with how-to's for better plotting techniques. 
@@ -363,4 +364,113 @@ ggplot() +
        title = "Salary Comparison: Median Police Officer versus State Median",
        subtitle = "On average, the median salary for an officer is $23k greater",
        caption = "Source: Bureau of Labor Statistics")
+```
+
+# Creating a grouped, faceted, chicklet plot
+
+This uses the ``ggchicklet`` package and reads in data from a pdf from [this post](https://taylorgrant.netlify.app/2020/06/getting-data-out-of-a-pdf/){target="_blank"}. In this case, we'll look at a June survey and questions about the public opinon of various NFL quarterbacks. 
+
+```{r echo = FALSE} 
+tmp  <- pdftools::pdf_text(here('static', 'data', 'read_pdfs', 'june9_june11.pdf'))
+set_responses <- function(res) {
+  ## set the names for data table ## 
+  response_count <- length(res)
+  app <- c("_pct", "_n")
+  rep(app, response_count)
+  nms <- c('Question', "Demographics", paste0(rep(res, each = 2), rep(app, response_count)), "Total")
+  return(nms)
+}
+tidy_mc <- function(page) {
+  
+  ## function to strip out the punctuation
+  stripPunct <- function(x) suppressWarnings(as.numeric(str_replace_all(x, "%|\\(|\\)", "")))
+
+  ## which page to read in ##
+  tmp_pg <- tmp[page]
+  ## split on the newline \n ##
+  tmp_table <- str_split(tmp_pg, "\n", simplify = TRUE)
+  ## determine where the data stops and starts ## 
+  tbl_start <- which(str_detect(tmp_table, "Demographic"))
+  tbl_stop <- which(str_detect(tmp_table, "Continued|Note:")) # two endings depending on the page
+  ## pull the table number ## 
+  table_num <- tmp_table[,2]
+  ## keep rows between our start and stop ##  
+  tbl1 <- tmp_table[,(tbl_start+1):(tbl_stop-1)]
+  ## get rid of white space ## 
+  tbl1 <- str_trim(tbl1)
+  ## any time there are 2 spaces, add delimiter ## 
+  tbl2 <- str_replace_all(tbl1, "\\s{2,}", "|")
+  tbl2 <- str_replace_all(tbl2, "% ", "%|")
+  tbl2 <- str_replace_all(tbl2, "\\) ", ")|")
+  ## define table as text connection and read in with read.csv 
+  text_con <- textConnection(tbl2)
+  data_table <- read.csv(text_con, sep = "|", header = FALSE)
+  
+  ## clean up and set as numeric ## 
+  data_table <- data_table %>% 
+    mutate(across(V2:ncol(.), stripPunct)) %>% 
+    mutate(table_num = str_trim(table_num)) %>% 
+    relocate(table_num) # new dplyr 1.0 functions
+}
+
+```
+
+The pdf has been read in using the `pdftools` package, and now we'll use some functions from that earlier post to parse and clean the data of interest. 
+
+```{r}
+pages <- 99:134
+title <- "Do you have a favorable or unfavorable opinion of each of the following NFL players?"
+resp <- c("Very favorable", "Somewhat favorable", 'Somewhat unfavorable', "Very unfavorable", "Heard of", "Never heard of")
+lvls <- c("Very favorable", "Somewhat favorable", 'Somewhat unfavorable', "Very unfavorable", "Heard of", "Never heard of")
+# set the responses 
+nms <- set_responses(resp)
+## get the data and set responses
+df <- pages %>% 
+  map_dfr(tidy_mc) %>% 
+  set_names(nms)
+
+df <- df %>% 
+  mutate(Question = case_when(Question == "Table CMS6_1" ~ "Drew Brees",
+                              Question == "Table CMS6_2" ~ "Eli Manning",
+                              Question == "Table CMS6_3" ~ "Tom Brady",
+                              Question == "Table CMS6_4" ~ "Patrick Mahomes",
+                              Question == "Table CMS6_5" ~ "Aaron Rodgers",
+                              Question == "Table CMS6_6" ~ "Russell Wilson",
+                              Question == "Table CMS6_7" ~ "Jimmy Garoppolo",
+                              Question == "Table CMS6_8" ~ "Deshaun Watson",
+                              Question == "Table CMS6_9" ~ "Lamar Jackson"))
+
+```
+
+We'll now take the popularity of 9 different quarterbacks and will facet by the player, and group responses by respondent gender. We're going to use `coord_flip` to so that the chicklet plot is horizontal and we're going to move the facet to the left, and the axis text of gender to the right. We'll also change the facet text so that it's horizontal as opposed to the standard vertical orientation. 
+
+```{r warning=FALSE, fig.height=9}
+library(ggchicklet)
+df %>% filter(str_detect(Demographics, fixed("NFL Fans", ignore_case = TRUE))) %>% 
+  group_by(Question) %>% 
+  select(Question, Demographics, contains('pct')) %>% 
+  gather(response, pct, 3:ncol(.)) %>% 
+  mutate(pct = pct/100, 
+         response = str_replace_all(response, "_", " "),
+         response = str_trim(str_replace_all(response, "pct", "")),
+         response = factor(response, levels = lvls)) %>%
+  arrange(Question) %>%
+  ggplot(aes(x = Demographics, y = pct)) + 
+  geom_chicklet(aes(fill = response)) +
+  facet_grid(Question~., switch = "y") +
+  scale_x_discrete(position = "top") + 
+  scale_fill_manual(name = NULL, 
+                    values = my_colors("solr8")[c(1,3,4,6,7,8)]) +
+  coord_flip() + 
+  theme_twg() + 
+  hrbrthemes::scale_y_percent(expand = c(0,0), position = "right") +
+  guides(fill=guide_legend(nrow=2, byrow = TRUE)) +
+  theme(legend.position="bottom",
+        axis.text = element_text(size = 11),
+        plot.title.position = "plot",
+        strip.text.y.left = element_text(angle = 0, size = 11, hjust = .5),
+        strip.background = element_rect(fill = "#E8E8E8", color = "#E8E8E8")) +
+  labs(x = NULL, y = NULL,
+       title = title)
+
 ```

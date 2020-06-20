@@ -29,6 +29,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1553798708/se
 <li><a href="#unifying-legends">Unifying Legends</a></li>
 <li><a href="#dropping-a-series-from-a-legend">Dropping a series from a legend</a></li>
 <li><a href="#making-a-dumbbell-plot">Making a dumbbell plot</a></li>
+<li><a href="#creating-a-grouped-faceted-chicklet-plot">Creating a grouped, faceted, chicklet plot</a></li>
 </ul>
 </div>
 
@@ -235,11 +236,11 @@ p1 | p2</code></pre>
 ## get police officer salary data ## 
 GET(&quot;https://www.bls.gov/oes/special.requests/oes_research_2019_sec_99.xlsx&quot;, write_disk(path &lt;- tempfile(fileext = &quot;.xlsx&quot;)))</code></pre>
 <pre><code>## Response [https://www.bls.gov/oes/special.requests/oes_research_2019_sec_99.xlsx]
-##   Date: 2020-06-05 01:48
+##   Date: 2020-06-20 22:07
 ##   Status: 200
 ##   Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 ##   Size: 8.44 MB
-## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmphIOKbY/file137013136147b.xlsx</code></pre>
+## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpXq5ONc/file773356fd2e4c.xlsx</code></pre>
 <pre class="r"><code>tmp &lt;-
   read_excel(path) %&gt;% 
   clean_names()
@@ -323,4 +324,59 @@ ggplot() +
        subtitle = &quot;On average, the median salary for an officer is $23k greater&quot;,
        caption = &quot;Source: Bureau of Labor Statistics&quot;)</code></pre>
 <p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+<div id="creating-a-grouped-faceted-chicklet-plot" class="section level1">
+<h1>Creating a grouped, faceted, chicklet plot</h1>
+<p>This uses the <code>ggchicklet</code> package and reads in data from a pdf from <a href="https://taylorgrant.netlify.app/2020/06/getting-data-out-of-a-pdf/" target="_blank">this post</a>. In this case, we’ll look at a June survey and questions about the public opinon of various NFL quarterbacks.</p>
+<p>The pdf has been read in using the <code>pdftools</code> package, and now we’ll use some functions from that earlier post to parse and clean the data of interest.</p>
+<pre class="r"><code>pages &lt;- 99:134
+title &lt;- &quot;Do you have a favorable or unfavorable opinion of each of the following NFL players?&quot;
+resp &lt;- c(&quot;Very favorable&quot;, &quot;Somewhat favorable&quot;, &#39;Somewhat unfavorable&#39;, &quot;Very unfavorable&quot;, &quot;Heard of&quot;, &quot;Never heard of&quot;)
+lvls &lt;- c(&quot;Very favorable&quot;, &quot;Somewhat favorable&quot;, &#39;Somewhat unfavorable&#39;, &quot;Very unfavorable&quot;, &quot;Heard of&quot;, &quot;Never heard of&quot;)
+# set the responses 
+nms &lt;- set_responses(resp)
+## get the data and set responses
+df &lt;- pages %&gt;% 
+  map_dfr(tidy_mc) %&gt;% 
+  set_names(nms)
+
+df &lt;- df %&gt;% 
+  mutate(Question = case_when(Question == &quot;Table CMS6_1&quot; ~ &quot;Drew Brees&quot;,
+                              Question == &quot;Table CMS6_2&quot; ~ &quot;Eli Manning&quot;,
+                              Question == &quot;Table CMS6_3&quot; ~ &quot;Tom Brady&quot;,
+                              Question == &quot;Table CMS6_4&quot; ~ &quot;Patrick Mahomes&quot;,
+                              Question == &quot;Table CMS6_5&quot; ~ &quot;Aaron Rodgers&quot;,
+                              Question == &quot;Table CMS6_6&quot; ~ &quot;Russell Wilson&quot;,
+                              Question == &quot;Table CMS6_7&quot; ~ &quot;Jimmy Garoppolo&quot;,
+                              Question == &quot;Table CMS6_8&quot; ~ &quot;Deshaun Watson&quot;,
+                              Question == &quot;Table CMS6_9&quot; ~ &quot;Lamar Jackson&quot;))</code></pre>
+<p>We’ll now take the popularity of 9 different quarterbacks and will facet by the player, and group responses by respondent gender. We’re going to use <code>coord_flip</code> to so that the chicklet plot is horizontal and we’re going to move the facet to the left, and the axis text of gender to the right. We’ll also change the facet text so that it’s horizontal as opposed to the standard vertical orientation.</p>
+<pre class="r"><code>library(ggchicklet)
+df %&gt;% filter(str_detect(Demographics, fixed(&quot;NFL Fans&quot;, ignore_case = TRUE))) %&gt;% 
+  group_by(Question) %&gt;% 
+  select(Question, Demographics, contains(&#39;pct&#39;)) %&gt;% 
+  gather(response, pct, 3:ncol(.)) %&gt;% 
+  mutate(pct = pct/100, 
+         response = str_replace_all(response, &quot;_&quot;, &quot; &quot;),
+         response = str_trim(str_replace_all(response, &quot;pct&quot;, &quot;&quot;)),
+         response = factor(response, levels = lvls)) %&gt;%
+  arrange(Question) %&gt;%
+  ggplot(aes(x = Demographics, y = pct)) + 
+  geom_chicklet(aes(fill = response)) +
+  facet_grid(Question~., switch = &quot;y&quot;) +
+  scale_x_discrete(position = &quot;top&quot;) + 
+  scale_fill_manual(name = NULL, 
+                    values = my_colors(&quot;solr8&quot;)[c(1,3,4,6,7,8)]) +
+  coord_flip() + 
+  theme_twg() + 
+  hrbrthemes::scale_y_percent(expand = c(0,0), position = &quot;right&quot;) +
+  guides(fill=guide_legend(nrow=2, byrow = TRUE)) +
+  theme(legend.position=&quot;bottom&quot;,
+        axis.text = element_text(size = 11),
+        plot.title.position = &quot;plot&quot;,
+        strip.text.y.left = element_text(angle = 0, size = 11, hjust = .5),
+        strip.background = element_rect(fill = &quot;#E8E8E8&quot;, color = &quot;#E8E8E8&quot;)) +
+  labs(x = NULL, y = NULL,
+       title = title)</code></pre>
+<p><img src="/post/2019-03-28-snippets-ggplot_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 </div>
