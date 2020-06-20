@@ -236,11 +236,11 @@ p1 | p2</code></pre>
 ## get police officer salary data ## 
 GET(&quot;https://www.bls.gov/oes/special.requests/oes_research_2019_sec_99.xlsx&quot;, write_disk(path &lt;- tempfile(fileext = &quot;.xlsx&quot;)))</code></pre>
 <pre><code>## Response [https://www.bls.gov/oes/special.requests/oes_research_2019_sec_99.xlsx]
-##   Date: 2020-06-20 22:07
+##   Date: 2020-06-20 22:12
 ##   Status: 200
 ##   Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 ##   Size: 8.44 MB
-## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpXq5ONc/file773356fd2e4c.xlsx</code></pre>
+## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpjWyc2g/file79a31e4d1110.xlsx</code></pre>
 <pre class="r"><code>tmp &lt;-
   read_excel(path) %&gt;% 
   clean_names()
@@ -350,7 +350,8 @@ df &lt;- df %&gt;%
                               Question == &quot;Table CMS6_7&quot; ~ &quot;Jimmy Garoppolo&quot;,
                               Question == &quot;Table CMS6_8&quot; ~ &quot;Deshaun Watson&quot;,
                               Question == &quot;Table CMS6_9&quot; ~ &quot;Lamar Jackson&quot;))</code></pre>
-<p>We’ll now take the popularity of 9 different quarterbacks and will facet by the player, and group responses by respondent gender. We’re going to use <code>coord_flip</code> to so that the chicklet plot is horizontal and we’re going to move the facet to the left, and the axis text of gender to the right. We’ll also change the facet text so that it’s horizontal as opposed to the standard vertical orientation.</p>
+<p>We’ll now take the popularity of 9 different quarterbacks and will facet by the player, and group the responses of NFL fans by their age and ethnicity. We’ll also inlcude the overall opinion of all NFL fans for each quarterback.</p>
+<p>To make the plot, we’ll use <code>coord_flip</code> to so that the chicklet plot is horizontal and we’re going to reverse the positions of the facet and the axis text. We’ll also rotate the orientation of the facet text from vertical to horizontal for easier reading.</p>
 <pre class="r"><code>library(ggchicklet)
 df %&gt;% filter(str_detect(Demographics, fixed(&quot;NFL Fans&quot;, ignore_case = TRUE))) %&gt;% 
   group_by(Question) %&gt;% 
@@ -370,7 +371,7 @@ df %&gt;% filter(str_detect(Demographics, fixed(&quot;NFL Fans&quot;, ignore_cas
   coord_flip() + 
   theme_twg() + 
   hrbrthemes::scale_y_percent(expand = c(0,0), position = &quot;right&quot;) +
-  guides(fill=guide_legend(nrow=2, byrow = TRUE)) +
+  guides(fill=guide_legend(nrow=1, byrow = TRUE)) +
   theme(legend.position=&quot;bottom&quot;,
         axis.text = element_text(size = 11),
         plot.title.position = &quot;plot&quot;,
