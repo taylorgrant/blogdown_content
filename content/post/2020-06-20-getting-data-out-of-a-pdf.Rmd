@@ -170,7 +170,7 @@ This function requires us to do a little more manual work -- we need to give the
 ## set the color palette
 pal <- my_colors("solr5")
 ## title and factor levels 
-title <- "How important is it for Donald Trump to address racialinequality in the U.S.,\nwhich refers to differences across races in income, access to quality healthcare,\naccess to voting rights or general quality of life?"
+title <- "How important is it for Donald Trump to address racial inequality in the U.S.,\nwhich refers to differences across races in income, access to quality healthcare,\naccess to voting rights or general quality of life?"
 lvls <- c("Very important", "Somewhat important", "Not too important", "Not important at all", "Don't know")
 date <- "6/10/20-6/12/20"
 
