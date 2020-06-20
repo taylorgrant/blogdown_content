@@ -114,14 +114,15 @@ tibble(type = rep(c('a','b', 'c'), each = 4),
              xmax = 8, xmin = 6)) +
   facet_wrap(~type, ncol = 3) + geom_rect(colour = "white", show.legend = TRUE) +
   coord_polar(theta = "y") + 
-  theme_twg() + 
+  theme_twg(grid = FALSE) + 
   xlim(c(4,8)) + 
   scale_fill_manual(values = c("#154577", "#999999", '#fccd22','#0c725a'),
                     labels = c("Cat", "Dog", 'Bird', "Snake"),
                     name = "") + 
   theme(legend.position = "bottom",
         panel.grid=element_blank(),
-        axis.text=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
         axis.ticks=element_blank(),
         plot.title = element_text(hjust = .5),
         strip.background =element_rect(fill="lightgray", color = NA)) + 

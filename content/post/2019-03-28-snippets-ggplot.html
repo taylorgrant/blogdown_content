@@ -236,11 +236,11 @@ p1 | p2</code></pre>
 ## get police officer salary data ## 
 GET(&quot;https://www.bls.gov/oes/special.requests/oes_research_2019_sec_99.xlsx&quot;, write_disk(path &lt;- tempfile(fileext = &quot;.xlsx&quot;)))</code></pre>
 <pre><code>## Response [https://www.bls.gov/oes/special.requests/oes_research_2019_sec_99.xlsx]
-##   Date: 2020-06-20 22:18
+##   Date: 2020-06-20 22:22
 ##   Status: 200
 ##   Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 ##   Size: 8.44 MB
-## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpudZQ9C/file7e21523740bf.xlsx</code></pre>
+## &lt;ON DISK&gt;  /var/folders/94/ccg99vlx5hn4rhfw5qgqfbvs4jjjx5/T//RtmpcnZhob/file81553a65f79.xlsx</code></pre>
 <pre class="r"><code>tmp &lt;-
   read_excel(path) %&gt;% 
   clean_names()
