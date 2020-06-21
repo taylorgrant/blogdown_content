@@ -32,6 +32,7 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 <li><a href="#piping-into-a-t.test">Piping into a t.test</a></li>
 <li><a href="#arranging-within-a-group">Arranging within a group</a></li>
 <li><a href="#using-cross-and-map-to-paste">Using <code>cross</code> and <code>map</code> to paste</a></li>
+<li><a href="#group-indices-within-nested-groups">Group indices within nested groups</a></li>
 </ul>
 </div>
 
@@ -52,10 +53,10 @@ df %&gt;% setNames(names)</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   name1 name2 name3 name4
 ##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1 u         9    25 u    
-## 2 q        26    83 j    
-## 3 z        80    56 a    
-## 4 m         3    28 t</code></pre>
+## 1 r        59    53 y    
+## 2 g        65     9 r    
+## 3 m        86    25 h    
+## 4 n        58    46 a</code></pre>
 </div>
 <div id="using-rename_at-to-rename-specific-columns" class="section level1">
 <h1>Using rename_at to rename specific columns</h1>
@@ -73,10 +74,10 @@ df</code></pre>
 <pre><code>## # A tibble: 4 x 4
 ##   a     pastedName_b     c pastedName_d
 ##   &lt;chr&gt;        &lt;int&gt; &lt;int&gt; &lt;chr&gt;       
-## 1 n               95    55 n           
-## 2 f               72    30 z           
-## 3 v                7    49 m           
-## 4 j               63    87 s</code></pre>
+## 1 s               69    97 l           
+## 2 a               71    41 a           
+## 3 z               98    72 g           
+## 4 d               17    11 e</code></pre>
 </div>
 <div id="mutate-and-summarise-multiple-columns" class="section level1">
 <h1>Mutate and Summarise multiple columns</h1>
@@ -84,7 +85,7 @@ df</code></pre>
 <pre class="r"><code>mtcars %&gt;% 
   group_by(cyl) %&gt;%
   summarise_at(vars(disp, drat, mpg), funs(median, mean))</code></pre>
-<pre><code>## Warning: funs() is soft deprecated as of dplyr 0.8.0
+<pre><code>## Warning: `funs()` is deprecated as of dplyr 0.8.0.
 ## Please use a list of either functions or lambdas: 
 ## 
 ##   # Simple named list: 
@@ -95,7 +96,8 @@ df</code></pre>
 ## 
 ##   # Using lambdas
 ##   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
-## This warning is displayed once per session.</code></pre>
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
 <pre><code>## # A tibble: 3 x 7
 ##     cyl disp_median drat_median mpg_median disp_mean drat_mean mpg_mean
 ##   &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
@@ -196,11 +198,11 @@ tmp</code></pre>
 <pre><code>## # A tibble: 5 x 4
 ##   g1_letters g1_num h1_letters h1_num
 ##   &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;       &lt;int&gt;
-## 1 a          429115 j            7716
-## 2 q          214813 y           11264
-## 3 y          182448 q           42156
-## 4 v          520611 k           17576
-## 5 w          449754 p            7229</code></pre>
+## 1 e          368905 b           53270
+## 2 b          410237 q            6663
+## 3 g          513404 s           26112
+## 4 u          189307 g           34136
+## 5 s           36581 n           39083</code></pre>
 <p>But we can also use the <code>intersect</code> function to create an AND statement</p>
 <pre class="r"><code>tmp &lt;- tibble(g1_letters = sample(letters, 5), 
               g1_num = sample(1:600000, 5),
@@ -220,7 +222,7 @@ tmp</code></pre>
 <pre><code>## # A tibble: 1 x 6
 ##    g1_num g1_weighted g2_num g2_weighted h1_num h1_weighted
 ##     &lt;int&gt; &lt;chr&gt;        &lt;int&gt;       &lt;dbl&gt;  &lt;int&gt;       &lt;dbl&gt;
-## 1 1096130 438452sel   173501      69400. 187518      75007.</code></pre>
+## 1 1362325 544930sel   157276      62910. 144118      57647.</code></pre>
 </div>
 <div id="dplyr---group_split-function" class="section level1">
 <h1>dplyr - group_split function</h1>
@@ -233,82 +235,75 @@ split_by &lt;- starwars %&gt;%
   group_by(gender)
 
 group_split(split_by)</code></pre>
-<pre><code>## [[1]]
-## # A tibble: 19 x 13
-##    name  height  mass hair_color skin_color eye_color birth_year gender
-##    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
-##  1 Leia…    150  49   brown      light      brown             19 female
-##  2 Beru…    165  75   brown      light      blue              47 female
-##  3 Mon …    150  NA   auburn     fair       blue              48 female
-##  4 Shmi…    163  NA   black      fair       brown             72 female
-##  5 Ayla…    178  55   none       blue       hazel             48 female
-##  6 Adi …    184  50   none       dark       blue              NA female
-##  7 Cordé    157  NA   brown      light      brown             NA female
-##  8 Lumi…    170  56.2 black      yellow     blue              58 female
-##  9 Barr…    166  50   black      yellow     blue              40 female
-## 10 Dormé    165  NA   brown      light      brown             NA female
-## 11 Zam …    168  55   blonde     fair, gre… yellow            NA female
-## 12 Taun…    213  NA   none       grey       black             NA female
-## 13 Joca…    167  NA   white      fair       blue              NA female
-## 14 R4-P…     96  NA   none       silver, r… red, blue         NA female
-## 15 Shaa…    178  57   none       red, blue… black             NA female
-## 16 Sly …    178  48   none       pale       white             NA female
-## 17 Rey       NA  NA   brown      light      hazel             NA female
-## 18 Capt…     NA  NA   unknown    unknown    unknown           NA female
-## 19 Padm…    165  45   brown      light      brown             46 female
+<pre><code>## &lt;list_of&lt;
+##   tbl_df&lt;
+##     name      : character
+##     height    : integer
+##     mass      : double
+##     hair_color: character
+##     skin_color: character
+##     eye_color : character
+##     birth_year: double
+##     sex       : character
+##     gender    : character
+##     homeworld : character
+##     species   : character
+##     films     : list
+##     vehicles  : list
+##     starships : list
+##   &gt;
+## &gt;[3]&gt;
+## [[1]]
+## # A tibble: 17 x 14
+##    name  height  mass hair_color skin_color eye_color birth_year sex   gender
+##    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; 
+##  1 Leia…    150  49   brown      light      brown             19 fema… femin…
+##  2 Beru…    165  75   brown      light      blue              47 fema… femin…
+##  3 Mon …    150  NA   auburn     fair       blue              48 fema… femin…
+##  4 Shmi…    163  NA   black      fair       brown             72 fema… femin…
+##  5 Ayla…    178  55   none       blue       hazel             48 fema… femin…
+##  6 Adi …    184  50   none       dark       blue              NA fema… femin…
+##  7 Cordé    157  NA   brown      light      brown             NA fema… femin…
+##  8 Lumi…    170  56.2 black      yellow     blue              58 fema… femin…
+##  9 Barr…    166  50   black      yellow     blue              40 fema… femin…
+## 10 Dormé    165  NA   brown      light      brown             NA fema… femin…
+## 11 Zam …    168  55   blonde     fair, gre… yellow            NA fema… femin…
+## 12 Taun…    213  NA   none       grey       black             NA fema… femin…
+## 13 Joca…    167  NA   white      fair       blue              NA fema… femin…
+## 14 R4-P…     96  NA   none       silver, r… red, blue         NA none  femin…
+## 15 Shaa…    178  57   none       red, blue… black             NA fema… femin…
+## 16 Rey       NA  NA   brown      light      hazel             NA fema… femin…
+## 17 Padm…    165  45   brown      light      brown             46 fema… femin…
 ## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
 ## #   vehicles &lt;list&gt;, starships &lt;list&gt;
 ## 
 ## [[2]]
-## # A tibble: 1 x 13
-##   name  height  mass hair_color skin_color eye_color birth_year gender homeworld
-##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    
-## 1 Jabb…    175  1358 &lt;NA&gt;       green-tan… orange           600 herma… Nal Hutta
-## # … with 4 more variables: species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;,
-## #   starships &lt;list&gt;
-## 
-## [[3]]
-## # A tibble: 62 x 13
-##    name  height  mass hair_color skin_color eye_color birth_year gender
-##    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; 
-##  1 Luke…    172    77 blond      fair       blue            19   male  
-##  2 Dart…    202   136 none       white      yellow          41.9 male  
-##  3 Owen…    178   120 brown, gr… light      blue            52   male  
-##  4 Bigg…    183    84 black      light      brown           24   male  
-##  5 Obi-…    182    77 auburn, w… fair       blue-gray       57   male  
-##  6 Anak…    188    84 blond      fair       blue            41.9 male  
-##  7 Wilh…    180    NA auburn, g… fair       blue            64   male  
-##  8 Chew…    228   112 brown      unknown    blue           200   male  
-##  9 Han …    180    80 brown      fair       brown           29   male  
-## 10 Gree…    173    74 &lt;NA&gt;       green      black           44   male  
-## # … with 52 more rows, and 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;,
+## # A tibble: 66 x 14
+##    name  height  mass hair_color skin_color eye_color birth_year sex   gender
+##    &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; 
+##  1 Luke…    172    77 blond      fair       blue            19   male  mascu…
+##  2 C-3PO    167    75 &lt;NA&gt;       gold       yellow         112   none  mascu…
+##  3 R2-D2     96    32 &lt;NA&gt;       white, bl… red             33   none  mascu…
+##  4 Dart…    202   136 none       white      yellow          41.9 male  mascu…
+##  5 Owen…    178   120 brown, gr… light      blue            52   male  mascu…
+##  6 R5-D4     97    32 &lt;NA&gt;       white, red red             NA   none  mascu…
+##  7 Bigg…    183    84 black      light      brown           24   male  mascu…
+##  8 Obi-…    182    77 auburn, w… fair       blue-gray       57   male  mascu…
+##  9 Anak…    188    84 blond      fair       blue            41.9 male  mascu…
+## 10 Wilh…    180    NA auburn, g… fair       blue            64   male  mascu…
+## # … with 56 more rows, and 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;,
 ## #   films &lt;list&gt;, vehicles &lt;list&gt;, starships &lt;list&gt;
 ## 
-## [[4]]
-## # A tibble: 2 x 13
-##   name  height  mass hair_color skin_color eye_color birth_year gender homeworld
-##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    
-## 1 IG-88    200   140 none       metal      red               15 none   &lt;NA&gt;     
-## 2 BB8       NA    NA none       none       black             NA none   &lt;NA&gt;     
-## # … with 4 more variables: species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;,
-## #   starships &lt;list&gt;
-## 
-## [[5]]
-## # A tibble: 3 x 13
-##   name  height  mass hair_color skin_color eye_color birth_year gender homeworld
-##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    
-## 1 C-3PO    167    75 &lt;NA&gt;       gold       yellow           112 &lt;NA&gt;   Tatooine 
-## 2 R2-D2     96    32 &lt;NA&gt;       white, bl… red               33 &lt;NA&gt;   Naboo    
-## 3 R5-D4     97    32 &lt;NA&gt;       white, red red               NA &lt;NA&gt;   Tatooine 
-## # … with 4 more variables: species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;,
-## #   starships &lt;list&gt;
-## 
-## attr(,&quot;ptype&quot;)
-## # A tibble: 0 x 13
-## # … with 13 variables: name &lt;chr&gt;, height &lt;int&gt;, mass &lt;dbl&gt;, hair_color &lt;chr&gt;,
-## #   skin_color &lt;chr&gt;, eye_color &lt;chr&gt;, birth_year &lt;dbl&gt;, gender &lt;chr&gt;,
-## #   homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;, vehicles &lt;list&gt;,
-## #   starships &lt;list&gt;</code></pre>
+## [[3]]
+## # A tibble: 4 x 14
+##   name  height  mass hair_color skin_color eye_color birth_year sex   gender
+##   &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; 
+## 1 Ric …    183    NA brown      fair       blue              NA &lt;NA&gt;  &lt;NA&gt;  
+## 2 Quar…    183    NA black      dark       brown             62 &lt;NA&gt;  &lt;NA&gt;  
+## 3 Sly …    178    48 none       pale       white             NA &lt;NA&gt;  &lt;NA&gt;  
+## 4 Capt…     NA    NA unknown    unknown    unknown           NA &lt;NA&gt;  &lt;NA&gt;  
+## # … with 5 more variables: homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,
+## #   vehicles &lt;list&gt;, starships &lt;list&gt;</code></pre>
 </div>
 <div id="piping-into-a-t.test" class="section level1">
 <h1>Piping into a t.test</h1>
@@ -319,13 +314,13 @@ group_split(split_by)</code></pre>
 ##  Two Sample t-test
 ## 
 ## data:  a by group
-## t = 45.243, df = 198, p-value &lt; 2.2e-16
+## t = 42.697, df = 198, p-value &lt; 2.2e-16
 ## alternative hypothesis: true difference in means is not equal to 0
 ## 95 percent confidence interval:
-##  29.68082 32.38616
+##  29.04223 31.85485
 ## sample estimates:
 ##  mean in group blue mean in group green 
-##            79.55430            48.52081</code></pre>
+##            80.61202            50.16348</code></pre>
 </div>
 <div id="arranging-within-a-group" class="section level1">
 <h1>Arranging within a group</h1>
@@ -399,4 +394,70 @@ data %&gt;%
 ## 4 Q4-13
 ## 5 Q1-14
 ## 6 Q2-14</code></pre>
+</div>
+<div id="group-indices-within-nested-groups" class="section level1">
+<h1>Group indices within nested groups</h1>
+<p>Assume we have a data set with a nested group structures like so.</p>
+<pre class="r"><code>tibble(letter = rep(letters[1:2], each = 6),
+       state = c(rep(c(state.abb[c(1,4,5)]), each = 2),
+                 rep(c(state.abb[c(25,38,43)]), each = 2)))</code></pre>
+<pre><code>## # A tibble: 12 x 2
+##    letter state
+##    &lt;chr&gt;  &lt;chr&gt;
+##  1 a      AL   
+##  2 a      AL   
+##  3 a      AR   
+##  4 a      AR   
+##  5 a      CA   
+##  6 a      CA   
+##  7 b      MO   
+##  8 b      MO   
+##  9 b      PA   
+## 10 b      PA   
+## 11 b      TX   
+## 12 b      TX</code></pre>
+<p>Our goal is to produce a repeating id for each state within each letter group, so that AL, AR, and CA would be 1, 2, 3 and MO, PA, and TX would also be 1, 2, 3.</p>
+<p>But using the <code>group_indices()</code> function doesn’t help us here (note I’m suppressing warnings because I have no idea how to use <code>group_by()</code> first with this function).</p>
+<pre class="r"><code>tibble(letter = rep(letters[1:2], each = 6),
+       state = c(rep(c(state.abb[c(1,4,5)]), each = 2),
+                 rep(c(state.abb[c(25,38,43)]), each = 2))) %&gt;%
+  mutate(id1 = suppressWarnings(group_indices(., letter)),
+         id2 = suppressWarnings(group_indices(., state)))</code></pre>
+<pre><code>## # A tibble: 12 x 4
+##    letter state   id1   id2
+##    &lt;chr&gt;  &lt;chr&gt; &lt;int&gt; &lt;int&gt;
+##  1 a      AL        1     1
+##  2 a      AL        1     1
+##  3 a      AR        1     2
+##  4 a      AR        1     2
+##  5 a      CA        1     3
+##  6 a      CA        1     3
+##  7 b      MO        2     4
+##  8 b      MO        2     4
+##  9 b      PA        2     5
+## 10 b      PA        2     5
+## 11 b      TX        2     6
+## 12 b      TX        2     6</code></pre>
+<p>But we can get to what we want by using <code>cumsum</code> and <code>!duplicated</code>…</p>
+<pre class="r"><code>tibble(letter = rep(letters[1:2], each = 6),
+       state = c(rep(c(state.abb[c(1,4,5)]), each = 2),
+                 rep(c(state.abb[c(25,38,43)]), each = 2))) %&gt;%
+  group_by(letter) %&gt;%
+  mutate(id = cumsum(!duplicated(state)))</code></pre>
+<pre><code>## # A tibble: 12 x 3
+## # Groups:   letter [2]
+##    letter state    id
+##    &lt;chr&gt;  &lt;chr&gt; &lt;int&gt;
+##  1 a      AL        1
+##  2 a      AL        1
+##  3 a      AR        2
+##  4 a      AR        2
+##  5 a      CA        3
+##  6 a      CA        3
+##  7 b      MO        1
+##  8 b      MO        1
+##  9 b      PA        2
+## 10 b      PA        2
+## 11 b      TX        3
+## 12 b      TX        3</code></pre>
 </div>

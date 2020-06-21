@@ -258,3 +258,32 @@ data %>%
   reduce(bind_rows) %>%
   head()
 ```
+
+# Group indices within nested groups 
+
+Assume we have a data set with a nested group structures like so. 
+
+```{r}
+tibble(letter = rep(letters[1:2], each = 6),
+       state = c(rep(c(state.abb[c(1,4,5)]), each = 2),
+                 rep(c(state.abb[c(25,38,43)]), each = 2)))
+```
+
+Our goal is to produce a repeating id for each state within each letter group, so that AL, AR, and CA would be 1, 2, 3 and MO, PA, and TX would also be 1, 2, 3. 
+
+But using the `group_indices()` function doesn't help us here (note I'm suppressing warnings because I have no idea how to use `group_by()` first with this function).
+```{r}
+tibble(letter = rep(letters[1:2], each = 6),
+       state = c(rep(c(state.abb[c(1,4,5)]), each = 2),
+                 rep(c(state.abb[c(25,38,43)]), each = 2))) %>%
+  mutate(id1 = suppressWarnings(group_indices(., letter)),
+         id2 = suppressWarnings(group_indices(., state)))
+```
+But we can get to what we want by using `cumsum` and `!duplicated`...
+```{r}
+tibble(letter = rep(letters[1:2], each = 6),
+       state = c(rep(c(state.abb[c(1,4,5)]), each = 2),
+                 rep(c(state.abb[c(25,38,43)]), each = 2))) %>%
+  group_by(letter) %>%
+  mutate(id = cumsum(!duplicated(state)))
+```
