@@ -38,6 +38,7 @@ Updated as I find them...
 - [Kaggle](https://www.kaggle.com/datasets?fileType=csv){target="_blank"}
 - [Zillow Housing Data](https://www.zillow.com/research/data/){target="_blank"}
 - US Popular Baby Names [babynamer R package](https://github.com/abresler/babynamer){target="_blank"}
+- [AwesomeData](https://github.com/awesomedata/awesome-public-datasets){target="_blank"}
 
 ------------------
 
