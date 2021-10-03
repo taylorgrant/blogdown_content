@@ -21,7 +21,7 @@ disqusShortname = ""
 googleAnalytics = "UA-78751969-1"
 paginate = 20
 canonifyurls = true
-ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_cache$", "\\.knit\\.md$", "\\.utf8\\.md$"]
 enableEmoji = true
 
 [permalinks]

@@ -1,8 +1,9 @@
 .Rproj.user
 .Rhistory
 .Ruserdata
-blogdown
+/blogdown
 .DS_Store
-public/
+/public/
 .RData
 static/data/
+Thumbs.db
