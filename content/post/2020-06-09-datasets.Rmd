@@ -39,7 +39,8 @@ Updated as I find them...
 - [Zillow Housing Data](https://www.zillow.com/research/data/){target="_blank"}
 - US Popular Baby Names [babynamer R package](https://github.com/abresler/babynamer){target="_blank"}
 - [AwesomeData](https://github.com/awesomedata/awesome-public-datasets){target="_blank"}
-- [Recreation Information Database](https://ridb.recreation.gov/download){target="_blank"}
+- [Cryptic Crossword Clues](https://cryptics.eigenfoo.xyz/){target="_blank"}
+- [Formula1 Racing Results](https://ergast.com/mrd/query/){target="_blank"}
 
 ------------------
 
@@ -99,9 +100,17 @@ Updated as I find them...
   - Select "Download all data for this report/survey"
 - [US Census - Residential Single Family Home Sales](https://www.census.gov/construction/nrs/index.html){target="_blank}
 
+## Environmental 
+- [Reservoir Levels and Water Monitoring](https://data.usbr.gov/catalog){target="_blank"}
+
+## Congressional Stock Transactions 
+- [Senate Stock Watcher](https://senatestockwatcher.com/){target="_blank"}
+- [House Stock Watcher](https://housestockwatcher.com/){target="blank"}
+
 ## Other
 - [Highway Statistics incl. Vehicle and Driver Registrations](https://www.fhwa.dot.gov/policyinformation/statistics/2018/){target="_blank"}
 - [Monthly Retail Sales](https://www.census.gov/retail/marts/www/timeseries.html){target="_blank"}
+- [Recreation Information Database](https://ridb.recreation.gov/download){target="_blank"}
 
 ------------------
 
