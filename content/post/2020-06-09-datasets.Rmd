@@ -1,19 +1,18 @@
 ---
 title: Datasets
-author: ''
-date: '2020-06-09'
-slug: datasets
-categories: 
+author:
+date: '2021-11-11'
+categories:
   - data
-tags: 
+tags:
   - datasets
+slug: datasets
 thumbnailImagePosition: left
 thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1591760616/Stack-of-books-great-education.jpg
-summary: "A running collection of interesting sources of data"
+summary: A running collection of interesting sources of data
 output:
   blogdown::html_page:
-    toc: false
-
+    toc: no
 ---
 
 Updated as I find them...
