@@ -7,3 +7,8 @@
 .RData
 static/data/
 Thumbs.db
+\\.Rmd$
+\\.Rmarkdown$
+_cache$
+\\.knit\\.md$
+\\.utf8\\.md$
