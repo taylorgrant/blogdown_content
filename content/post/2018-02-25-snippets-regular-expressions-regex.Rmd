@@ -1,7 +1,7 @@
 ---
 title: 'Snippets: regular expressions regex'
 author: ''
-date: '2019-04-10'
+date: '2023-04-24'
 slug: snippets-regular-expressions-regex
 categories:
   - R
@@ -87,23 +87,25 @@ str_sub(st, 1, 4)
 str_sub(st, 5, 10)
 ```
 
-# Programmatically inserting a line break in strings
+# Programmatically inserting a line break every N spaces
 
 Found this useful when working with lots of data and using a function to parse the data and plot using ggplot. 
 ```{r, warning=FALSE}
-pacman::p_load(tidyverse)
-dat <- tibble(a = c("Suburban (just outside of urban/metro area)", "Small town (separate from suburban area, but within proximity)", 
-"Rural (far from large urban area)", "Urban (close to large metro area)", 
-"Other"),
-   val = 1:5)
+strfun <- function(str, n) {gsub(paste0("([^ ]+( +[^ ]+){",n-1,"}) +"),
+                              "\\1\n", str)}
 
-dat %>% 
-  mutate(a = ifelse(str_count(a, "\\S+") > 6, 
-                      str_replace_all(a, word(a, str_count(a, "\\S+")/2 + 1), 
-                                      paste0("\n", word(a, str_count(a, "\\S+")/2  +1))), a)) %>%
-  ggplot(aes(x = val, y = a)) + 
-  geom_point(col = "blue") 
+string <- "As he crossed toward the pharmacy at the corner he involuntarily turned his head because of a burst of light that had ricocheted from his temple..."
 
+strfun(string, 8)
+
+```
+
+# Adding line break after N characters 
+
+```{r}
+string <- "As he crossed toward the pharmacy at the corner he involuntarily turned his head because of a burst of light that had ricocheted from his temple..."
+
+paste(strwrap(string, width = 80), collapse = "\n")
 ```
 
 # Counting words in a string

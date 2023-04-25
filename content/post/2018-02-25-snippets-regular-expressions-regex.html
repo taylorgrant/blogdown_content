@@ -1,7 +1,7 @@
 ---
 title: 'Snippets: regular expressions regex'
 author: ''
-date: '2019-04-10'
+date: '2023-04-24'
 slug: snippets-regular-expressions-regex
 categories:
   - R
@@ -19,19 +19,20 @@ thumbnailImage: https://res.cloudinary.com/dn83gtg0l/image/upload/v1548271167/sn
 
 <div id="TOC">
 <ul>
-<li><a href="#pulling-out-text-before-or-after-symbolspaceother">Pulling out text before or after symbol/space/other</a></li>
-<li><a href="#pulling-text-after-first-occurrence-in-string-with-multiple-occurrences">Pulling text after first occurrence in string with multiple occurrences</a></li>
-<li><a href="#keeping-only-the-last-occurrence-in-string-with-multiple-occurrences">Keeping only the last occurrence in string with multiple occurrences</a></li>
-<li><a href="#dropping-everything-after-the-last-occurrence-in-string-with-multiple-occurrences">Dropping everything after the last occurrence in string with multiple occurrences</a></li>
-<li><a href="#splitting-and-pulling-data-after-symbols.">Splitting and pulling data after symbols.</a></li>
-<li><a href="#remove-commas-and-convert-string-to-numeric">Remove commas and convert string to numeric</a></li>
-<li><a href="#add-commas-and-convert-numeric-to-string">Add commas and convert numeric to string</a></li>
-<li><a href="#pull-out-the-last-n-and-first-n-characters-in-string">Pull out the last N and first N characters in string</a></li>
-<li><a href="#programmatically-inserting-a-line-break-in-strings">Programmatically inserting a line break in strings</a></li>
-<li><a href="#counting-words-in-a-string">Counting words in a string</a></li>
-<li><a href="#removing-trailing-and-leading-punctuation">Removing trailing and leading punctuation</a></li>
-<li><a href="#efficiently-converting-all-versions-of-a-word">Efficiently converting all versions of a word</a></li>
-<li><a href="#splitting-words-on-space-or-other-character">Splitting words on space or other character</a></li>
+<li><a href="#pulling-out-text-before-or-after-symbolspaceother" id="toc-pulling-out-text-before-or-after-symbolspaceother">Pulling out text before or after symbol/space/other</a></li>
+<li><a href="#pulling-text-after-first-occurrence-in-string-with-multiple-occurrences" id="toc-pulling-text-after-first-occurrence-in-string-with-multiple-occurrences">Pulling text after first occurrence in string with multiple occurrences</a></li>
+<li><a href="#keeping-only-the-last-occurrence-in-string-with-multiple-occurrences" id="toc-keeping-only-the-last-occurrence-in-string-with-multiple-occurrences">Keeping only the last occurrence in string with multiple occurrences</a></li>
+<li><a href="#dropping-everything-after-the-last-occurrence-in-string-with-multiple-occurrences" id="toc-dropping-everything-after-the-last-occurrence-in-string-with-multiple-occurrences">Dropping everything after the last occurrence in string with multiple occurrences</a></li>
+<li><a href="#splitting-and-pulling-data-after-symbols." id="toc-splitting-and-pulling-data-after-symbols.">Splitting and pulling data after symbols.</a></li>
+<li><a href="#remove-commas-and-convert-string-to-numeric" id="toc-remove-commas-and-convert-string-to-numeric">Remove commas and convert string to numeric</a></li>
+<li><a href="#add-commas-and-convert-numeric-to-string" id="toc-add-commas-and-convert-numeric-to-string">Add commas and convert numeric to string</a></li>
+<li><a href="#pull-out-the-last-n-and-first-n-characters-in-string" id="toc-pull-out-the-last-n-and-first-n-characters-in-string">Pull out the last N and first N characters in string</a></li>
+<li><a href="#programmatically-inserting-a-line-break-every-n-spaces" id="toc-programmatically-inserting-a-line-break-every-n-spaces">Programmatically inserting a line break every N spaces</a></li>
+<li><a href="#adding-line-break-after-n-characters" id="toc-adding-line-break-after-n-characters">Adding line break after N characters</a></li>
+<li><a href="#counting-words-in-a-string" id="toc-counting-words-in-a-string">Counting words in a string</a></li>
+<li><a href="#removing-trailing-and-leading-punctuation" id="toc-removing-trailing-and-leading-punctuation">Removing trailing and leading punctuation</a></li>
+<li><a href="#efficiently-converting-all-versions-of-a-word" id="toc-efficiently-converting-all-versions-of-a-word">Efficiently converting all versions of a word</a></li>
+<li><a href="#splitting-words-on-space-or-other-character" id="toc-splitting-words-on-space-or-other-character">Splitting words on space or other character</a></li>
 </ul>
 </div>
 
@@ -103,22 +104,23 @@ str_sub(st, 1, 4)</code></pre>
 str_sub(st, 5, 10)</code></pre>
 <pre><code>## [1] &quot;string&quot;</code></pre>
 </div>
-<div id="programmatically-inserting-a-line-break-in-strings" class="section level1">
-<h1>Programmatically inserting a line break in strings</h1>
+<div id="programmatically-inserting-a-line-break-every-n-spaces" class="section level1">
+<h1>Programmatically inserting a line break every N spaces</h1>
 <p>Found this useful when working with lots of data and using a function to parse the data and plot using ggplot.</p>
-<pre class="r"><code>pacman::p_load(tidyverse)
-dat &lt;- tibble(a = c(&quot;Suburban (just outside of urban/metro area)&quot;, &quot;Small town (separate from suburban area, but within proximity)&quot;, 
-&quot;Rural (far from large urban area)&quot;, &quot;Urban (close to large metro area)&quot;, 
-&quot;Other&quot;),
-   val = 1:5)
+<pre class="r"><code>strfun &lt;- function(str, n) {gsub(paste0(&quot;([^ ]+( +[^ ]+){&quot;,n-1,&quot;}) +&quot;),
+                              &quot;\\1\n&quot;, str)}
 
-dat %&gt;% 
-  mutate(a = ifelse(str_count(a, &quot;\\S+&quot;) &gt; 6, 
-                      str_replace_all(a, word(a, str_count(a, &quot;\\S+&quot;)/2 + 1), 
-                                      paste0(&quot;\n&quot;, word(a, str_count(a, &quot;\\S+&quot;)/2  +1))), a)) %&gt;%
-  ggplot(aes(x = val, y = a)) + 
-  geom_point(col = &quot;blue&quot;) </code></pre>
-<p><img src="/post/2018-02-25-snippets-regular-expressions-regex_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+string &lt;- &quot;As he crossed toward the pharmacy at the corner he involuntarily turned his head because of a burst of light that had ricocheted from his temple...&quot;
+
+strfun(string, 8)</code></pre>
+<pre><code>## [1] &quot;As he crossed toward the pharmacy at the\ncorner he involuntarily turned his head because of\na burst of light that had ricocheted from\nhis temple...&quot;</code></pre>
+</div>
+<div id="adding-line-break-after-n-characters" class="section level1">
+<h1>Adding line break after N characters</h1>
+<pre class="r"><code>string &lt;- &quot;As he crossed toward the pharmacy at the corner he involuntarily turned his head because of a burst of light that had ricocheted from his temple...&quot;
+
+paste(strwrap(string, width = 80), collapse = &quot;\n&quot;)</code></pre>
+<pre><code>## [1] &quot;As he crossed toward the pharmacy at the corner he involuntarily turned his\nhead because of a burst of light that had ricocheted from his temple...&quot;</code></pre>
 </div>
 <div id="counting-words-in-a-string" class="section level1">
 <h1>Counting words in a string</h1>
